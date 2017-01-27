@@ -18,6 +18,13 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
             await ReplyAsync(echo);
         }
 
+        [Command("git"), Summary("Links to my GitLab page")]
+        [Alias("github", "gitlab")]
+        public async Task Git()
+        {
+            await ReplyAsync("http://git.argus.moe/serenity/SoraBot");
+        }
+
         //$lenny lenny -> ( ͡° ͜ʖ ͡°)
         [Command("lenny"), Summary("Posts a lenny face")]
         public async Task Lenny()
