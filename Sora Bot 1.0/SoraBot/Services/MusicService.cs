@@ -172,9 +172,9 @@ namespace Sora_Bot_1.SoraBot.Services
                         queue.RemoveAt(0);
                         queueDict.TryUpdate(Context.Guild.Id, queue);
                     }*/
-                    for (int i = 0; i < queue.Count; i++)
+                    for (int i = 0; i <= queue.Count; i++)
                     {
-                        string name = queue[i];
+                        string name = queue[0];
                         var ffmpeg = CreateStream(name);
                         audioStream_Token strToken;
                         if (audioStreamDict.ContainsKey(client))
