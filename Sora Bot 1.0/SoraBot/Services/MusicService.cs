@@ -176,7 +176,6 @@ namespace Sora_Bot_1.SoraBot.Services
                         queueDict.TryGetValue(Context.Guild.Id, out queue);
                         queue.Remove(name);
                         queueDict.TryUpdate(Context.Guild.Id, queue);
-
                     }
                 }
                 else
