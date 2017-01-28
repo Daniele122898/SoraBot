@@ -1,0 +1,7 @@
+# 28.1.2017
+ - Added Music queues
+ - Added Possiblity to Skip
+ - Added new compression for 1/10 of space needed
+ - Added dynamic prefix to show which prefix is used
+ - Added fun commands
+ - rewritten in discord.net 1.0
