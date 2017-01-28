@@ -43,22 +43,34 @@ namespace Sora_Bot_1.SoraBot.Modules.AudioModule
             await musicService.JoinChannel(channel, Context.Guild.Id);
         }
 
-        [Command("add")]
-        public async Task AddToQueue(string url)
+        [Command("add", RunMode = RunMode.Async), Summary("Adds selected song to Queue")]
+        public async Task AddToQueue([Summary("URL to add")] string url)
         {
             await musicService.AddQueue(url, Context);
         }
 
-        [Command("queue")]
+        [Command("skip"), Summary("Skip current song in queue")]
+        public async Task SkipQueue()
+        {
+            await musicService.SkipQueueEntry(Context);
+        }
+
+        [Command("list"), Summary("Shows a list of all songs in the Queue")]
+        public async Task List()
+        {
+            await musicService.QueueList(Context);
+        }
+
+        [Command("np"), Summary("Tells you which song is currently playing")]
+        public async Task NowPlaying()
+        {
+            await musicService.NowPlaying(Context);
+        }
+
+        [Command("play",RunMode = RunMode.Async), Summary("Plays the qurrent queue")]
         public async Task PlayQueue()
         {
             await musicService.PlayQueue(Context);
-        }
-
-        [Command("count")]
-        public async Task CountQueue()
-        {
-            await musicService.CountQueue(Context);
         }
         
         [Command("leave"), Summary("Leaves the voice channel in which the user is in or the one passed as an argument")]
@@ -75,11 +87,12 @@ namespace Sora_Bot_1.SoraBot.Modules.AudioModule
             await musicService.LeaveChannel(Context);
         }
 
+        /*
         [Command("play", RunMode = RunMode.Async), Summary("Plays a YT URL")]
         public async Task PlayMusic([Summary("URL to play")] string url)
         {
             await musicService.PlayMusic(url, Context);
-        }
+        }*/
 
         [Command("stop"), Summary("Stops the current Audioplayer")]
         public async Task StopMusic(IVoiceChannel channel = null)

@@ -14,14 +14,13 @@ namespace Sora_Bot_1.SoraBot.Core
 {
     public class CommandHandler
     {
-
         private DiscordSocketClient client;
         private CommandService commands;
         private DependencyMap map;
         private CommandHandler handler => this;
         private MusicService musicService;
         private ReminderService remService;
-        public static Dictionary<ulong, string> prefixDict= new Dictionary<ulong, string>();
+        public static Dictionary<ulong, string> prefixDict = new Dictionary<ulong, string>();
         private JsonSerializer jSerializer = new JsonSerializer();
 
         public async Task Install(DiscordSocketClient c)
@@ -40,12 +39,11 @@ namespace Sora_Bot_1.SoraBot.Core
             map.Add(handler);
             map.Add(commands);
             //map.Add(remService);
-                
+
             //Discover all of the commands in this assembly and load them
             await commands.AddModulesAsync(Assembly.GetEntryAssembly());
             //Hook the messagereceive event into our command handler
             client.MessageReceived += HandleCommand;
-            
         }
 
         private void InitializeLoader()
@@ -60,7 +58,7 @@ namespace Sora_Bot_1.SoraBot.Core
             {
                 using (JsonWriter writer = new JsonTextWriter(sw))
                 {
-                    jSerializer.Serialize(writer,prefixDict);
+                    jSerializer.Serialize(writer, prefixDict);
                 }
             }
         }
@@ -74,6 +72,18 @@ namespace Sora_Bot_1.SoraBot.Core
             else
             {
                 prefixDict.Add(ID, prefix);
+            }
+        }
+
+        public string GetPrefix(ulong ID)
+        {
+            if (prefixDict.ContainsKey(ID))
+            {
+                return prefixDict[ID];
+            }
+            else
+            {
+                return "$";
             }
         }
 
@@ -102,7 +112,7 @@ namespace Sora_Bot_1.SoraBot.Core
             var message = messageParam as SocketUserMessage;
             if (message == null) return;
 
-            
+
             //Create a command Context
             var context = new CommandContext(client, message);
 
@@ -112,9 +122,11 @@ namespace Sora_Bot_1.SoraBot.Core
             //create a number to track where the prefix ends and the command begins
             int argPos = 0;
             //Determine if the message is a command based on if it starts with ! or a mention prefix
-            if (!(message.HasStringPrefix(prefix, ref argPos) || message.HasMentionPrefix(client.CurrentUser, ref argPos)))
+            if (
+                !(message.HasStringPrefix(prefix, ref argPos) ||
+                  message.HasMentionPrefix(client.CurrentUser, ref argPos)))
                 return;
-            
+
             //Execute the command. (result does no indicate a return value
             // rather an object starting if the command executed successfully
             var result = await commands.ExecuteAsync(context, argPos, map);

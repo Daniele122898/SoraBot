@@ -94,7 +94,6 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
             var proc = System.Diagnostics.Process.GetCurrentProcess();
 
             DiscordSocketClient _client = Context.Client as DiscordSocketClient;
-
             Func<double, double> formatRamValue = d =>
             {
                 while (d > 1024)

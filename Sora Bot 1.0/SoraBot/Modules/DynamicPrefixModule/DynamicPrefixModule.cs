@@ -18,11 +18,18 @@ namespace Sora_Bot_1.SoraBot.Modules.DynamicPrefixModule
         }
 
         [Command("prefix"), Summary("Changes the prefix of the bot")]
-        public async Task ChangePrefix([Summary("Prefix to change to")] string prefix)
+        public async Task ChangePrefix([Summary("Prefix to change to")] string prefix = null)
         {
-            await ReplyAsync($"Prefix in this Guild was changed to `{prefix}`");
-            handler.UpdateDict(Context.Guild.Id, prefix);
-            handler.SaveDatabase();
+            if (prefix != null)
+            {
+                await ReplyAsync($"Prefix in this Guild was changed to `{prefix}`");
+                handler.UpdateDict(Context.Guild.Id, prefix);
+                handler.SaveDatabase();
+            }
+            else
+            {
+                await ReplyAsync($"Prefix for this Guild is `{handler.GetPrefix(Context.Guild.Id)}`");
+            }
         }
 
     }
