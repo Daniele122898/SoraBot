@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Discord.Commands;
@@ -19,6 +20,7 @@ namespace Sora_Bot_1.SoraBot.Core
         private DependencyMap map;
         private CommandHandler handler => this;
         private MusicService musicService;
+        private UserGuildUpdateService updateService;
         private ReminderService remService;
         public static Dictionary<ulong, string> prefixDict = new Dictionary<ulong, string>();
         private JsonSerializer jSerializer = new JsonSerializer();
@@ -29,6 +31,7 @@ namespace Sora_Bot_1.SoraBot.Core
             LoadDatabase();
             client = c;
 
+            updateService = new UserGuildUpdateService();
             musicService = new MusicService();
             //remService = new ReminderService();
 
@@ -38,12 +41,15 @@ namespace Sora_Bot_1.SoraBot.Core
             map.Add(musicService);
             map.Add(handler);
             map.Add(commands);
+            map.Add(updateService);
             //map.Add(remService);
 
             //Discover all of the commands in this assembly and load them
             await commands.AddModulesAsync(Assembly.GetEntryAssembly());
             //Hook the messagereceive event into our command handler
             client.MessageReceived += HandleCommand;
+            client.UserJoined += updateService.UserJoined;
+            client.UserLeft += updateService.UserLeft;
         }
 
         private void InitializeLoader()
@@ -101,7 +107,7 @@ namespace Sora_Bot_1.SoraBot.Core
             }
             else
             {
-                File.Create("guildPrefix.json");
+                File.Create("guildPrefix.json").Dispose();
             }
         }
 

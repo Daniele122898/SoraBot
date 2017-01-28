@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
@@ -18,7 +19,7 @@ namespace Sora_Bot_1.SoraBot.Core
         public async Task Run()
         {
             client = new DiscordSocketClient(new DiscordSocketConfig() {
-                LogLevel = LogSeverity.Debug    ,
+                LogLevel = LogSeverity.Debug,
                 AudioMode = AudioMode.Outgoing
             });
 
@@ -28,7 +29,7 @@ namespace Sora_Bot_1.SoraBot.Core
             };
 
             //Place the token of your bot account here
-            string token = "MjcwOTMxMjg0NDg5MDExMjAy.C2VvCw.VHmnIh_OPACTdmwSZFD_5JeRa-E";
+            string token = File.ReadAllText("token.txt");
 
             /*
         //Hook into the messagereceuved event on DiscordSocketclient
