@@ -15,8 +15,8 @@ using Sora_Bot_1.SoraBot.Services;
 
 namespace Sora_Bot_1.SoraBot.Modules.AudioModule
 {
-    [Group("music")]
-    [Alias("m")]
+    //[Group("music")]
+    //[Alias("m")]
     public class AudioModule : ModuleBase
     {
         
@@ -49,7 +49,7 @@ namespace Sora_Bot_1.SoraBot.Modules.AudioModule
             await musicService.AddQueue(url, Context);
         }
 
-        [Command("skip"), Summary("Skip current song in queue")]
+        [Command("skip", RunMode = RunMode.Async), Summary("Skip current song in queue")]
         public async Task SkipQueue()
         {
             await musicService.SkipQueueEntry(Context);

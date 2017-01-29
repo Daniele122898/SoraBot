@@ -56,26 +56,32 @@ namespace Sora_Bot_1.SoraBot.Services
         {
             var msg =
                 await Context.Channel.SendMessageAsync(":arrows_counterclockwise: Downloading and Adding to Queue...");
-            string name = await Download(url, msg, Context);
-            if (!name.Equals("f"))
+            if (url.Contains("youtube.com/watch?v="))
             {
-                List<string> tempList = new List<string>();
-                if (queueDict.ContainsKey(Context.Guild.Id))
+                string name = await Download(url, msg, Context);
+                if (!name.Equals("f"))
                 {
-                    queueDict.TryGetValue(Context.Guild.Id, out tempList);
-                    tempList.Add(name);
-                    queueDict.TryUpdate(Context.Guild.Id, tempList);
+                    List<string> tempList = new List<string>();
+                    if (queueDict.ContainsKey(Context.Guild.Id))
+                    {
+                        queueDict.TryGetValue(Context.Guild.Id, out tempList);
+                        tempList.Add(name);
+                        queueDict.TryUpdate(Context.Guild.Id, tempList);
+                    }
+                    else
+                    {
+                        tempList.Add(name);
+                        queueDict.TryAdd(Context.Guild.Id, tempList);
+                    }
+                    //await Context.Channel.SendMessageAsync(":musical_note: Successfully Downloaded. Will play shortly");
                 }
-                else
-                {
-                    tempList.Add(name);
-                    queueDict.TryAdd(Context.Guild.Id, tempList);
-                }
-                //await Context.Channel.SendMessageAsync(":musical_note: Successfully Downloaded. Will play shortly");
             }
             else
             {
-                await Context.Channel.SendMessageAsync(":no_entry_sign: failed");
+                await msg.ModifyAsync(x =>
+                {
+                    x.Content = ":no_entry_sign: Must be a valid Youtube link!";
+                });
             }
         }
 
@@ -125,6 +131,7 @@ namespace Sora_Bot_1.SoraBot.Services
                     if (queue.Count == 0)
                     {
                         await Context.Channel.SendMessageAsync(":track_next: Queue is now empty!");
+                        await StopMusic(Context);
                     }
                     else
                     {
@@ -232,7 +239,12 @@ namespace Sora_Bot_1.SoraBot.Services
                     {
                         var eb = new EmbedBuilder()
                         {
-                            Color = new Color(4, 97, 247)
+                            Color = new Color(4, 97, 247),
+                            Footer = new EmbedFooterBuilder()
+                            {
+                                Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
+                                IconUrl = Context.User.AvatarUrl
+                            }
                         };
 
                         eb.Title = "Queue List";
@@ -248,10 +260,11 @@ namespace Sora_Bot_1.SoraBot.Services
                             efb.IsInline = true;
                             efb.Value = titleT;
                         });
+
                         eb.AddField((efb) =>
                         {
-                        efb.Name = "Queue";
-                        efb.IsInline = true;
+                            efb.Name = "Queue";
+                            efb.IsInline = false;
                             for (int i = 1; i < queue.Count; i++)
                             {
                                 var infoJson = File.ReadAllText($"{queue[i]}.info.json");
@@ -261,6 +274,10 @@ namespace Sora_Bot_1.SoraBot.Services
                             
                                 efb.Value += $"{i}. {title} \n";
                             
+                            }
+                            if (queue.Count == 1)
+                            {
+                                efb.Value = "No Songs in Queue";
                             }
                         });
 
@@ -297,7 +314,12 @@ namespace Sora_Bot_1.SoraBot.Services
 
                     var eb = new EmbedBuilder()
                     {
-                        Color = new Color(4, 97, 247)
+                        Color = new Color(4, 97, 247),
+                        Footer = new EmbedFooterBuilder()
+                        {
+                            Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
+                            IconUrl = Context.User.AvatarUrl
+                        }
                     };
 
                     eb.AddField((efb) =>
@@ -351,7 +373,7 @@ namespace Sora_Bot_1.SoraBot.Services
             bool stream = false;
             string[] id = new string[2];
             string[] idL = path.Split('=');
-            if (!path.Equals("random") && !path.Equals("rand") && idL[1] != null)
+            if (idL[1] != null)
             {
                 if (idL[1].Contains("&"))
                 {
@@ -360,7 +382,13 @@ namespace Sora_Bot_1.SoraBot.Services
                 }
                 id[1] = idL[1];
             }
-
+            else
+            {
+                await msg.ModifyAsync(
+                        x => { x.Content = ":musical_note: Not a Valid link!"; });
+                return "f";
+            }
+            /*
             if (path.Equals("random") || path.Equals("rand"))
             {
                 if (songDataBase.Count < 1)
@@ -373,13 +401,15 @@ namespace Sora_Bot_1.SoraBot.Services
                     Random rand = new Random();
                     int index = rand.Next(songDataBase.Count);
                     id[1] = "" + songDataBase[index];
+                    path = "https://www.youtube.com/watch?v=" + id[1];
                 }
-            }
+            }*/
 
             // Create FFmpeg using the previous example
+            Process ytdl = new Process();
             if (!File.Exists(id[1] + ".mp3"))
             {
-                var ytdl = YtDl(path);
+                ytdl = YtDl(path);
             }
 
             if (id[1] != null)
@@ -388,6 +418,11 @@ namespace Sora_Bot_1.SoraBot.Services
                 stopwatch.Start();
                 while (!File.Exists(id[1] + ".mp3") && stopwatch.ElapsedMilliseconds < 30000)
                 {
+                    if (ytdl != null)
+                    {
+                        if (ytdl.HasExited)
+                            break;
+                    }
                 }
                 if (File.Exists(id[1] + ".mp3"))
                 {

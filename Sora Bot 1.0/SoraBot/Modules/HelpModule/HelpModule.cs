@@ -70,7 +70,12 @@ namespace Sora_Bot_1.SoraBot.Modules.HelpModule
                                         $"{current}{(c.Aliases.ElementAt(0) == alias ? string.Empty : ", ")}{alias}") +
                                 "\n\n**Parameters** ",
                                 (current, cmd) =>
-                                    $"{current}\n{cmd.Name} {(cmd.IsOptional ? "(optional)" : "")}: {cmd.Summary}");
+                                    $"{current}\n{cmd.Name} {(cmd.IsOptional ? "(optional)" : "")}: {cmd.Summary}") +
+                            "\n\n**Permissions**\n";
+                        if (c.Preconditions.Count > 0)
+                        {
+                            efb.Value += "Manage Guild";
+                        }
                     });
                     found = true;
                 }

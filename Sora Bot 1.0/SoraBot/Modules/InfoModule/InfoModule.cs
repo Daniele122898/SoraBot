@@ -59,7 +59,12 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
 
             var eb = new EmbedBuilder()
             {
-                Color = new Color(4, 97, 247)
+                Color = new Color(4, 97, 247),
+                Footer = new EmbedFooterBuilder()
+                {
+                    Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
+                    IconUrl = Context.User.AvatarUrl
+                }
             };
 
             
@@ -113,15 +118,21 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
             var eb = new EmbedBuilder()
             {
                 Color = new Color(4, 97, 247),
-                ThumbnailUrl = userInfo.AvatarUrl
+                ThumbnailUrl = userInfo.AvatarUrl,
+                Footer = new EmbedFooterBuilder()
+                {
+                 Text   = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
+                 IconUrl = Context.User.AvatarUrl
+                }
             };
             eb.AddField((efb) =>
             {
-                efb.Name = "User";
+                efb.Name = "User Info";
                 efb.IsInline = true;
-                efb.Value = $"Name + Discriminator: {userInfo.Username}#{userInfo.Discriminator} \n" +
-                            $"Created at: {userInfo.CreatedAt} \n" +
-                            $"Status: {userInfo.Status}";
+                efb.Value = $"**Name + Discriminator:** \t{userInfo.Username}#{userInfo.Discriminator} \n" +
+                            $"**Created at:** \t{userInfo.CreatedAt.ToString().Remove(userInfo.CreatedAt.ToString().Length -6)} \n" +
+                            $"**Status:** \t{userInfo.Status}\n" +
+                            $"**Avatar:** \t[Link]({userInfo.AvatarUrl})";
             });
 
             await Context.Channel.SendMessageAsync("", false, eb);
@@ -134,7 +145,12 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
             var eb = new EmbedBuilder()
             {
                 Color = new Color(4, 97, 247),
-                ThumbnailUrl = Context.Guild.IconUrl
+                ThumbnailUrl = Context.Guild.IconUrl,
+                Footer = new EmbedFooterBuilder()
+                {
+                    Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
+                    IconUrl = Context.User.AvatarUrl
+                }
             };
 
             var GuildOwner = await Context.Guild.GetUserAsync(Context.Guild.OwnerId);
@@ -143,9 +159,9 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
             {
                 efb.Name = "Guild";
                 efb.IsInline = true;
-                efb.Value = $"Name: {Context.Guild.Name} \n" + $"ID: {Context.Guild.Id}\n" + $"Owner: {GuildOwner}\n" +
-                            $"Voice Region ID: {Context.Guild.VoiceRegionId}\n" +
-                            $"Created At: {Context.Guild.CreatedAt}";
+                efb.Value = $"**Name:** \t{Context.Guild.Name} \n" + $"**ID:** \t{Context.Guild.Id}\n" + $"**Owner:** \t{GuildOwner}\n" +
+                            $"**Voice Region ID:** \t{Context.Guild.VoiceRegionId}\n" +
+                            $"**Created At:** \t{Context.Guild.CreatedAt.ToString().Remove(Context.Guild.CreatedAt.ToString().Length - 6)}";
             });
 
             await Context.Channel.SendMessageAsync("", false, eb);
