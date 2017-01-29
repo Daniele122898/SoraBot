@@ -22,6 +22,7 @@ namespace Sora_Bot_1.SoraBot.Core
         private MusicService musicService;
         private UserGuildUpdateService updateService;
         private ReminderService remService;
+        private PlayingWith playingWith;
         public static Dictionary<ulong, string> prefixDict = new Dictionary<ulong, string>();
         private JsonSerializer jSerializer = new JsonSerializer();
 
@@ -35,8 +36,11 @@ namespace Sora_Bot_1.SoraBot.Core
             musicService = new MusicService();
             //remService = new ReminderService();
 
+            playingWith = new PlayingWith(client);
+
             commands = new CommandService();
             map = new DependencyMap();
+
 
             map.Add(musicService);
             map.Add(handler);
@@ -122,9 +126,14 @@ namespace Sora_Bot_1.SoraBot.Core
             //Create a command Context
             var context = new CommandContext(client, message);
 
+            if(context.IsPrivate)
+                return;
+
             string prefix;
             if (!prefixDict.TryGetValue(context.Guild.Id, out prefix))
+            {
                 prefix = "$";
+            }
             //create a number to track where the prefix ends and the command begins
             int argPos = 0;
             //Determine if the message is a command based on if it starts with ! or a mention prefix

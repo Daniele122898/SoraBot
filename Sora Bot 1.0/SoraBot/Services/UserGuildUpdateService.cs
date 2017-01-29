@@ -31,7 +31,7 @@ namespace Sora_Bot_1.SoraBot.Services
             ulong channelID;
             if (updateChannelPreferenceDict.TryGetValue(user.Guild.Id, out channelID))
             {
-                await (user.Guild.GetChannel(channelID) as IMessageChannel).SendMessageAsync($"{user.Username} has left us :frowning:");
+                await (user.Guild.GetChannel(channelID) as IMessageChannel).SendMessageAsync($"`{user.Username}` has left us :frowning:");
             }
         }
 
@@ -40,7 +40,7 @@ namespace Sora_Bot_1.SoraBot.Services
             ulong channelID;
             if (updateChannelPreferenceDict.TryGetValue(user.Guild.Id, out channelID))
             {
-                await (user.Guild.GetChannel(channelID) as IMessageChannel).SendMessageAsync($"Welcome {user.Mention} to {user.Guild.Name}!");
+                await (user.Guild.GetChannel(channelID) as IMessageChannel).SendMessageAsync($"Welcome {user.Mention} to *{user.Guild.Name}*!");
             }
         }
 

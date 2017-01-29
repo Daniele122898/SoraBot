@@ -19,7 +19,7 @@ namespace Sora_Bot_1.SoraBot.Core
         public async Task Run()
         {
             client = new DiscordSocketClient(new DiscordSocketConfig() {
-                LogLevel = LogSeverity.Debug,
+                LogLevel = LogSeverity.Info,
                 AudioMode = AudioMode.Outgoing
             });
 

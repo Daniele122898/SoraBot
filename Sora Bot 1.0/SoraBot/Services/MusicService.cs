@@ -598,6 +598,12 @@ namespace Sora_Bot_1.SoraBot.Services
             {
                 File.Create("songDatabase.json");
             }
+
+            
+        }
+        public int PlayingFor()
+        {
+            return audioDict.Count;
         }
     } // CLASS
 

@@ -38,11 +38,14 @@ namespace Sora_Bot_1.SoraBot.Modules.HelpModule
 
                 foreach (var c in service.Commands)
                 {
-                    eb.AddField((efb) =>
+                    if (!c.Module.Aliases.FirstOrDefault().Equals("o"))
                     {
-                        efb.Name = c.Module.Aliases.FirstOrDefault() + " " + c.Name;
-                        efb.Value = c.Summary ?? "No specific description";
-                    });
+                        eb.AddField((efb) =>
+                        {
+                            efb.Name = c.Module.Aliases.FirstOrDefault() + " " + c.Name;
+                            efb.Value = c.Summary ?? "No specific description";
+                        });
+                    }
                 }
             }
             else
