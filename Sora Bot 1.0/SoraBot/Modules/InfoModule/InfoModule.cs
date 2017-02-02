@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Discord;
+using System.Runtime.InteropServices;
 using Discord.Commands;
 using Discord.WebSocket;
 using Sora_Bot_1.SoraBot.Core;
@@ -60,6 +61,7 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
             var eb = new EmbedBuilder()
             {
                 Color = new Color(4, 97, 247),
+                ThumbnailUrl = Context.Client.CurrentUser.AvatarUrl,
                 Footer = new EmbedFooterBuilder()
                 {
                     Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
@@ -74,14 +76,15 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
             {
                 efb.Name = "System";
                 efb.IsInline = true;
-                efb.Value = $"os version:\t{System.Runtime.InteropServices.RuntimeInformation.OSDescription}\narchitecture:\t{System.Runtime.InteropServices.RuntimeInformation.OSArchitecture}\nframework:\t{System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription}";
+                efb.Value =
+                        $"**OS version:**\t{(RuntimeInformation.OSDescription.Length >= 37 ? RuntimeInformation.OSDescription.Remove(37) : RuntimeInformation.OSDescription)}\n**Architecture:**\t{RuntimeInformation.OSArchitecture}\n**Framework:**\t{RuntimeInformation.FrameworkDescription}";
             });
 
             eb.AddField((efb) =>
             {
                 efb.Name = "Sora";
                 efb.IsInline = true;
-                efb.Value = $"architecture:\t{System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture}\nup time:\t{(DateTime.Now - proc.StartTime).ToString(@"d'd 'hh\:mm\:ss")}\nmemory:\t{formatRamValue(proc.PagedMemorySize64).ToString("f2")} {formatRamUnit(proc.PagedMemorySize64)}\nprocessor time:\t{proc.TotalProcessorTime.ToString(@"d'd 'hh\:mm\:ss")}";
+                efb.Value = $"**Architecture:**\t{RuntimeInformation.ProcessArchitecture}\n**Up time:**\t{(DateTime.Now - proc.StartTime).ToString(@"d'd 'hh\:mm\:ss")}\n**Memory:**\t{formatRamValue(proc.PagedMemorySize64).ToString("f2")} {formatRamUnit(proc.PagedMemorySize64)}\n**Processor time:**\t{proc.TotalProcessorTime.ToString(@"d'd 'hh\:mm\:ss")}";
             });
 
             eb.AddField((efb) =>
@@ -97,7 +100,7 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                     userCount += g.Users.Count;
                 }
 
-                efb.Value = $"state:\t{_client.ConnectionState}\nguilds:\t{_client.Guilds.Count}\nchannels:\t{channelCount}\nusers:\t{userCount}\nplaying music for: \t{musicService.PlayingFor()}\nping:\t{_client.Latency} ms";
+                efb.Value = $"**State:**\t{_client.ConnectionState}\n**Guilds:**\t{_client.Guilds.Count}\n**Channels:**\t{channelCount}\n**Users:**\t{userCount}\n**Playing music for:** \t{musicService.PlayingFor()} guilds\n**Ping:**\t{_client.Latency} ms";
             });
             
             await Context.Channel.SendMessageAsync("", false, eb);
@@ -130,6 +133,7 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                 efb.Name = "User Info";
                 efb.IsInline = true;
                 efb.Value = $"**Name + Discriminator:** \t{userInfo.Username}#{userInfo.Discriminator} \n" +
+                            $"**ID** \t{userInfo.Id}\n" +
                             $"**Created at:** \t{userInfo.CreatedAt.ToString().Remove(userInfo.CreatedAt.ToString().Length -6)} \n" +
                             $"**Status:** \t{userInfo.Status}\n" +
                             $"**Avatar:** \t[Link]({userInfo.AvatarUrl})";

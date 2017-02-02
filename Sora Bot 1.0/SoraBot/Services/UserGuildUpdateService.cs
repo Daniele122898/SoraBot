@@ -63,6 +63,7 @@ namespace Sora_Bot_1.SoraBot.Services
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
             }
         }
 
@@ -84,31 +85,48 @@ namespace Sora_Bot_1.SoraBot.Services
 
         private void SaveDatabase()
         {
-            using (StreamWriter sw = File.CreateText(@"AnnouncementChannels.json"))
+            try
             {
-                using (JsonWriter writer = new JsonTextWriter(sw))
+                using (StreamWriter sw = File.CreateText(@"AnnouncementChannels.json"))
                 {
-                    jSerializer.Serialize(writer, updateChannelPreferenceDict);
+                    using (JsonWriter writer = new JsonTextWriter(sw))
+                    {
+                        jSerializer.Serialize(writer, updateChannelPreferenceDict);
+                    }
                 }
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                SentryService.SendError(e);
+            }
+            
         }
 
         private void LoadDatabase()
         {
-            if (File.Exists("AnnouncementChannels.json"))
+            try
             {
-                using (StreamReader sr = File.OpenText(@"AnnouncementChannels.json"))
+                if (File.Exists("AnnouncementChannels.json"))
                 {
-                    using (JsonReader reader = new JsonTextReader(sr))
+                    using (StreamReader sr = File.OpenText(@"AnnouncementChannels.json"))
                     {
-                        updateChannelPreferenceDict =
-                            jSerializer.Deserialize<ConcurrentDictionary<ulong, ulong>>(reader);
+                        using (JsonReader reader = new JsonTextReader(sr))
+                        {
+                            updateChannelPreferenceDict =
+                                jSerializer.Deserialize<ConcurrentDictionary<ulong, ulong>>(reader);
+                        }
                     }
                 }
+                else
+                {
+                    File.Create("AnnouncementChannels.json").Dispose();
+                }
             }
-            else
+            catch (Exception e)
             {
-                File.Create("AnnouncementChannels.json").Dispose();
+                Console.WriteLine(e);
+                SentryService.SendError(e);
             }
         }
 

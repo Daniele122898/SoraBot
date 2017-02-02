@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Newtonsoft.Json;
@@ -31,12 +32,13 @@ namespace Sora_Bot_1.SoraBot.Core
             InitializeLoader();
             LoadDatabase();
             client = c;
-
             updateService = new UserGuildUpdateService();
             musicService = new MusicService();
             //remService = new ReminderService();
 
             playingWith = new PlayingWith(client);
+            SentryService.client = client;
+            SentryService.Install();
 
             commands = new CommandService();
             map = new DependencyMap();
@@ -126,6 +128,7 @@ namespace Sora_Bot_1.SoraBot.Core
             //Create a command Context
             var context = new CommandContext(client, message);
 
+
             if(context.IsPrivate)
                 return;
 
@@ -135,7 +138,7 @@ namespace Sora_Bot_1.SoraBot.Core
                 prefix = "$";
             }
             //create a number to track where the prefix ends and the command begins
-            int argPos = 0;
+            int argPos = prefix.Length-1;
             //Determine if the message is a command based on if it starts with ! or a mention prefix
             if (
                 !(message.HasStringPrefix(prefix, ref argPos) ||

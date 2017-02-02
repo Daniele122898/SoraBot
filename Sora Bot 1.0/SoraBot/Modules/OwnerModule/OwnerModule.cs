@@ -53,5 +53,23 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
             await updateService.RemoveChannel(Context);
         }
         //END ANNOUNCEMENTS
+
+        //CREATE EXCEPTION
+
+        [Command("exc")]
+        [RequireOwner]
+        public async Task CreateException()
+        {
+            try
+            {
+                int i2 = 0;
+                int i = 10 / i2;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
+        }
     }
 }

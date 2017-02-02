@@ -28,9 +28,6 @@ namespace Sora_Bot_1.SoraBot.Services
 
         private ConcurrentDictionary<ulong, List<string>> queueDict = new ConcurrentDictionary<ulong, List<string>>();
 
-        private List<string> songDataBase = new List<string>();
-        private JsonSerializer jSerializer = new JsonSerializer();
-
 
         public async Task JoinChannel(IVoiceChannel channel, ulong guildID)
         {
@@ -41,104 +38,135 @@ namespace Sora_Bot_1.SoraBot.Services
 
         public async Task LeaveChannel(CommandContext Context)
         {
-            IAudioClient aClient;
-            audioDict.TryGetValue(Context.Guild.Id, out aClient);
-            if (aClient == null)
+            try
             {
-                await Context.Channel.SendMessageAsync("Bot is not connected to any Voice Channels");
-                return;
+                IAudioClient aClient;
+                audioDict.TryGetValue(Context.Guild.Id, out aClient);
+                if (aClient == null)
+                {
+                    await Context.Channel.SendMessageAsync("Bot is not connected to any Voice Channels");
+                    return;
+                }
+                await aClient.DisconnectAsync();
+                audioDict.TryRemove(Context.Guild.Id, out aClient);
             }
-            await aClient.DisconnectAsync();
-            audioDict.TryRemove(Context.Guild.Id, out aClient);
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
         }
 
         public async Task AddQueue(string url, CommandContext Context)
         {
-            var msg =
-                await Context.Channel.SendMessageAsync(":arrows_counterclockwise: Downloading and Adding to Queue...");
-            if (url.Contains("youtube.com/watch?v="))
+            try
             {
-                string name = await Download(url, msg, Context);
-                if (!name.Equals("f"))
+                var msg =
+                    await Context.Channel.SendMessageAsync(
+                        ":arrows_counterclockwise: Downloading and Adding to Queue...");
+                if (url.Contains("youtube.com/watch?v="))
                 {
-                    List<string> tempList = new List<string>();
-                    if (queueDict.ContainsKey(Context.Guild.Id))
+                    string name = await Download(url, msg, Context);
+                    if (!name.Equals("f"))
                     {
-                        queueDict.TryGetValue(Context.Guild.Id, out tempList);
-                        tempList.Add(name);
-                        queueDict.TryUpdate(Context.Guild.Id, tempList);
+                        List<string> tempList = new List<string>();
+                        if (queueDict.ContainsKey(Context.Guild.Id))
+                        {
+                            queueDict.TryGetValue(Context.Guild.Id, out tempList);
+                            tempList.Add(name);
+                            queueDict.TryUpdate(Context.Guild.Id, tempList);
+                        }
+                        else
+                        {
+                            tempList.Add(name);
+                            queueDict.TryAdd(Context.Guild.Id, tempList);
+                        }
+                        //await Context.Channel.SendMessageAsync(":musical_note: Successfully Downloaded. Will play shortly");
                     }
-                    else
-                    {
-                        tempList.Add(name);
-                        queueDict.TryAdd(Context.Guild.Id, tempList);
-                    }
-                    //await Context.Channel.SendMessageAsync(":musical_note: Successfully Downloaded. Will play shortly");
+                }
+                else
+                {
+                    await msg.ModifyAsync(x => { x.Content = ":no_entry_sign: Must be a valid Youtube link!"; });
                 }
             }
-            else
+            catch (Exception e)
             {
-                await msg.ModifyAsync(x =>
-                {
-                    x.Content = ":no_entry_sign: Must be a valid Youtube link!";
-                });
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
             }
         }
 
         public async Task PlayQueue(CommandContext Context)
         {
-            IAudioClient client;
-            if (!audioDict.TryGetValue(Context.Guild.Id, out client))
+            try
             {
-                await Context.Channel.SendMessageAsync(":no_entry_sign: Bot must first join a Voice Channel!");
+                IAudioClient client;
+                if (!audioDict.TryGetValue(Context.Guild.Id, out client))
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: Bot must first join a Voice Channel!");
+                }
+                else
+                {
+                    PlayQueueAsync(client, Context);
+                }
             }
-            else
+            catch (Exception e)
             {
-                PlayQueueAsync(client, Context);
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
             }
         }
 
         public async Task SkipQueueEntry(CommandContext Context)
         {
-            IAudioClient client;
-            if (!audioDict.TryGetValue(Context.Guild.Id, out client))
+            try
             {
-                List<string> queue = new List<string>();
-                if (!queueDict.TryGetValue(Context.Guild.Id, out queue))
+                IAudioClient client;
+                if (!audioDict.TryGetValue(Context.Guild.Id, out client))
                 {
-                    await Context.Channel.SendMessageAsync(
-                        ":no_entry_sign: You first have to create a Queue by adding atleast one song!");
-                }
-                else
-                {
-                    queue.RemoveAt(0);
-                    queueDict.TryUpdate(Context.Guild.Id, queue);
-                    await Context.Channel.SendMessageAsync(":track_next: Skipped first entry in Queue");
-                }
-            }
-            else
-            {
-                List<string> queue = new List<string>();
-                if (!queueDict.TryGetValue(Context.Guild.Id, out queue))
-                {
-                    await Context.Channel.SendMessageAsync(
-                        ":no_entry_sign: You first have to create a Queue by adding atleast one song!");
-                }
-                else
-                {
-                    queue.RemoveAt(0);
-                    queueDict.TryUpdate(Context.Guild.Id, queue);
-                    if (queue.Count == 0)
+                    List<string> queue = new List<string>();
+                    if (!queueDict.TryGetValue(Context.Guild.Id, out queue))
                     {
-                        await Context.Channel.SendMessageAsync(":track_next: Queue is now empty!");
-                        await StopMusic(Context);
+                        await Context.Channel.SendMessageAsync(
+                            ":no_entry_sign: You first have to create a Queue by adding atleast one song!");
                     }
                     else
                     {
-                        PlayQueueAsync(client, Context);
-                        await Context.Channel.SendMessageAsync(":track_next: Skipped first entry in Queue and started playing next song!");
+                        queue.RemoveAt(0);
+                        queueDict.TryUpdate(Context.Guild.Id, queue);
+                        await Context.Channel.SendMessageAsync(":track_next: Skipped first entry in Queue");
                     }
                 }
+                else
+                {
+                    List<string> queue = new List<string>();
+                    if (!queueDict.TryGetValue(Context.Guild.Id, out queue))
+                    {
+                        await Context.Channel.SendMessageAsync(
+                            ":no_entry_sign: You first have to create a Queue by adding atleast one song!");
+                    }
+                    else
+                    {
+                        queue.RemoveAt(0);
+                        queueDict.TryUpdate(Context.Guild.Id, queue);
+                        if (queue.Count == 0)
+                        {
+                            await Context.Channel.SendMessageAsync(":track_next: Queue is now empty!");
+                            await StopMusic(Context);
+                        }
+                        else
+                        {
+                            PlayQueueAsync(client, Context);
+                            await Context.Channel.SendMessageAsync(
+                                ":track_next: Skipped first entry in Queue and started playing next song!");
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
             }
         }
 
@@ -193,6 +221,7 @@ namespace Sora_Bot_1.SoraBot.Services
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
             }
         }
 
@@ -215,17 +244,40 @@ namespace Sora_Bot_1.SoraBot.Services
 
         public async Task StopMusic(CommandContext Context)
         {
-            IAudioClient client;
-            audioDict.TryGetValue(Context.Guild.Id, out client);
+            try
+            {
+                if (audioDict.ContainsKey(Context.Guild.Id))
+                {
+                    IAudioClient client;
+                    audioDict.TryGetValue(Context.Guild.Id, out client);
 
-            audioStream_Token strAT;
-            audioStreamDict.TryGetValue(client, out strAT);
+                    if (audioStreamDict.ContainsKey(client))
+                    {
+                        audioStream_Token strAT;
+                        audioStreamDict.TryGetValue(client, out strAT);
 
-            strAT.tokenSource.Cancel();
-            strAT.tokenSource.Dispose();
-            strAT.tokenSource = new CancellationTokenSource();
-            strAT.token = strAT.tokenSource.Token;
-            audioStreamDict.TryUpdate(client, strAT);
+                        strAT.tokenSource.Cancel();
+                        strAT.tokenSource.Dispose();
+                        strAT.tokenSource = new CancellationTokenSource();
+                        strAT.token = strAT.tokenSource.Token;
+                        audioStreamDict.TryUpdate(client, strAT);
+                        await Context.Channel.SendMessageAsync(":stop_button: Stopped the Music Playback!");
+                    }
+                    else
+                    {
+                        await Context.Channel.SendMessageAsync(":no_entry_sign: Currently not playing anything!");
+                    }
+                }
+                else
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: I dind't even join a Channel yet!");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
         }
 
         public async Task QueueList(CommandContext Context)
@@ -271,9 +323,8 @@ namespace Sora_Bot_1.SoraBot.Services
                                 var info = JObject.Parse(infoJson);
 
                                 var title = info["fulltitle"].ToString();
-                            
+
                                 efb.Value += $"{i}. {title} \n";
-                            
                             }
                             if (queue.Count == 1)
                             {
@@ -286,6 +337,7 @@ namespace Sora_Bot_1.SoraBot.Services
                     catch (Exception e)
                     {
                         Console.WriteLine(e);
+                        await SentryService.SendError(e, Context);
                     }
                 }
                 else
@@ -302,44 +354,52 @@ namespace Sora_Bot_1.SoraBot.Services
 
         public async Task NowPlaying(CommandContext Context)
         {
-            List<string> queue = new List<string>();
-            if (queueDict.TryGetValue(Context.Guild.Id, out queue))
+            try
             {
-                if (queue.Count != 0)
+                List<string> queue = new List<string>();
+                if (queueDict.TryGetValue(Context.Guild.Id, out queue))
                 {
-                    var infoJson = File.ReadAllText($"{queue[0]}.info.json");
-                    var info = JObject.Parse(infoJson);
-
-                    var title = info["fulltitle"];
-
-                    var eb = new EmbedBuilder()
+                    if (queue.Count != 0)
                     {
-                        Color = new Color(4, 97, 247),
-                        Footer = new EmbedFooterBuilder()
+                        var infoJson = File.ReadAllText($"{queue[0]}.info.json");
+                        var info = JObject.Parse(infoJson);
+
+                        var title = info["fulltitle"];
+
+                        var eb = new EmbedBuilder()
                         {
-                            Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
-                            IconUrl = Context.User.AvatarUrl
-                        }
-                    };
+                            Color = new Color(4, 97, 247),
+                            Footer = new EmbedFooterBuilder()
+                            {
+                                Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
+                                IconUrl = Context.User.AvatarUrl
+                            }
+                        };
 
-                    eb.AddField((efb) =>
+                        eb.AddField((efb) =>
+                        {
+                            efb.Name = "Now playing";
+                            efb.IsInline = true;
+                            efb.Value = title.ToString();
+                        });
+
+                        await Context.Channel.SendMessageAsync("", false, eb);
+                    }
+                    else
                     {
-                        efb.Name = "Now playing";
-                        efb.IsInline = true;
-                        efb.Value = title.ToString();
-                    });
-
-                    await Context.Channel.SendMessageAsync("", false, eb);
+                        await Context.Channel.SendMessageAsync(":no_entry_sign: Queue is empty!");
+                    }
                 }
                 else
                 {
-                    await Context.Channel.SendMessageAsync(":no_entry_sign: Queue is empty!");
+                    await Context.Channel.SendMessageAsync(
+                        ":no_entry_sign: You first have to create a Queue by adding atleast one song!");
                 }
             }
-            else
+            catch (Exception e)
             {
-                await Context.Channel.SendMessageAsync(
-                    ":no_entry_sign: You first have to create a Queue by adding atleast one song!");
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
             }
         }
 
@@ -362,7 +422,21 @@ namespace Sora_Bot_1.SoraBot.Services
             var ytdl = new ProcessStartInfo
             {
                 FileName = "youtube-dl",
-                Arguments = $"-i -x --no-playlist --max-filesize 100m --audio-format mp3 --audio-quality 0 --id {path} --write-info-json"
+                Arguments =
+                    $"-i -x --no-playlist --max-filesize 100m --audio-format mp3 --audio-quality 0 --id {path} --write-info-json"
+            };
+            return Process.Start(ytdl);
+        }
+
+        private Process CheckerYtDl(string path)
+        {
+            var ytdl = new ProcessStartInfo
+            {
+                FileName = "youtube-dl",
+                Arguments =
+                    $"-J --flat-playlist {path}",
+                RedirectStandardOutput = true,
+                UseShellExecute = false
             };
             return Process.Start(ytdl);
         }
@@ -385,7 +459,7 @@ namespace Sora_Bot_1.SoraBot.Services
             else
             {
                 await msg.ModifyAsync(
-                        x => { x.Content = ":musical_note: Not a Valid link!"; });
+                    x => { x.Content = ":musical_note: Not a Valid link!"; });
                 return "f";
             }
             /*
@@ -407,9 +481,36 @@ namespace Sora_Bot_1.SoraBot.Services
 
             // Create FFmpeg using the previous example
             Process ytdl = new Process();
+            Process ytdlChecker = new Process();
             if (!File.Exists(id[1] + ".mp3"))
             {
-                ytdl = YtDl(path);
+                try
+                {
+                    ytdlChecker = CheckerYtDl(path);
+                    ytdlChecker.ErrorDataReceived += (x, y) =>
+                    {
+                        stream = false;
+                        Console.WriteLine("YTDL CHECKER FAILED");
+                    };
+                    string output = ytdlChecker.StandardOutput.ReadToEnd();
+                    var data = JObject.Parse(output);
+
+                    if (data["is_live"].Value<string>() != null)
+                    {
+                        stream = false;
+                        ytdl = YtDl("");
+                        Console.WriteLine("YTDL CHECKER LIVE DETECTED");
+                    }
+                    else
+                    {
+                        ytdl = YtDl(path);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    await SentryService.SendError(e, Context);
+                }
             }
 
             if (id[1] != null)
@@ -426,34 +527,30 @@ namespace Sora_Bot_1.SoraBot.Services
                 }
                 if (File.Exists(id[1] + ".mp3"))
                 {
-                    await msg.ModifyAsync(
-                        x => { x.Content = ":musical_note: Successfully Downloaded."; });
-                    if (!songDataBase.Contains(id[1]))
+                    try
                     {
-                        if (songDataBase.Count < 1)
-                        {
-                            LoadDatabse();
-                        }
-                        songDataBase.Add(id[1]);
-                        SaveDatabase();
+                        await msg.ModifyAsync(
+                            x => { x.Content = ":musical_note: Successfully Downloaded."; });
+                        stream = true;
                     }
-                    stream = true;
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        await SentryService.SendError(e, Context);
+                    }
                 }
                 else
                 {
                     await msg.ModifyAsync(x =>
                     {
                         x.Content =
-                            ":no_entry_sign: Failed to Download. Possible reasons: Video is blocked in Bot's country, Video was too long, NO PLAYLISTS!";
+                            ":no_entry_sign: Failed to Download. Possible reasons: Video is blocked in Bot's country, Video was too long, NO PLAYLISTS AND NO LIVE STREAMS!";
                     });
                 }
             }
             else
             {
-                if (!path.Equals("rand") && !path.Equals("random"))
-                {
-                    await msg.ModifyAsync(x => { x.Content = "It must be a YT link! Failed to Download."; });
-                }
+                await msg.ModifyAsync(x => { x.Content = "It must be a YT link! Failed to Download."; });
             }
             if (stream)
             {
@@ -600,42 +697,6 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
-        private void InitializeLoader()
-        {
-            jSerializer.Converters.Add(new JavaScriptDateTimeConverter());
-            jSerializer.NullValueHandling = NullValueHandling.Ignore;
-        }
-
-        private void SaveDatabase()
-        {
-            using (StreamWriter sw = File.CreateText(@"songDatabase.json"))
-            {
-                using (JsonWriter writer = new JsonTextWriter(sw))
-                {
-                    jSerializer.Serialize(writer, songDataBase);
-                }
-            }
-        }
-
-        private void LoadDatabse()
-        {
-            if (File.Exists("songDatabase.json"))
-            {
-                using (StreamReader sr = File.OpenText(@"songDatabase.json"))
-                {
-                    using (JsonReader reader = new JsonTextReader(sr))
-                    {
-                        songDataBase = jSerializer.Deserialize<List<string>>(reader);
-                    }
-                }
-            }
-            else
-            {
-                File.Create("songDatabase.json");
-            }
-
-            
-        }
         public int PlayingFor()
         {
             return audioDict.Count;

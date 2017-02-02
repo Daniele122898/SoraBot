@@ -29,7 +29,7 @@ namespace Sora_Bot_1.SoraBot.Core
             };
 
             //Place the token of your bot account here
-            string token = File.ReadAllText("token.txt");
+            string token = File.ReadAllText("token2.txt");
 
             /*
         //Hook into the messagereceuved event on DiscordSocketclient
