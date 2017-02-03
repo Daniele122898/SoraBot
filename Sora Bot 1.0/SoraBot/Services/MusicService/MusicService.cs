@@ -471,40 +471,40 @@ namespace Sora_Bot_1.SoraBot.Services
                     x => { x.Content = ":musical_note: Not a Valid link!"; });
                 return "f";
             }
-            /*
-            if (path.Equals("random") || path.Equals("rand"))
-            {
-                if (songDataBase.Count < 1)
-                {
-                    await msg.ModifyAsync(
-                        x => { x.Content = ":no_entry_sign: Current Song Database is empty. Cannot play random song"; });
-                }
-                else
-                {
-                    Random rand = new Random();
-                    int index = rand.Next(songDataBase.Count);
-                    id[1] = "" + songDataBase[index];
-                    path = "https://www.youtube.com/watch?v=" + id[1];
-                }
-            }*/
 
             // Create FFmpeg using the previous example
-            string betterPath = "https://www.youtube.com/watch?v="+id[1];
+            //string betterPath = "https://www.youtube.com/watch?v="+id[1];
+
+            
+
             Process ytdl = new Process();
             if (!File.Exists(id[1] + ".mp3"))
             {
                 try
                 {
-                    var ytdlChecker = CheckerYtDl(betterPath);
+                    var ytdlChecker = CheckerYtDl(path);
                     ytdlChecker.ErrorDataReceived += (x, y) =>
                     {
                         stream = false;
                         Console.WriteLine("YTDL CHECKER FAILED");
                     };
                     string output = ytdlChecker.StandardOutput.ReadToEnd();
-                    var data = JObject.Parse(output);
+                    ytdlChecker.WaitForExit();
+                    if (ytdlChecker.ExitCode != 0)
+                    {
+                        await msg.ModifyAsync(x =>
+                        {
+                            x.Content =
+                                ":no_entry_sign: YT-DL Error. Possible reasons: Video is blocked in Bot's country, NO LIVESTREAMS or a plain YT-DL bug. Retry once";
+                        });
+                        return "f";
+                    }
+                    
+                    //var data = JObject.Parse(output);
+                    IDictionary<string, JToken> json = JObject.Parse(output);
 
-                    if (data["is_live"].Value<string>() != null)
+                    if (json.ContainsKey("is_live") && !String.IsNullOrEmpty(json["is_live"].Value<string>()))
+                    //if (data["is_live"].Value<string>() != null)
                     //if (String.IsNullOrEmpty(data["is_live"].Value<string>()))
                     {
                         stream = false;
@@ -513,7 +513,7 @@ namespace Sora_Bot_1.SoraBot.Services
                     }
                     else
                     {
-                        ytdl = YtDl(betterPath);
+                        ytdl = YtDl(path);
                     }
                 }
                 catch (Exception e)
