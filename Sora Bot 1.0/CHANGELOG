@@ -1,0 +1,12 @@
+**Version**
+0.0.9
+
+**Date**
+2.2.2017
+
+**Changes**
+  - Fixed Help command to be nicer...
+  - Added Changelog
+  - Fixed bug when stopping Audio and no audioplayer was initiated
+  - Removed the possibility to add Livestreams
+  - Added my own Sentry System! All bugs will be reported to me :3

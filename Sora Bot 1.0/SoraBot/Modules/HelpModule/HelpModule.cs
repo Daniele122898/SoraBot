@@ -34,7 +34,7 @@ namespace Sora_Bot_1.SoraBot.Modules.HelpModule
 
             if (cmdName == null)
             {
-                eb.Title = "Sora Help:";
+                eb.Title = "Sora Help: ([ ] are optional parameters)";
 
                 foreach (var c in service.Commands)
                 {
@@ -42,7 +42,7 @@ namespace Sora_Bot_1.SoraBot.Modules.HelpModule
                     {
                         eb.AddField((efb) =>
                         {
-                            efb.Name = c.Module.Aliases.FirstOrDefault() + " " + c.Name;
+                            efb.Name = c.Module.Aliases.FirstOrDefault() + " " + c.Name +(c.Parameters.Count >0 ? (c.Parameters.FirstOrDefault().IsOptional ? $" [<{c.Parameters.FirstOrDefault()}>]" : $" <{c.Parameters.FirstOrDefault()}>") : "");
                             efb.Value = c.Summary ?? "No specific description";
                         });
                     }
@@ -61,7 +61,7 @@ namespace Sora_Bot_1.SoraBot.Modules.HelpModule
                     eb.AddField((efb) =>
                     {
                         efb.Name = c.Parameters.Aggregate(c.Name + "\n",
-                            (current, cmd) => $"{current} {(cmd.IsOptional ? $"[<{cmd.Name}>]" : $"{cmd.Name}>")}");
+                            (current, cmd) => $"{current} {(cmd.IsOptional ? $"[<{cmd.Name}>]" : $"<{cmd.Name}>")}");
                         efb.Value =
                             c.Parameters.Aggregate(
                                 c.Summary + "\n\n" +

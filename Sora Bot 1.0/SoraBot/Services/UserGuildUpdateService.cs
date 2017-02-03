@@ -18,7 +18,7 @@ namespace Sora_Bot_1.SoraBot.Services
         ConcurrentDictionary<ulong, ulong> updateChannelPreferenceDict =
             new ConcurrentDictionary<ulong, ulong>();
 
-        private JsonSerializer jSerializer = new JsonSerializer();
+        private readonly JsonSerializer jSerializer = new JsonSerializer();
 
         public UserGuildUpdateService()
         {

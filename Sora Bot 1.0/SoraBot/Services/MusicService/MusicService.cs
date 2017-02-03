@@ -481,12 +481,11 @@ namespace Sora_Bot_1.SoraBot.Services
 
             // Create FFmpeg using the previous example
             Process ytdl = new Process();
-            Process ytdlChecker = new Process();
             if (!File.Exists(id[1] + ".mp3"))
             {
                 try
                 {
-                    ytdlChecker = CheckerYtDl(path);
+                    var ytdlChecker = CheckerYtDl(path);
                     ytdlChecker.ErrorDataReceived += (x, y) =>
                     {
                         stream = false;

@@ -11,6 +11,7 @@ using Discord.WebSocket;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Sora_Bot_1.SoraBot.Services;
+using Sora_Bot_1.SoraBot.Services.ChangelogService;
 
 namespace Sora_Bot_1.SoraBot.Core
 {
@@ -53,6 +54,9 @@ namespace Sora_Bot_1.SoraBot.Core
             //Discover all of the commands in this assembly and load them
             await commands.AddModulesAsync(Assembly.GetEntryAssembly());
             //Hook the messagereceive event into our command handler
+
+            ChangelogService.LoadChangelog();
+
             client.MessageReceived += HandleCommand;
             client.UserJoined += updateService.UserJoined;
             client.UserLeft += updateService.UserLeft;
