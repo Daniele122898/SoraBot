@@ -84,7 +84,7 @@ namespace Sora_Bot_1.SoraBot.Modules.AudioModule
                 return;
             }
 
-            await musicService.LeaveChannel(Context);
+            await musicService.LeaveChannel(Context, channel);
         }
 
         /*

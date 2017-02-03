@@ -36,7 +36,7 @@ namespace Sora_Bot_1.SoraBot.Services
             audioDict.TryAdd(guildID, audioClient);
         }
 
-        public async Task LeaveChannel(CommandContext Context)
+        public async Task LeaveChannel(CommandContext Context, IVoiceChannel _channel)
         {
             try
             {
@@ -44,11 +44,20 @@ namespace Sora_Bot_1.SoraBot.Services
                 audioDict.TryGetValue(Context.Guild.Id, out aClient);
                 if (aClient == null)
                 {
-                    await Context.Channel.SendMessageAsync("Bot is not connected to any Voice Channels");
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: Bot is not connected to any Voice Channels");
                     return;
                 }
-                await aClient.DisconnectAsync();
-                audioDict.TryRemove(Context.Guild.Id, out aClient);
+                var channel = (Context.Guild as SocketGuild).CurrentUser.VoiceChannel as IVoiceChannel;
+                if (channel.Id == _channel.Id)
+                {
+                    await aClient.DisconnectAsync();
+                    audioDict.TryRemove(Context.Guild.Id, out aClient);
+                }
+                else
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: You must be in the same channel as the me!");
+                }
+                
             }
             catch (Exception e)
             {
@@ -480,12 +489,13 @@ namespace Sora_Bot_1.SoraBot.Services
             }*/
 
             // Create FFmpeg using the previous example
+            string betterPath = "https://www.youtube.com/watch?v="+id[1];
             Process ytdl = new Process();
             if (!File.Exists(id[1] + ".mp3"))
             {
                 try
                 {
-                    var ytdlChecker = CheckerYtDl(path);
+                    var ytdlChecker = CheckerYtDl(betterPath);
                     ytdlChecker.ErrorDataReceived += (x, y) =>
                     {
                         stream = false;
@@ -495,6 +505,7 @@ namespace Sora_Bot_1.SoraBot.Services
                     var data = JObject.Parse(output);
 
                     if (data["is_live"].Value<string>() != null)
+                    //if (String.IsNullOrEmpty(data["is_live"].Value<string>()))
                     {
                         stream = false;
                         ytdl = YtDl("");
@@ -502,7 +513,7 @@ namespace Sora_Bot_1.SoraBot.Services
                     }
                     else
                     {
-                        ytdl = YtDl(path);
+                        ytdl = YtDl(betterPath);
                     }
                 }
                 catch (Exception e)

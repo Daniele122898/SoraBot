@@ -109,6 +109,12 @@ namespace Sora_Bot_1.SoraBot.Modules.FunModule
             await ReplyAsync("To invite Me just open this link and choose the Server:\nhttps://discordapp.com/oauth2/authorize?client_id=270931284489011202&scope=bot&permissions=30720");
         }
 
+        [Command("pat"), Summary("Pats the person specified")]
+        public async Task Pat([Summary("Person to pat")] IUser user)
+        {
+            await ReplyAsync($"{Context.User.Mention} pats {user.Mention} ｡◕ ‿ ◕｡ \n http://i.imgur.com/bDMMk0L.gif");
+        }
+
     }
 
 }
