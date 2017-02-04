@@ -16,6 +16,7 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
     public class StarBoardService
     {
         private ConcurrentDictionary<ulong, ulong> starChannelDict = new ConcurrentDictionary<ulong, ulong>();
+        private ConcurrentDictionary<ulong, starMsg> msgIdDictionary = new ConcurrentDictionary<ulong, starMsg>();
 
         private readonly JsonSerializer jSerializer = new JsonSerializer();
 
@@ -30,6 +31,7 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
             try
             {
                 ulong channelID;
+                IUserMessage sentMessage = null;
                 IMessage dmsg = null;
                 bool specified = true;
                 ulong guildID = (reaction.Channel as IGuildChannel).GuildId;
@@ -48,52 +50,78 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                         {
                             return;
                         }
-
-                        if ((specified ? reaction.Message.Value.Attachments.Count : dmsg.Attachments.Count) < 1)
+                        if (msgIdDictionary.ContainsKey(msgID))
                         {
-                            var eb = new EmbedBuilder()
-                            {
-                                Color = new Color(4, 97, 247),
-                                Timestamp = DateTimeOffset.UtcNow,
-                                Author = new EmbedAuthorBuilder()
-                                {
-                                    IconUrl =
-                                        (specified ? reaction.Message.Value.Author.AvatarUrl : dmsg.Author.AvatarUrl),
-                                    Name =
-                                        $"{(specified ? reaction.Message.Value.Author.Username : dmsg.Author.Username)}#{(specified ? reaction.Message.Value.Author.Discriminator : dmsg.Author.Discriminator)}"
-                                },
-                                Description =
-                                    (specified ? reaction.Message.Value.Content : dmsg.Content)
-                            };
-                            await (((reaction.Channel as IGuildChannel).Guild as SocketGuild).GetChannel(channelID) as
-                                IMessageChannel).SendMessageAsync(
-                                $"{reaction.Emoji.Name} in #{((specified ? reaction.Message.GetValueOrDefault().Channel : dmsg.Channel) as IMessageChannel).Name}\n",
-                                false, eb);
+                            starMsg msgStruct = new starMsg();
+                            msgIdDictionary.TryGetValue(msgID, out msgStruct);
+                            msgStruct.counter += 1;
+                            /*var guild = ((reaction.Channel as IGuildChannel)?.Guild as SocketGuild);
+                            var channel = guild?.GetChannel(channelID) as IMessageChannel;
+                            var msgToEdit =
+                                (IUserMessage)
+                                await channel.GetMessageAsync(msgStruct.starMSGID, CacheMode.AllowDownload, null);*/
+                            msgIdDictionary.TryUpdate(msgID, msgStruct);
+                            /*await msgToEdit.ModifyAsync(x => { x.Content = $"{msgStruct.counter} {msgToEdit.Content}"; });*/
+                            SaveDatabase();
+                            return;
                         }
                         else
                         {
-                            var eb = new EmbedBuilder()
+                            if ((specified ? reaction.Message.Value.Attachments.Count : dmsg.Attachments.Count) < 1)
                             {
-                                Color = new Color(4, 97, 247),
-                                Timestamp = DateTimeOffset.UtcNow,
-                                ImageUrl =
-                                (specified
-                                    ? reaction.Message.Value.Attachments.FirstOrDefault().Url
-                                    : dmsg.Attachments.FirstOrDefault().Url),
-                                Author = new EmbedAuthorBuilder()
+                                var eb = new EmbedBuilder()
                                 {
-                                    IconUrl =
-                                        (specified ? reaction.Message.Value.Author.AvatarUrl : dmsg.Author.AvatarUrl),
-                                    Name =
-                                        $"{(specified ? reaction.Message.Value.Author.Username : dmsg.Author.Username)}#{(specified ? reaction.Message.Value.Author.Discriminator : dmsg.Author.Discriminator)}"
-                                },
-                                Description =
-                                    (specified ? reaction.Message.Value.Content : dmsg.Content)
+                                    Color = new Color(4, 97, 247),
+                                    Timestamp = DateTimeOffset.UtcNow,
+                                    Author = new EmbedAuthorBuilder()
+                                    {
+                                        IconUrl =
+                                            (specified ? reaction.Message.Value.Author.AvatarUrl : dmsg.Author.AvatarUrl),
+                                        Name =
+                                            $"{(specified ? reaction.Message.Value.Author.Username : dmsg.Author.Username)}#{(specified ? reaction.Message.Value.Author.Discriminator : dmsg.Author.Discriminator)}"
+                                    },
+                                    Description =
+                                        (specified ? reaction.Message.Value.Content : dmsg.Content)
+                                };
+                                sentMessage = await (((reaction.Channel as IGuildChannel).Guild as SocketGuild)
+                                    .GetChannel(channelID) as
+                                    IMessageChannel).SendMessageAsync(
+                                    $"{reaction.Emoji.Name} in #{((specified ? reaction.Message.GetValueOrDefault().Channel : dmsg.Channel) as IMessageChannel).Name}\n",
+                                    false, eb);
+                            }
+                            else
+                            {
+                                var eb = new EmbedBuilder()
+                                {
+                                    Color = new Color(4, 97, 247),
+                                    Timestamp = DateTimeOffset.UtcNow,
+                                    ImageUrl =
+                                    (specified
+                                        ? reaction.Message.Value.Attachments.FirstOrDefault().Url
+                                        : dmsg.Attachments.FirstOrDefault().Url),
+                                    Author = new EmbedAuthorBuilder()
+                                    {
+                                        IconUrl =
+                                            (specified ? reaction.Message.Value.Author.AvatarUrl : dmsg.Author.AvatarUrl),
+                                        Name =
+                                            $"{(specified ? reaction.Message.Value.Author.Username : dmsg.Author.Username)}#{(specified ? reaction.Message.Value.Author.Discriminator : dmsg.Author.Discriminator)}"
+                                    },
+                                    Description =
+                                        (specified ? reaction.Message.Value.Content : dmsg.Content)
+                                };
+                                sentMessage = await (((reaction.Channel as IGuildChannel).Guild as SocketGuild)
+                                    .GetChannel(channelID) as
+                                    IMessageChannel).SendMessageAsync(
+                                    $"{reaction.Emoji.Name} in #{((specified ? reaction.Message.GetValueOrDefault().Channel : dmsg.Channel) as IMessageChannel).Name}\n",
+                                    false, eb);
+                            }
+                            starMsg msgStruct = new starMsg
+                            {
+                                starMSGID = sentMessage.Id,
+                                counter = 1
                             };
-                            await (((reaction.Channel as IGuildChannel).Guild as SocketGuild).GetChannel(channelID) as
-                                IMessageChannel).SendMessageAsync(
-                                $"{reaction.Emoji.Name} in #{((specified ? reaction.Message.GetValueOrDefault().Channel : dmsg.Channel) as IMessageChannel).Name}\n",
-                                false, eb);
+                            msgIdDictionary.TryAdd(msgID, msgStruct);
+                            SaveDatabase();
                         }
                     }
                 }
@@ -105,8 +133,47 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
             }
         }
 
-        public async Task StarRemoved(ulong arg1, Optional<SocketUserMessage> arg2, SocketReaction arg3)
+        public async Task StarRemoved(ulong msgID, Optional<SocketUserMessage> msg, SocketReaction reaction)
         {
+            ulong channelID;
+            ulong guildID = (reaction.Channel as IGuildChannel).GuildId;
+
+            if (starChannelDict.TryGetValue(guildID, out channelID))
+            {
+                starMsg msgStruct = new starMsg();
+                if (msgIdDictionary.TryGetValue(msgID, out msgStruct))
+                {
+                    msgStruct.counter -= 1;
+                    var guild = ((reaction.Channel as IGuildChannel)?.Guild as SocketGuild);
+                    var channel = guild?.GetChannel(channelID) as IMessageChannel;
+                    var msgToEdit =
+                        (IUserMessage)
+                        await channel.GetMessageAsync(msgStruct.starMSGID, CacheMode.AllowDownload, null);
+
+                    if (msgStruct.counter < 1)
+                    {
+                        await msgToEdit.DeleteAsync();
+                        msgIdDictionary.TryRemove(msgID, out msgStruct);
+                    }
+                    else
+                    {
+                        /*
+                        if (msgToEdit.Content.Contains("⭐"))
+                        {
+                            string subString = msgToEdit.Content.Substring(msgToEdit.Content.IndexOf("⭐"));
+                            await msgToEdit.ModifyAsync(x => { x.Content = $"{msgStruct.counter} {subString}"; });
+                        }
+                        else if(msgToEdit.Content.Contains("🌟"))
+                        {
+                            string subString = msgToEdit.Content.Substring(msgToEdit.Content.IndexOf("🌟"));
+                            await msgToEdit.ModifyAsync(x => { x.Content = $"{msgStruct.counter} {subString}"; });
+                        }*/
+                        msgIdDictionary.TryUpdate(msgID, msgStruct);
+
+                    }
+                    SaveDatabase();
+                }
+            }
         }
 
         public async Task SetChannel(CommandContext Context)
@@ -148,10 +215,17 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
             }
         }
 
+        public struct starMsg
+        {
+            public ulong starMSGID;
+            public int counter;
+        }
+
         private void SaveDatabase()
         {
             try
             {
+                
                 using (StreamWriter sw = File.CreateText(@"StarBoard.json"))
                 {
                     using (JsonWriter writer = new JsonTextWriter(sw))
@@ -165,7 +239,6 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                 Console.WriteLine(e);
                 SentryService.SendError(e);
             }
-
         }
 
         private void LoadDatabase()

@@ -8,6 +8,7 @@ using Discord.WebSocket;
 using Microsoft.VisualBasic;
 using Sora_Bot_1.SoraBot.Core;
 using Sora_Bot_1.SoraBot.Services;
+using Sora_Bot_1.SoraBot.Services.StarBoradService;
 
 
 namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
@@ -20,11 +21,13 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
 
         private readonly CommandHandler handler;
         private UserGuildUpdateService updateService;
+        private StarBoardService starBoardService;
 
-        public OwnerModule(CommandHandler _handler, UserGuildUpdateService service)
+        public OwnerModule(CommandHandler _handler, UserGuildUpdateService service, StarBoardService starboards)
         {
             handler = _handler;
             updateService = service;
+            starBoardService = starboards;
         }
 
         [Command("prefix"), Summary("Changes the prefix of the bot")]
@@ -55,6 +58,22 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
         }
 
         //END ANNOUNCEMENTS
+
+        //STARBOARD
+        [Command("star"), Summary("Sets the Channel in which Star reactions should be posted")]
+        [RequireOwner]
+        public async Task SetStarBoardChannel()
+        {
+            await starBoardService.SetChannel(Context);
+        }
+
+        [Command("starremove"), Summary("Removes current Starboard channel!")]
+        [RequireOwner]
+        public async Task RemoveStarBoardChannel()
+        {
+            await starBoardService.RemoveChannel(Context);
+        }
+        //END STARBOARD
 
         //CREATE EXCEPTION
 
