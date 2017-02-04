@@ -12,6 +12,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Sora_Bot_1.SoraBot.Services;
 using Sora_Bot_1.SoraBot.Services.ChangelogService;
+using Sora_Bot_1.SoraBot.Services.PatService;
+using Sora_Bot_1.SoraBot.Services.TagService;
 
 namespace Sora_Bot_1.SoraBot.Core
 {
@@ -24,6 +26,8 @@ namespace Sora_Bot_1.SoraBot.Core
         private MusicService musicService;
         private UserGuildUpdateService updateService;
         private ReminderService remService;
+        private PatService patService;
+        private TagService tagService;
         private PlayingWith playingWith;
         public static Dictionary<ulong, string> prefixDict = new Dictionary<ulong, string>();
         private JsonSerializer jSerializer = new JsonSerializer();
@@ -37,6 +41,8 @@ namespace Sora_Bot_1.SoraBot.Core
             musicService = new MusicService();
             //remService = new ReminderService();
 
+            tagService = new TagService();
+            patService = new PatService();
             playingWith = new PlayingWith(client);
             SentryService.client = client;
             SentryService.Install();
@@ -49,6 +55,8 @@ namespace Sora_Bot_1.SoraBot.Core
             map.Add(handler);
             map.Add(commands);
             map.Add(updateService);
+            map.Add(patService);
+            map.Add(tagService);
             //map.Add(remService);
 
             //Discover all of the commands in this assembly and load them
