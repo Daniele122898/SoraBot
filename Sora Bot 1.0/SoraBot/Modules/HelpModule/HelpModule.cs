@@ -74,7 +74,7 @@ namespace Sora_Bot_1.SoraBot.Modules.HelpModule
                             "\n\n**Permissions**\n";
                         if (c.Preconditions.Count > 0)
                         {
-                            efb.Value += "Manage Guild";
+                            efb.Value += "Manage Channels";
                         }
                     });
                     found = true;

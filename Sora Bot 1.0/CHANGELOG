@@ -1,14 +1,15 @@
 **Version**
-0.0.9.2.1
+0.0.9.3
 
 **Date**
 4.2.2017
 
 **Changes**
-  - Added support for multiple '|' in Tags!
-  - Enhanced sentry system
-  - Fixed some ugly bugs
-  - Added global patcount per User
-  - Added remove function to Tags
-  - Fixed some tag bugs
-  - Removed Spamming guild and blacklisted
+  - ADDED BETA OF STARBOARD! How to use:
+		set a channel in which sora should post the star reactions with $star
+		remove the said channel with $starremove
+		(Setting and removing the channel needs manageChannels permissions!)
+		
+		To add a post in the StarBoard just add a star reaction to a message (either `:star:` or `:star2:`)
+		(needs no permission. Keep in mind you cannot add your own message to the starboard!)
+  - Fixed some bugs

@@ -13,6 +13,7 @@ using Newtonsoft.Json.Converters;
 using Sora_Bot_1.SoraBot.Services;
 using Sora_Bot_1.SoraBot.Services.ChangelogService;
 using Sora_Bot_1.SoraBot.Services.PatService;
+using Sora_Bot_1.SoraBot.Services.StarBoradService;
 using Sora_Bot_1.SoraBot.Services.TagService;
 
 namespace Sora_Bot_1.SoraBot.Core
@@ -25,6 +26,7 @@ namespace Sora_Bot_1.SoraBot.Core
         private CommandHandler handler => this;
         private MusicService musicService;
         private UserGuildUpdateService updateService;
+        private StarBoardService starBoardService;
         private ReminderService remService;
         private PatService patService;
         private TagService tagService;
@@ -38,6 +40,7 @@ namespace Sora_Bot_1.SoraBot.Core
             LoadDatabase();
             client = c;
             updateService = new UserGuildUpdateService();
+            starBoardService = new StarBoardService();
             musicService = new MusicService();
             //remService = new ReminderService();
 
@@ -57,6 +60,7 @@ namespace Sora_Bot_1.SoraBot.Core
             map.Add(updateService);
             map.Add(patService);
             map.Add(tagService);
+            map.Add(starBoardService);
             //map.Add(remService);
 
             //Discover all of the commands in this assembly and load them
@@ -68,6 +72,8 @@ namespace Sora_Bot_1.SoraBot.Core
             client.MessageReceived += HandleCommand;
             client.UserJoined += updateService.UserJoined;
             client.UserLeft += updateService.UserLeft;
+            client.ReactionAdded += starBoardService.StarAdded;
+            client.ReactionRemoved += starBoardService.StarRemoved;
         }
 
         private void InitializeLoader()
