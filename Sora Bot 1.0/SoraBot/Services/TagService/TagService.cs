@@ -14,7 +14,9 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
 {
     public class TagService
     {
-        private ConcurrentDictionary<ulong, List<TagStruct>> tagDict = new ConcurrentDictionary<ulong, List<TagStruct>>();
+        private ConcurrentDictionary<ulong, List<TagStruct>> tagDict =
+            new ConcurrentDictionary<ulong, List<TagStruct>>();
+
         private JsonSerializer jSerializer = new JsonSerializer();
 
         public TagService()
@@ -27,14 +29,32 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
         {
             try
             {
-                string[] tag = entry.Split('|');
-                if (!String.IsNullOrEmpty(tag[0]) && !String.IsNullOrEmpty(tag[1]) && tag.Length == 2)
+                int index = entry.IndexOf('|');
+                //string[] tag = entry.Split('|');
+                if (index < 1)
+                {
+                    await Context.Channel.SendMessageAsync(
+                        $":no_entry_sign: Failed to add tag! Make sure its: `tag | what to do when tag is called`");
+                    return;
+                }
+                string tag = entry.Remove(index);
+                string content = entry.Substring(index);
+                //if (tag.Length > 1 && !String.IsNullOrEmpty(tag[0]) && !String.IsNullOrEmpty(tag[1]))
+                if (!String.IsNullOrEmpty(tag) && !String.IsNullOrEmpty(content.Substring(content.IndexOf('|') + 1).Trim()))
                 {
                     TagStruct tagStruct = new TagStruct
                     {
-                        tag = tag[0].Trim(),
-                        value = tag[1].Trim()
+                        tag = tag.Trim(),
+                        value = content.Substring(content.IndexOf('|') + 1).Trim()
                     };
+                    /*
+                    if (tag.Length > 2)
+                    {
+                        for (int i = 2; i < tag.Length; i++)
+                        {
+                            tagStruct.value += tag[i];
+                        }
+                    }*/
                     List<TagStruct> tagList = new List<TagStruct>();
                     if (tagDict.ContainsKey(Context.Guild.Id))
                     {
@@ -71,17 +91,17 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
                         x.Name = "Successfully Added Tag!";
                         x.IsInline = true;
                         x.Value = $"**Tag**\n" +
-                                  $"{tag[0]}\n" +
+                                  $"{tagStruct.tag}\n" +
                                   $"**Value**\n" +
-                                  $"{tag[1]}";
+                                  $"{tagStruct.value}";
                     });
                     SaveDatabase();
-                    await Context.Channel.SendMessageAsync("",false,eb);
+                    await Context.Channel.SendMessageAsync("", false, eb);
                 }
                 else
                 {
                     await Context.Channel.SendMessageAsync(
-                        $":no_entry_sign: Failed to add tag! Make sure its <tag | what to do when tag is called>");
+                        $":no_entry_sign: Failed to add tag! Make sure its: `tag | what to do when tag is called`");
                 }
             }
             catch (Exception e)
@@ -95,7 +115,6 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
         {
             if (tagDict.ContainsKey(Context.Guild.Id))
             {
-
                 List<TagStruct> tagStruct = new List<TagStruct>();
                 tagDict.TryGetValue(Context.Guild.Id, out tagStruct);
 
@@ -128,23 +147,72 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
 
         public async Task SearchTagAndSend(string tag, CommandContext Context)
         {
-            List<TagStruct> tagStruct = new List<TagStruct>();
-            if (tagDict.ContainsKey(Context.Guild.Id))
+            try
             {
-                tagDict.TryGetValue(Context.Guild.Id, out tagStruct);
-                foreach (var t in tagStruct)
+                List<TagStruct> tagStruct = new List<TagStruct>();
+                if (tagDict.ContainsKey(Context.Guild.Id))
                 {
-                    if (t.tag.Equals(tag))
+                    tagDict.TryGetValue(Context.Guild.Id, out tagStruct);
+                    foreach (var t in tagStruct)
                     {
-                        await Context.Channel.SendMessageAsync(t.value);
-                        return;
+                        if (t.tag.Equals(tag.Trim()))
+                        {
+                            await Context.Channel.SendMessageAsync(t.value);
+                            return;
+                        }
                     }
+                    await Context.Channel.SendMessageAsync($":no_entry_sign: Tag `{tag}` was not found!");
                 }
-                await Context.Channel.SendMessageAsync($":no_entry_sign: Tag `{tag}` was not found!");
+                else
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: There are no tags in this guild!");
+                }
             }
-            else
+            catch (Exception e)
             {
-                await Context.Channel.SendMessageAsync(":no_entry_sign: There are no tags in this guild!");
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
+        }
+
+        public async Task RemoveTag(string tag, CommandContext Context)
+        {
+            try
+            {
+                List<TagStruct> tagStruct = new List<TagStruct>();
+                if (tagDict.ContainsKey(Context.Guild.Id))
+                {
+                    tagDict.TryGetValue(Context.Guild.Id, out tagStruct);
+                    foreach (var t in tagStruct)
+                    {
+                        if (t.tag.Equals(tag.Trim()))
+                        {
+                            tagStruct.Remove(t);
+                            if (tagDict.TryUpdate(Context.Guild.Id, tagStruct))
+                            {
+                                SaveDatabase();
+                                await Context.Channel.SendMessageAsync(
+                                    $":white_check_mark: Successfully removed the Tag `{t.tag}`");
+                            }
+                            else
+                            {
+                                await Context.Channel.SendMessageAsync("Something went wrong :(");
+                            }
+
+                            return;
+                        }
+                    }
+                    await Context.Channel.SendMessageAsync($":no_entry_sign: Tag `{tag}` was not found!");
+                }
+                else
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: There are no tags in this guild!");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
             }
         }
 

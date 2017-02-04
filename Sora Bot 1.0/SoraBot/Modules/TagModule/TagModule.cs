@@ -25,10 +25,10 @@ namespace Sora_Bot_1.SoraBot.Modules.TagModule
             await tagService.CreateTag(tagEntry, Context);
         }
 
-        [Command(""), Summary("Searches for your tag if existing")]
-        public async Task SearchTag([Summary("tag to search"), Remainder] string tag)
+        [Command("remove"), Summary("Removes specified Tag")]
+        public async Task RemoveTag([Summary("tag to remove"), Remainder] string tag)
         {
-            await tagService.SearchTagAndSend(tag, Context);
+            await tagService.RemoveTag(tag, Context);
         }
 
         [Command("taglist"), Summary("Lists all tags")]
@@ -36,5 +36,13 @@ namespace Sora_Bot_1.SoraBot.Modules.TagModule
         {
             await tagService.ListTags(Context);
         }
+
+        [Command(""), Summary("Displays the value of the Tag specified if it exists")]
+        public async Task SearchTag([Summary("tag to search"), Remainder] string tag)
+        {
+            await tagService.SearchTagAndSend(tag, Context);
+        }
+
+        
     }
 }

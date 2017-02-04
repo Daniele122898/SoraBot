@@ -28,11 +28,11 @@ namespace Sora_Bot_1.SoraBot.Modules.AudioModule
             musicService = _musicService;
         }
 
-        [Command("join", RunMode = RunMode.Async),Summary("Joines the channel of the User or the one passed as an argument")]
-        public async Task JoinChannel([Summary("Channel to join")] IVoiceChannel channel = null)
+        [Command("join", RunMode = RunMode.Async),Summary("Joines the channel of the User")]
+        public async Task JoinChannel()
         {
             //Get the audio channel
-            channel = channel ?? (Context.Message.Author as IGuildUser)?.VoiceChannel;
+            var channel = (Context.Message.Author as IGuildUser)?.VoiceChannel;
             if (channel == null)
             {
                 await Context.Channel.SendMessageAsync(
@@ -73,10 +73,10 @@ namespace Sora_Bot_1.SoraBot.Modules.AudioModule
             await musicService.PlayQueue(Context);
         }
         
-        [Command("leave"), Summary("Leaves the voice channel in which the user is in or the one passed as an argument")]
-        public async Task LeaveChannel([Summary("Channel to leave")]IVoiceChannel channel = null)
+        [Command("leave"), Summary("Leaves the voice channel in which the User is in.")]
+        public async Task LeaveChannel()
         {
-            channel = channel?? (Context.Message.Author as IGuildUser)?.VoiceChannel;
+            var channel = (Context.Message.Author as IGuildUser)?.VoiceChannel;
             if (channel == null)
             {
                 await Context.Channel.SendMessageAsync(
@@ -95,7 +95,7 @@ namespace Sora_Bot_1.SoraBot.Modules.AudioModule
         }*/
 
         [Command("stop"), Summary("Stops the current Audioplayer")]
-        public async Task StopMusic(IVoiceChannel channel = null)
+        public async Task StopMusic()
         {
             await musicService.StopMusic(Context);
         }

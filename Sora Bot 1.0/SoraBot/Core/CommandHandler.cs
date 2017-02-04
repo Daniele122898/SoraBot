@@ -139,9 +139,7 @@ namespace Sora_Bot_1.SoraBot.Core
 
             //Create a command Context
             var context = new CommandContext(client, message);
-
-
-            if(context.IsPrivate)
+            if (context.IsPrivate)
                 return;
 
             string prefix;

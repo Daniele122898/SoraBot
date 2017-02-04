@@ -1,13 +1,14 @@
 **Version**
-0.0.9.1
+0.0.9.2.1
 
 **Date**
-3.2.2017
+4.2.2017
 
 **Changes**
-  - Fixed Audio Bugs
-  - Fixed Help command to be nicer...
-  - Added Changelog
-  - Fixed bug when stopping Audio and no audioplayer was initiated
-  - Removed the possibility to add Livestreams
-  - Added my own Sentry System! All bugs will be reported to me :3
+  - Added support for multiple '|' in Tags!
+  - Enhanced sentry system
+  - Fixed some ugly bugs
+  - Added global patcount per User
+  - Added remove function to Tags
+  - Fixed some tag bugs
+  - Removed Spamming guild and blacklisted
