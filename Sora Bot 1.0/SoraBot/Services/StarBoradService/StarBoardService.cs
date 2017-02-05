@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,10 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
     {
         private ConcurrentDictionary<ulong, ulong> starChannelDict = new ConcurrentDictionary<ulong, ulong>();
         private ConcurrentDictionary<ulong, starMsg> msgIdDictionary = new ConcurrentDictionary<ulong, starMsg>();
+        private ConcurrentDictionary<ulong, short> msgStarBlackDict = new ConcurrentDictionary<ulong, short>();
+
+        private ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, short>> userReactionBlacklistDict =
+            new ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, short>>();
 
         private readonly JsonSerializer jSerializer = new JsonSerializer();
 
@@ -30,6 +35,17 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
         {
             try
             {
+                //MSG BLACKLIST
+                if (msgStarBlackDict.ContainsKey(msgID))
+                {
+                    short count;
+                    msgStarBlackDict.TryGetValue(msgID, out count);
+                    if (count >= 2)
+                    {
+                        return;
+                    }
+                }
+
                 ulong channelID;
                 IUserMessage sentMessage = null;
                 IMessage dmsg = null;
@@ -50,8 +66,18 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                         {
                             return;
                         }
+
+                        Random rand = new Random(DateTime.Now.Millisecond);
+                        await Task.Delay(rand.Next(50));
+
                         if (msgIdDictionary.ContainsKey(msgID))
                         {
+                            //USER BLACKLIST
+                            if (await CheckBlacklist(msgID, reaction.UserId))
+                            {
+                                return;
+                            }
+
                             starMsg msgStruct = new starMsg();
                             msgIdDictionary.TryGetValue(msgID, out msgStruct);
                             msgStruct.counter += 1;
@@ -62,11 +88,20 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                                 await channel.GetMessageAsync(msgStruct.starMSGID, CacheMode.AllowDownload, null);*/
                             msgIdDictionary.TryUpdate(msgID, msgStruct);
                             /*await msgToEdit.ModifyAsync(x => { x.Content = $"{msgStruct.counter} {msgToEdit.Content}"; });*/
+
+
                             SaveDatabase();
                             return;
                         }
                         else
                         {
+                            //USER BLACKLIST
+                            if (await CheckBlacklist(msgID, reaction.UserId))
+                            {
+                                return;
+                            }
+
+
                             if ((specified ? reaction.Message.Value.Attachments.Count : dmsg.Attachments.Count) < 1)
                             {
                                 var eb = new EmbedBuilder()
@@ -154,6 +189,17 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                     {
                         await msgToEdit.DeleteAsync();
                         msgIdDictionary.TryRemove(msgID, out msgStruct);
+                        if (msgStarBlackDict.ContainsKey(msgID))
+                        {
+                            short count;
+                            msgStarBlackDict.TryGetValue(msgID, out count);
+                            count++;
+                            msgStarBlackDict.TryUpdate(msgID, count);
+                        }
+                        else
+                        {
+                            msgStarBlackDict.TryAdd(msgID, 1);
+                        }
                     }
                     else
                     {
@@ -169,7 +215,6 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                             await msgToEdit.ModifyAsync(x => { x.Content = $"{msgStruct.counter} {subString}"; });
                         }*/
                         msgIdDictionary.TryUpdate(msgID, msgStruct);
-
                     }
                     SaveDatabase();
                 }
@@ -199,6 +244,43 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
             }
         }
 
+        public async Task<bool> CheckBlacklist(ulong msgID, ulong userID)
+        {
+            ConcurrentDictionary<ulong, short> userList = new ConcurrentDictionary<ulong, short>();
+            if (userReactionBlacklistDict.ContainsKey(msgID))
+            {
+                userReactionBlacklistDict.TryGetValue(msgID, out userList);
+                short counter;
+                if (userList.ContainsKey(userID))
+                {
+                    userList.TryGetValue(userID, out counter);
+                    if (counter >= 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        counter++;
+                        userList.TryUpdate(userID, counter);
+                        userReactionBlacklistDict.TryUpdate(msgID, userList);
+                    }
+                }
+                else
+                {
+                    counter = 1;
+                    userList.TryAdd(userID, counter);
+                    userReactionBlacklistDict.TryUpdate(msgID, userList);
+                }
+            }
+            else
+            {
+                short counter = 1;
+                userList.TryAdd(userID, counter);
+                userReactionBlacklistDict.TryAdd(msgID, userList);
+            }
+            return false;
+        }
+
         public async Task RemoveChannel(CommandContext Context)
         {
             if (!starChannelDict.ContainsKey(Context.Guild.Id))
@@ -225,7 +307,6 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
         {
             try
             {
-                
                 using (StreamWriter sw = File.CreateText(@"StarBoard.json"))
                 {
                     using (JsonWriter writer = new JsonTextWriter(sw))
