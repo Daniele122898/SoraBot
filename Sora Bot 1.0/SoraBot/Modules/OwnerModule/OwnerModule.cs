@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using Discord.Net;
 using Discord.WebSocket;
 using Microsoft.VisualBasic;
 using Sora_Bot_1.SoraBot.Core;
 using Sora_Bot_1.SoraBot.Services;
+using Sora_Bot_1.SoraBot.Services.EPService;
 using Sora_Bot_1.SoraBot.Services.StarBoradService;
 
 
@@ -22,12 +25,15 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
         private readonly CommandHandler handler;
         private UserGuildUpdateService updateService;
         private StarBoardService starBoardService;
+        private EPService epService;
 
-        public OwnerModule(CommandHandler _handler, UserGuildUpdateService service, StarBoardService starboards)
+        public OwnerModule(CommandHandler _handler, UserGuildUpdateService service, StarBoardService starboards,
+            EPService _epService)
         {
             handler = _handler;
             updateService = service;
             starBoardService = starboards;
+            epService = _epService;
         }
 
         [Command("prefix"), Summary("Changes the prefix of the bot")]
@@ -40,6 +46,16 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
         }
 
         //END PREFIX
+
+        //EPSERIVCE
+
+        [Command("epCount")]
+        [RequireOwner]
+        public async Task CountUsersEP()
+        {
+            await ReplyAsync($"Currently {epService.GetUserCount()} users in Database");
+        }
+        //END EPSERVICE
 
         //ANNOUNCEMENTS
 
@@ -73,6 +89,7 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
         {
             await starBoardService.RemoveChannel(Context);
         }
+
         //END STARBOARD
 
         //CREATE EXCEPTION
@@ -149,7 +166,6 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
                 Console.WriteLine(e);
                 await SentryService.SendError(e, Context);
             }
-            
         }
 
         [Command("kick")]
@@ -165,7 +181,6 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
                 Console.WriteLine(e);
                 await SentryService.SendError(e, Context);
             }
-
         }
 
         [Command("guildlist")]
@@ -174,24 +189,14 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
         {
             try
             {
-                var eb = new EmbedBuilder()
+                string guildList = "";
+                var guilds = (Context.Client as DiscordSocketClient).Guilds;
+                foreach (var g in guilds)
                 {
-                    Color = new Color(4, 97, 247)
-                };
-
-                eb.AddField((x) =>
-                {
-                    x.Name = "Guild List";
-                    x.IsInline = true;
-                    x.Value = "";
-                    var guilds = (Context.Client as DiscordSocketClient).Guilds;
-                    foreach (var g in guilds)
-                    {
-                        x.Value += $"**Name:**\t{g.Name}\n**ID:**\t{g.Id}\n";
-                    }
-                });
-
-                await Context.Channel.SendMessageAsync("", false, eb);
+                    guildList += $"Name: {g.Name}\n ID: {g.Id} \n";
+                }
+                File.WriteAllText("guildlist.txt", guildList);
+                await Context.Channel.SendFileAsync("guildlist.txt", null, false, null);
             }
             catch (Exception e)
             {

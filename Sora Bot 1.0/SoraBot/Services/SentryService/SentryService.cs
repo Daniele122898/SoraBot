@@ -13,7 +13,7 @@ namespace Sora_Bot_1.SoraBot.Services
     {
         public static DiscordSocketClient client;
         private static IUser serenity;
-        
+
 
         public static void Install()
         {
@@ -49,9 +49,19 @@ namespace Sora_Bot_1.SoraBot.Services
             catch (Exception exception)
             {
                 Console.WriteLine(exception);
-                await SentryService.SendError(e);
             }
-            
+        }
+
+        public static async Task SendMessage(string message)
+        {
+            try
+            {
+                await (await serenity.CreateDMChannelAsync()).SendMessageAsync(message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         public static async Task SendError(Exception e, CommandContext Context)
@@ -84,9 +94,7 @@ namespace Sora_Bot_1.SoraBot.Services
             catch (Exception exception)
             {
                 Console.WriteLine(exception);
-                await SentryService.SendError(e, Context);
             }
-            
         }
     }
 }

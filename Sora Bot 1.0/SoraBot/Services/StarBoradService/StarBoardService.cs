@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using Discord.Net;
 using Discord.WebSocket;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -25,14 +26,17 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
 
         private readonly JsonSerializer jSerializer = new JsonSerializer();
 
-        public StarBoardService()
+        private DiscordSocketClient client;
+
+        public StarBoardService(DiscordSocketClient c)
         {
+            client = c;
             InitializeLoader();
             LoadDatabase();
         }
 
         public async Task StarAdded(ulong msgID, Optional<SocketUserMessage> msg, SocketReaction reaction)
-        {
+        {   
             try
             {
                 //MSG BLACKLIST
@@ -63,6 +67,11 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                         }
 
                         if (reaction.UserId == (specified ? reaction.Message.Value.Author.Id : dmsg.Author.Id))
+                        {
+                            return;
+                        }
+
+                        if (client.CurrentUser.Id == (specified ? reaction.Message.Value.Author.Id : dmsg.Author.Id))
                         {
                             return;
                         }
@@ -165,6 +174,7 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
             {
                 Console.WriteLine(e);
                 await SentryService.SendError(e);
+                throw;
             }
         }
 

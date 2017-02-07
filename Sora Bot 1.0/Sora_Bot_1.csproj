@@ -1,4 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+  <PropertyGroup Label="Configuration">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp1.0</TargetFramework>
@@ -8,10 +11,16 @@
     <EmbeddedResource Include="**\*.resx" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CoreCompat.System.Drawing" Version="1.0.0-beta006" />
     <PackageReference Include="Discord.Net.Commands" Version="1.0.0-rc-00546" />
     <PackageReference Include="Discord.Net.Core" Version="1.0.0-rc-00546" />
     <PackageReference Include="Discord.Net.WebSocket" Version="1.0.0-rc-00546" />
+    <PackageReference Include="ImageSharp" Version="1.0.0-alpha2-00038" />
+    <PackageReference Include="ImageSharp.Drawing" Version="1.0.0-alpha2-00038" />
+    <PackageReference Include="ImageSharp.Formats.Jpeg" Version="1.0.0-alpha2-00038" />
+    <PackageReference Include="ImageSharp.Processing" Version="1.0.0-alpha2-00026" />
     <PackageReference Include="Microsoft.NETCore.App" Version="1.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="runtime.linux-x64.CoreCompat.System.Drawing" Version="1.0.0-beta009" />
   </ItemGroup>
 </Project>

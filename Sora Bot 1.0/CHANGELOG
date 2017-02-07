@@ -1,17 +1,10 @@
 **Version**
-0.0.9.3.2
+0.0.9.4
 
 **Date**
 5.2.2017
 
 **Changes**
-  - Fixed ratelimiting on Starboard, added anti-spam mechanisms. enjoy
-  - Fixed some beta bugs <3 thanks to Core, Tricky and co.
-  - ADDED BETA OF STARBOARD! How to use:
-		set a channel in which sora should post the star reactions with $star
-		remove the said channel with $starremove
-		(Setting and removing the channel needs manageChannels permissions!)
-		
-		To add a post in the StarBoard just add a star reaction to a message (either `:star:` or `:star2:`)
-		(needs no permission. Keep in mind you cannot add your own message to the starboard!)
-  - Fixed some bugs
+  - Added leves - No use yet.. just testing
+  - Added Profile with EP gain
+  - Fixed some starboard stuff

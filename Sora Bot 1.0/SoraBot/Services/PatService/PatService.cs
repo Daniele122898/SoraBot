@@ -22,12 +22,14 @@ namespace Sora_Bot_1.SoraBot.Services.PatService
             LoadDatabase();
         }
 
-        public async Task AddPat(IUser user)
+        public async Task AddPat(IUser user, CommandContext context)
         {
             try
             {
                 if (patDict.ContainsKey(user.Id))
                 {
+                    if(context.User.Id == user.Id)
+                        return;
                     int counter = 0;
                     patDict.TryGetValue(user.Id, out counter);
                     counter++;

@@ -117,7 +117,6 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
         public async Task UserInfo([Summary("The (optional) user to get info for")] IUser user = null)
         {
             var userInfo = user ?? Context.Client.CurrentUser; // ?? if not null return left. if null return right
-
             var eb = new EmbedBuilder()
             {
                 Color = new Color(4, 97, 247),

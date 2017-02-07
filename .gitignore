@@ -15,7 +15,9 @@ $RECYCLE.BIN/
 
 token.txt
 token2.txt
-
+guildlist.txt
+*.jpg
+*.psd
 # Windows Installer files
 *.cab
 *.msi

@@ -21,7 +21,7 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
         [Command("pat"), Summary("Pats the person specified")]
         public async Task Pat([Summary("Person to pat")] IUser user)
         {
-            await patService.AddPat(user);
+            await patService.AddPat(user, Context);
             await ReplyAsync($"{Context.User.Mention} pats {user.Mention} ｡◕ ‿ ◕｡ \n http://i.imgur.com/bDMMk0L.gif");
         }
 
