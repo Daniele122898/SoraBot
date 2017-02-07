@@ -43,6 +43,14 @@ namespace Sora_Bot_1.SoraBot.Modules.TagModule
             await tagService.SearchTagAndSend(tag, Context);
         }
 
-        
+        [Command("restrict"),
+         Summary(
+             "Restricts the Tag Command to the specified permissions (If no permission is entered the restriction will be removed!) => `ManageChannels , Administrator, KickMembers, BanMembers, ManageGuild`"
+         )]
+        public async Task RestrictTask(
+            [Summary("Choose one of the permissions to add, if none given the current restriction will be removed")] string perm = null)
+        {
+            await tagService.RestrictManageChannels(Context, (perm == null ? perm : perm.ToLower()));
+        }
     }
 }

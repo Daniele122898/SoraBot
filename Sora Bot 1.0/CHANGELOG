@@ -1,10 +1,11 @@
 **Version**
-0.0.9.4
+0.0.9.5
 
 **Date**
-5.2.2017
+7.2.2017
 
 **Changes**
-  - Added leves - No use yet.. just testing
-  - Added Profile with EP gain
-  - Fixed some starboard stuff
+  - Added Tag Restriction to Permissions! 
+  - Removed automated Message when you level up 
+  => to reactivate it use p sub/subscribe
+  - Fixed a couple bugs
