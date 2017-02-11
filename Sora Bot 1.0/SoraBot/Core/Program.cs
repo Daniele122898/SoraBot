@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using Discord;
 using Discord.Audio;
 using Discord.Commands;
 using Discord.WebSocket;
+using Sora_Bot_1.SoraBot.Services.ConfigService;
 
 namespace Sora_Bot_1.SoraBot.Core
 {
@@ -13,11 +15,16 @@ namespace Sora_Bot_1.SoraBot.Core
     {
         public DiscordSocketClient client;
         private CommandHandler commands;
+        private ConcurrentDictionary<string, string> configDict = new ConcurrentDictionary<string, string>();
 
         static void Main(string[] args) => new Program().Run().GetAwaiter().GetResult();
 
         public async Task Run()
         {
+            ConfigService.InitializeLoader();
+            ConfigService.LoadConfig();
+            configDict = ConfigService.getConfig();
+
             client = new DiscordSocketClient(new DiscordSocketConfig() {
                 LogLevel = LogSeverity.Info,
                 AudioMode = AudioMode.Outgoing,
@@ -30,18 +37,11 @@ namespace Sora_Bot_1.SoraBot.Core
             };
 
             //Place the token of your bot account here
-            string token = File.ReadAllText("token2.txt");
-
-            /*
-        //Hook into the messagereceuved event on DiscordSocketclient
-        client.MessageReceived += async (message) =>
-        {
-            //Check to see if the message content is $ping
-            if (message.Content == "$ping")
-                //send pong back to the channel the message was sent int
-                await message.Channel.SendMessageAsync("pong :ping_pong:");
-        };
-        */
+            string token; //= File.ReadAllText("token2.txt");
+            if (!configDict.TryGetValue("token2", out token))
+            {
+                throw new Exception("FAILED TO GET TOKEN");
+            }
 
             
             //configure the client to use a bot token and use our token
