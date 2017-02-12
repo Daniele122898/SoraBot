@@ -13,6 +13,7 @@ namespace Sora_Bot_1.SoraBot.Services.ConfigService
     {
         private static JsonSerializer jSerializer = new JsonSerializer();
         private static ConcurrentDictionary<string, string> configDict = new ConcurrentDictionary<string, string>();
+        public static string DBname;
 
 
         public static void InitializeLoader()
@@ -34,6 +35,7 @@ namespace Sora_Bot_1.SoraBot.Services.ConfigService
             {
                 configDict = jSerializer.Deserialize<ConcurrentDictionary<string, string>>(reader);
             }
+            configDict.TryGetValue("DB", out DBname);
         }
 
         public static ConcurrentDictionary<string, string> getConfig()

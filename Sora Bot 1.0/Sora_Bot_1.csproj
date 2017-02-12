@@ -12,16 +12,17 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CoreCompat.System.Drawing" Version="1.0.0-beta006" />
-    <PackageReference Include="Discord.Net.Commands" Version="1.0.0-rc-00546" />
-    <PackageReference Include="Discord.Net.Core" Version="1.0.0-rc-00546" />
-    <PackageReference Include="Discord.Net.WebSocket" Version="1.0.0-rc-00546" />
-    <PackageReference Include="ImageSharp" Version="1.0.0-alpha2-00038" />
-    <PackageReference Include="ImageSharp.Drawing" Version="1.0.0-alpha2-00038" />
-    <PackageReference Include="ImageSharp.Formats.Jpeg" Version="1.0.0-alpha2-00038" />
-    <PackageReference Include="ImageSharp.Processing" Version="1.0.0-alpha2-00026" />
+    <PackageReference Include="Discord.Net.Commands" Version="1.0.0-rc-00593" />
+    <PackageReference Include="Discord.Net.Core" Version="1.0.0-rc-00593" />
+    <PackageReference Include="Discord.Net.WebSocket" Version="1.0.0-rc-00593" />
+    <PackageReference Include="ImageSharp" Version="1.0.0-alpha2-00052" />
+    <PackageReference Include="ImageSharp.Drawing" Version="1.0.0-alpha2-00052" />
+    <PackageReference Include="ImageSharp.Formats.Jpeg" Version="1.0.0-alpha2-00052" />
+    <PackageReference Include="ImageSharp.Processing" Version="1.0.0-alpha2-00040" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="1.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="1.0.1" />
     <PackageReference Include="Microsoft.NETCore.App" Version="1.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-    <PackageReference Include="RethinkDb.Driver" Version="2.3.15" />
     <PackageReference Include="runtime.linux-x64.CoreCompat.System.Drawing" Version="1.0.0-beta009" />
   </ItemGroup>
 </Project>

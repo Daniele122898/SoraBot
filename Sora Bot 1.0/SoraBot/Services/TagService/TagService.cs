@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,15 +42,17 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
 
         public async Task CreateTag(string entry, CommandContext Context)
         {
+
             try
             {
                 if (tagRestrictDict.ContainsKey(Context.Guild.Id))
                 {
                     GuildPermission permiss;
                     tagRestrictDict.TryGetValue(Context.Guild.Id, out permiss);
-                    if (!((SocketGuildUser) Context.User).GuildPermissions.Has(permiss))
+                    if (!((SocketGuildUser)Context.User).GuildPermissions.Has(permiss))
                     {
-                        await Context.Channel.SendMessageAsync(":no_entry_sign: You don't have the Permission to add a Tag!");
+                        await Context.Channel.SendMessageAsync(
+                            ":no_entry_sign: You don't have the Permission to add a Tag!");
                         return;
                     }
                 }
@@ -165,7 +168,8 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
                                 tagRestrictDict.TryAdd(context.Guild.Id, permiss);
                             }
                             SaveDatabaseRestrict();
-                            await context.Channel.SendMessageAsync($":white_check_mark: Successfully restricted tags to `{perms}`!");
+                            await context.Channel.SendMessageAsync(
+                                $":white_check_mark: Successfully restricted tags to `{perms}`!");
                         }
                         else
                         {
@@ -188,7 +192,6 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
                 Console.WriteLine(e);
                 await SentryService.SendError(e, context);
             }
-            
         }
 
         public async Task ListTags(CommandContext Context)
@@ -285,7 +288,10 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
                                 tagRestrictDict.TryGetValue(Context.Guild.Id, out permiss);
                             }
                             if (Context.User.Id == t.creatorID ||
-                                ((permiss == GuildPermission.Connect) ? ((SocketGuildUser)Context.User).GuildPermissions.Has(GuildPermission.ManageChannels) : ((SocketGuildUser)Context.User).GuildPermissions.Has(permiss)))
+                                ((permiss == GuildPermission.Connect)
+                                    ? ((SocketGuildUser)Context.User).GuildPermissions.Has(
+                                        GuildPermission.ManageChannels)
+                                    : ((SocketGuildUser)Context.User).GuildPermissions.Has(permiss)))
                             {
                                 tagStruct.Remove(t);
                                 if (tagDict.TryUpdate(Context.Guild.Id, tagStruct))
@@ -394,11 +400,18 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
             }
         }
 
+
         public struct TagStruct
         {
             public string tag;
             public string value;
             public ulong creatorID;
+        }
+
+        public struct GuildStruct
+        {
+            public ulong guild_id;
+            public List<TagStruct> tags;
         }
     }
 }

@@ -5,10 +5,8 @@ using System.Drawing.Text;
 using System.Runtime.InteropServices.ComTypes;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using static RethinkDb.Driver.RethinkDB;
 using Sora_Bot_1.SoraBot.Services.ConfigService;
-using RethinkDb.Driver;
-using RethinkDb.Driver.Ast;
+
 
 namespace Sora_Bot_1.SoraBot.Services.DB
 {
@@ -18,18 +16,10 @@ namespace Sora_Bot_1.SoraBot.Services.DB
         private static readonly object padlock = new object();
         private string ip;
         private string port;
-        public RethinkDb.Driver.Net.Connection conn { get; private set; }
 
         public DB()
         {
-            ConcurrentDictionary<string, string> config = ConfigService.ConfigService.getConfig();
-            config.TryGetValue("RethinkDBIP", out ip);
-            config.TryGetValue("RethinkDBPort", out port);
-            conn = R.Connection()
-                .Hostname(ip)
-                .Port(Int32.Parse(port))
-                .Timeout(60)
-                .Connect();
+            
         }
 
         //Singleton dings bums
