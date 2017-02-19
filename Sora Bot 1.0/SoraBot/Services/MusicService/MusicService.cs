@@ -52,6 +52,7 @@ namespace Sora_Bot_1.SoraBot.Services
                 if (channel.Id == _channel.Id)
                 {
                     await aClient.DisconnectAsync();
+                    aClient.Dispose();
                     audioDict.TryRemove(Context.Guild.Id, out aClient);
                 }
                 else

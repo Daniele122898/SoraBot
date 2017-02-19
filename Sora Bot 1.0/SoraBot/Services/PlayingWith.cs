@@ -20,6 +20,7 @@ namespace Sora_Bot_1.SoraBot.Services
             "with Serraniel",
             "with Serenity",
             "with Shiro <3",
+            "with Katsu <3",
 
             //Games
             "CS:GO",

@@ -42,7 +42,7 @@ namespace Sora_Bot_1.SoraBot.Core
 
             //Place the token of your bot account here
             string token; //= File.ReadAllText("token2.txt");
-            if (!configDict.TryGetValue("token1", out token))
+            if (!configDict.TryGetValue("token2", out token))
             {
                 throw new Exception("FAILED TO GET TOKEN");
             }

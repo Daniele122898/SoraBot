@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 using Microsoft.VisualBasic;
 using Sora_Bot_1.SoraBot.Core;
 
@@ -19,9 +20,13 @@ namespace Sora_Bot_1.SoraBot.Modules.DynamicPrefixModule
         }
 
         [Command("prefix"), Summary("Changes the prefix of the bot")]
-        [RequireUserPermission(GuildPermission.Administrator)]
         public async Task ChangePrefix([Summary("Prefix to change to")] string prefix)
         {
+            if (!((SocketGuildUser)Context.User).GuildPermissions.Has(GuildPermission.Administrator))
+            {
+                await ReplyAsync(":no_entry_sign: You don't have permission to set the perfix! You need Administrator permissions!");
+                return;
+            }
             await ReplyAsync($"Prefix in this Guild was changed to `{prefix}`");
             handler.UpdateDict(Context.Guild.Id, prefix);
             handler.SaveDatabase();
