@@ -31,14 +31,18 @@ namespace Sora_Bot_1.SoraBot.Core
                 MessageCacheSize = 50
             });
 
-            client.Log += (message) => {
-                Console.WriteLine($"{message.ToString()}");
+            client.Log += (message) =>
+            {
+                if (!message.ToString().Contains("Unknown OpCode (Speaking)"))
+                {
+                    Console.WriteLine($"{message.ToString()}");
+                }
                 return Task.CompletedTask;
             };
 
             //Place the token of your bot account here
             string token; //= File.ReadAllText("token2.txt");
-            if (!configDict.TryGetValue("token2", out token))
+            if (!configDict.TryGetValue("token1", out token))
             {
                 throw new Exception("FAILED TO GET TOKEN");
             }

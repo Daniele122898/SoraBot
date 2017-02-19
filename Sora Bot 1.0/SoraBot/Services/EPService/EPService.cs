@@ -155,8 +155,8 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                                 Size = new ImageSharp.Size(size, size),
                                 Mode = ResizeMode.Max
                             });
-                        image.ExifProfile = null;
-                        image.Quality = quality;
+                        //image.ExifProfile = null; TODO FIX THIS
+                        //image.Quality = quality;
                         image.Save(output);
                     }
                 }

@@ -31,6 +31,7 @@ namespace Sora_Bot_1.SoraBot.Core
         private ReminderService remService;
         private PatService patService;
         private TagService tagService;
+        private RatelimitService ratelimitService;
         private EPService epService;
         private PlayingWith playingWith;
         public static Dictionary<ulong, string> prefixDict = new Dictionary<ulong, string>();
@@ -44,6 +45,7 @@ namespace Sora_Bot_1.SoraBot.Core
             updateService = new UserGuildUpdateService();
             starBoardService = new StarBoardService(client);
             musicService = new MusicService();
+            ratelimitService = new RatelimitService();
             //remService = new ReminderService();
 
             tagService = new TagService();
@@ -78,6 +80,7 @@ namespace Sora_Bot_1.SoraBot.Core
             client.UserLeft += updateService.UserLeft;
             client.ReactionAdded += starBoardService.StarAdded;
             client.ReactionRemoved += starBoardService.StarRemoved;
+            client.UserVoiceStateUpdated += musicService.CheckIfAlone;
         }
 
         private void InitializeLoader()
@@ -167,9 +170,15 @@ namespace Sora_Bot_1.SoraBot.Core
                   message.HasMentionPrefix(client.CurrentUser, ref argPos)))
                 return;
 
+            //Send to Ratelimiter Service
+            if(await ratelimitService.onlyCheck(context))
+                return;
+
             //Execute the command. (result does no indicate a return value
             // rather an object starting if the command executed successfully
             var result = await commands.ExecuteAsync(context, argPos, map);
+            if (result.IsSuccess)
+                await ratelimitService.checkRatelimit(context);
             //if (!result.IsSuccess)
             //  await context.Channel.SendMessageAsync(result.ErrorReason);
         }

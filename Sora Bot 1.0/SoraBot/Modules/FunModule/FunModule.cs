@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Concurrent;
+using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -22,6 +23,13 @@ namespace Sora_Bot_1.SoraBot.Modules.FunModule
             await ReplyAsync("http://git.argus.moe/serenity/SoraBot");
         }
 
+        [Command("feedback"), Summary("How to give feedback or suggestions")]
+        [Alias("suggestions", "suggestion", "bug", "bugreport")]
+        public async Task Feedback()
+        {
+            await ReplyAsync("To give me feedback, suggestions or tell me about any bugs please join\n https://discord.gg/Pah4yj5");
+        }
+
         [Command("door"), Summary("Shows the specified user the door. Mostly used after bad jokes")]
         [Alias("out")]
         public async Task Door([Summary("User to show the door")] IUser user)
@@ -37,7 +45,7 @@ namespace Sora_Bot_1.SoraBot.Modules.FunModule
         }
 
         [Command("google"), Summary("Will google for you")]
-        public async Task Google([Summary("Subject to google"), Remainder]string google)
+        public async Task Google([Summary("Subject to google"), Remainder] string google)
         {
             string search = google.Replace(" ", "%20");
             await Context.Channel.SendMessageAsync("<https://lmgtfy.com/?q=" + search + ">");
@@ -49,10 +57,7 @@ namespace Sora_Bot_1.SoraBot.Modules.FunModule
         {
             var msg = await ReplyAsync("( ͡° ͜ʖ ͡°)>⌐■-■");
             await Task.Delay(1500);
-            await msg.ModifyAsync(x =>
-            {
-                x.Content = "( ͡⌐■ ͜ʖ ͡-■)";
-            });
+            await msg.ModifyAsync(x => { x.Content = "( ͡⌐■ ͜ʖ ͡-■)"; });
         }
 
         [Command("about"), Summary("Gives an about page")]
@@ -61,7 +66,7 @@ namespace Sora_Bot_1.SoraBot.Modules.FunModule
             var eb = new EmbedBuilder()
             {
                 Title = "About",
-                Color = new Color(4,97,247),
+                Color = new Color(4, 97, 247),
                 ThumbnailUrl = Context.Client.CurrentUser.AvatarUrl,
                 Footer = new EmbedFooterBuilder()
                 {
@@ -73,14 +78,15 @@ namespace Sora_Bot_1.SoraBot.Modules.FunModule
             {
                 efb.Name = "Creator";
                 efb.IsInline = true;
-                efb.Value = "This bot has been created by Serenity#0783.\nIf you want to directly chat with me join this Guild:\n<http://discord.meetkaren.xyz>";
+                efb.Value =
+                    "This bot has been created by Serenity#0783.\nIf you want to directly chat with me join this Guild:\n[Click to join](https://discord.gg/Pah4yj5)";
             });
             eb.AddField((efb) =>
             {
                 efb.Name = "Properties";
                 efb.IsInline = true;
                 efb.Value =
-                    "I was written in C# using the Discord.NET 1.0 API.\nFor more info about that use the `info` command\nor look at my source code at\n<http://git.argus.moe/serenity/SoraBot>";
+                    "I was written in C# using the Discord.NET 1.0 API.\nFor more info about that use the `info` command\nor look at my source code at [Gitlab](http://git.argus.moe/serenity/SoraBot)";
             });
             eb.AddField((efb) =>
             {
@@ -93,7 +99,7 @@ namespace Sora_Bot_1.SoraBot.Modules.FunModule
                             "I am here to rule over this new found world and I will overthrow Tet as the current God. That is my ultimate goal.\n" +
                             "If you feel confident enough you can always try to challenge me and I will make sure to leave you dazzled";
             });
-            await ReplyAsync("",false,eb);
+            await ReplyAsync("", false, eb);
         }
 
         [Command("ping"), Summary("Gives the ping of the Server on which the bot resides and the discord servers")]
@@ -106,9 +112,23 @@ namespace Sora_Bot_1.SoraBot.Modules.FunModule
         [Alias("inv")]
         public async Task InviteAsync()
         {
-            await ReplyAsync("To invite Me just open this link and choose the Server:\nhttps://discordapp.com/oauth2/authorize?client_id=270931284489011202&scope=bot&permissions=30720");
+            var eb = new EmbedBuilder()
+            {
+                Title = "Invite Sora",
+                Color = new Color(4, 97, 247),
+                Footer = new EmbedFooterBuilder()
+                {
+                    Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
+                    IconUrl = Context.User.AvatarUrl
+                },
+                Description =
+                    "Just uncheck the permissions you dont feel like giving, this might break Sora though. Atleast give him these permissions:\n" +
+                    "Read/Send Messages, Embed Links, Attack Files, Mention Everyone, Add Reactions, Read Message History\n" +
+                    "Connect to voice and speak!\n" +
+                    "[Click to Invite](https://discordapp.com/oauth2/authorize?client_id=270931284489011202&scope=bot&permissions=2146958463)"
+            };
+
+            await ReplyAsync("", false, eb);
         }
-
     }
-
 }

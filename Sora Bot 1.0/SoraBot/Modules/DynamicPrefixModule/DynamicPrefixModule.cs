@@ -19,7 +19,7 @@ namespace Sora_Bot_1.SoraBot.Modules.DynamicPrefixModule
         }
 
         [Command("prefix"), Summary("Changes the prefix of the bot")]
-        [RequireUserPermission(GuildPermission.ManageGuild)]
+        [RequireUserPermission(GuildPermission.Administrator)]
         public async Task ChangePrefix([Summary("Prefix to change to")] string prefix)
         {
             await ReplyAsync($"Prefix in this Guild was changed to `{prefix}`");

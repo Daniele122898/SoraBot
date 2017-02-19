@@ -1,11 +1,11 @@
 **Version**
-0.0.9.5
+0.0.9.7
 
 **Date**
-7.2.2017
+18.2.2017
 
 **Changes**
-  - Added Tag Restriction to Permissions! 
-  - Removed automated Message when you level up 
-  => to reactivate it use p sub/subscribe
-  - Fixed a couple bugs
+  - Bot leaves when no one is in the voicechannel
+  - Member count fixed
+  - Queues can be cleared now
+  - Improved user and guild info

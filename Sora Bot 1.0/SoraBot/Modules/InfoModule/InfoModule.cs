@@ -84,7 +84,7 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
             {
                 efb.Name = "Sora";
                 efb.IsInline = true;
-                efb.Value = $"**Architecture:**\t{RuntimeInformation.ProcessArchitecture}\n**Up time:**\t{(DateTime.Now - proc.StartTime).ToString(@"d'd 'hh\:mm\:ss")}\n**Memory:**\t{formatRamValue(proc.PagedMemorySize64).ToString("f2")} {formatRamUnit(proc.PagedMemorySize64)}\n**Processor time:**\t{proc.TotalProcessorTime.ToString(@"d'd 'hh\:mm\:ss")}";
+                efb.Value = $"**Up time:**\t{(DateTime.Now - proc.StartTime).ToString(@"d'd 'hh\:mm\:ss")}\n**Memory:**\t{formatRamValue(proc.PagedMemorySize64).ToString("f2")} {formatRamUnit(proc.PagedMemorySize64)}\n**Processor time:**\t{proc.TotalProcessorTime.ToString(@"d'd 'hh\:mm\:ss")}\n**Feedback or Suggestions here:**\n[Click to Join](https://discord.gg/Pah4yj5)";
             });
 
             eb.AddField((efb) =>
@@ -97,7 +97,7 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                 foreach (var g in _client.Guilds)
                 {
                     channelCount += g.Channels.Count;
-                    userCount += g.Users.Count;
+                    userCount += g.MemberCount;
                 }
 
                 efb.Value = $"**State:**\t{_client.ConnectionState}\n**Guilds:**\t{_client.Guilds.Count}\n**Channels:**\t{channelCount}\n**Users:**\t{userCount}\n**Playing music for:** \t{musicService.PlayingFor()} guilds\n**Ping:**\t{_client.Latency} ms";
@@ -116,58 +116,174 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
         [Alias("userinfo", "whois")]
         public async Task UserInfo([Summary("The (optional) user to get info for")] IUser user = null)
         {
-            var userInfo = user ?? Context.Client.CurrentUser; // ?? if not null return left. if null return right
-            var eb = new EmbedBuilder()
+            try
             {
-                Color = new Color(4, 97, 247),
-                ThumbnailUrl = userInfo.AvatarUrl,
-                Footer = new EmbedFooterBuilder()
+                var userInfo = user ?? Context.User; // ?? if not null return left. if null return right
+                var eb = new EmbedBuilder()
                 {
-                 Text   = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
-                 IconUrl = Context.User.AvatarUrl
-                }
-            };
-            eb.AddField((efb) =>
-            {
-                efb.Name = "User Info";
-                efb.IsInline = true;
-                efb.Value = $"**Name + Discriminator:** \t{userInfo.Username}#{userInfo.Discriminator} \n" +
-                            $"**ID** \t{userInfo.Id}\n" +
-                            $"**Created at:** \t{userInfo.CreatedAt.ToString().Remove(userInfo.CreatedAt.ToString().Length -6)} \n" +
-                            $"**Status:** \t{userInfo.Status}\n" +
-                            $"**Avatar:** \t[Link]({userInfo.AvatarUrl})";
-            });
+                    Color = new Color(4, 97, 247),
+                    ThumbnailUrl = userInfo.AvatarUrl,
+                    Title = $"{userInfo.Username}#{userInfo.Discriminator} Info",
+                    Description = $"Joined Discord on: {userInfo.CreatedAt.ToString().Remove(userInfo.CreatedAt.ToString().Length - 6)}",
+                    Footer = new EmbedFooterBuilder()
+                    {
+                        Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator} | {userInfo.Username} ID: {userInfo.Id}",
+                        IconUrl = Context.User.AvatarUrl
+                    }
+                };
 
-            await Context.Channel.SendMessageAsync("", false, eb);
+                eb.AddField((x) =>
+                {
+                    x.Name = "Status";
+                    x.IsInline = true;
+                    x.Value = userInfo.Status.ToString();
+                });
+
+                eb.AddField((x) =>
+                {
+                    x.Name = "Game";
+                    x.IsInline = true;
+                    x.Value = $"{(userInfo.Game.HasValue ? userInfo.Game.Value.Name : "none")}";
+                });
+
+                eb.AddField((x) =>
+                {
+                    x.Name = "Avatar";
+                    x.IsInline = true;
+                    x.Value = $"[Click to View]({userInfo.AvatarUrl})";
+                });
+
+                eb.AddField((x) =>
+                {
+                    x.Name = "Joined Guild";
+                    x.IsInline = true;
+                    x.Value = $"{(userInfo as SocketGuildUser)?.JoinedAt.ToString().Remove((userInfo as SocketGuildUser).JoinedAt.ToString().Length - 6)}";
+                });
+
+                string permissions = "";
+                (userInfo as SocketGuildUser)?.GuildPermissions.ToList().ForEach(x => { permissions += x.ToString() + " | "; });
+                eb.AddField((x) =>
+                {
+                    x.Name = "Guild Permissions";
+                    x.IsInline = true;
+                    x.Value = $"{permissions}";
+                });
+                /*
+                eb.AddField((efb) =>
+                {
+                    efb.Name = "User Info";
+                    efb.IsInline = true;
+                    efb.Value = $"**Name + Discriminator:** \t{userInfo.Username}#{userInfo.Discriminator} \n" +
+                                $"**ID** \t{userInfo.Id}\n" +
+                                $"**Created at:** \t{userInfo.CreatedAt.ToString().Remove(userInfo.CreatedAt.ToString().Length -6)} \n" +
+                                $"**Status:** \t{userInfo.Status}\n" +
+                                $"**Avatar:** \t[Link]({userInfo.AvatarUrl})";
+                });*/
+
+                await Context.Channel.SendMessageAsync("", false, eb);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
+            
         }
 
-        [Command("guild"), Summary("Returns info about the current Guild")]
+        [Command("guild", RunMode = RunMode.Async), Summary("Returns info about the current Guild")]
         [Alias("server", "serverinfo")]
         public async Task ServerInfo()
         {
-            var eb = new EmbedBuilder()
+            try
             {
-                Color = new Color(4, 97, 247),
-                ThumbnailUrl = Context.Guild.IconUrl,
-                Footer = new EmbedFooterBuilder()
+                var eb = new EmbedBuilder()
                 {
-                    Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
-                    IconUrl = Context.User.AvatarUrl
+                    Color = new Color(4, 97, 247),
+                    ThumbnailUrl = Context.Guild.IconUrl,
+                    Title = $"{Context.Guild.Name} info",
+                    Description = $"Created on {Context.Guild.CreatedAt.ToString().Remove(Context.Guild.CreatedAt.ToString().Length - 6)}",
+                    Footer = new EmbedFooterBuilder()
+                    {
+                        Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator} | Guild ID: {Context.Guild.Id}",
+                        IconUrl = Context.User.AvatarUrl
+                    }
+                };
+                var guild = ((SocketGuild)Context.Guild);
+                //await guild.DownloadUsersAsync();
+
+                //var onlineCount = users.Count(u => u.Status != UserStatus.Unknown && u.Status != UserStatus.Invisible && u.Status != UserStatus.Offline);
+                
+                var GuildOwner = await Context.Guild.GetUserAsync(Context.Guild.OwnerId);
+                int online = 0;
+                foreach (var u in guild.Users)
+                {
+                    if (u.Status != UserStatus.Unknown && u.Status != UserStatus.Invisible && u.Status != UserStatus.Offline)
+                    {
+                        online++;
+                    }
                 }
-            };
+                /*
+                eb.AddField((efb) =>
+                {
+                    efb.Name = "Guild";
+                    efb.IsInline = true;
+                    efb.Value = $"**Name:** \t{Context.Guild.Name} \n" + $"**ID:** \t{Context.Guild.Id}\n" + $"**Owner:** \t{GuildOwner}\n" +
+                                $"**Voice Region ID:** \t{Context.Guild.VoiceRegionId}\n" +
+                                $"**Created At:** \t{Context.Guild.CreatedAt.ToString().Remove(Context.Guild.CreatedAt.ToString().Length - 6)}";
+                });*/
 
-            var GuildOwner = await Context.Guild.GetUserAsync(Context.Guild.OwnerId);
+                eb.AddField((x) =>
+                {
+                    x.Name = "Owner";
+                    x.IsInline = true;
+                    x.Value = GuildOwner.Username;
+                });
 
-            eb.AddField((efb) =>
+                eb.AddField((x) =>
+                {
+                    x.Name = "Region";
+                    x.IsInline = true;
+                    x.Value = Context.Guild.VoiceRegionId;
+                });
+
+                eb.AddField((x) =>
+                {
+                    x.Name = "Roles";
+                    x.IsInline = true;
+                    x.Value = "" + Context.Guild.Roles.Count;
+                });
+
+                int voice = Context.Guild.GetVoiceChannelsAsync().Result.Count;
+                int text = Context.Guild.GetChannelsAsync().Result.Count - voice;
+                eb.AddField((x) =>
+                {
+                    x.Name = "Channels";
+                    x.IsInline = true;
+                    x.Value = $"{text} text, {voice} voice";
+                });
+
+                eb.AddField((x) =>
+                {
+                    x.Name = "Total Members";
+                    x.IsInline = true;
+                    x.Value = $"{online}/{((SocketGuild)Context.Guild).MemberCount}";
+                });
+
+                eb.AddField((x) =>
+                {
+                    x.Name = "Avatar Url";
+                    x.IsInline = true;
+                    x.Value = $"[Click to view]({Context.Guild.IconUrl})";
+                });
+
+                await Context.Channel.SendMessageAsync("", false, eb);
+            }
+            catch (Exception e)
             {
-                efb.Name = "Guild";
-                efb.IsInline = true;
-                efb.Value = $"**Name:** \t{Context.Guild.Name} \n" + $"**ID:** \t{Context.Guild.Id}\n" + $"**Owner:** \t{GuildOwner}\n" +
-                            $"**Voice Region ID:** \t{Context.Guild.VoiceRegionId}\n" +
-                            $"**Created At:** \t{Context.Guild.CreatedAt.ToString().Remove(Context.Guild.CreatedAt.ToString().Length - 6)}";
-            });
-
-            await Context.Channel.SendMessageAsync("", false, eb);
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
+            
         }
     }
 }

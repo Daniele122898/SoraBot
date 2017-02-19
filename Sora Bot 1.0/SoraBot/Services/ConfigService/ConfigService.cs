@@ -5,7 +5,6 @@ using System.IO;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using RethinkDb.Driver.Ast;
 
 namespace Sora_Bot_1.SoraBot.Services.ConfigService
 {
@@ -13,7 +12,6 @@ namespace Sora_Bot_1.SoraBot.Services.ConfigService
     {
         private static JsonSerializer jSerializer = new JsonSerializer();
         private static ConcurrentDictionary<string, string> configDict = new ConcurrentDictionary<string, string>();
-        public static string DBname;
 
 
         public static void InitializeLoader()
@@ -25,17 +23,16 @@ namespace Sora_Bot_1.SoraBot.Services.ConfigService
 
         public static void LoadConfig()
         {
-            if (!File.Exists(@".\SoraBot\Services\ConfigService\config.json"))
+            if (!File.Exists(@"config.json"))
             {
                 throw new IOException("COULDNT FIND CONFIG FILE!");
             }
 
-            using (StreamReader sr = File.OpenText(@".\SoraBot\Services\ConfigService\config.json"))
+            using (StreamReader sr = File.OpenText(@"config.json"))
             using (JsonReader reader = new JsonTextReader(sr))
             {
                 configDict = jSerializer.Deserialize<ConcurrentDictionary<string, string>>(reader);
             }
-            configDict.TryGetValue("DB", out DBname);
         }
 
         public static ConcurrentDictionary<string, string> getConfig()

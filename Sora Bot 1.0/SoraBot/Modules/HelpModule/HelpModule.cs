@@ -31,24 +31,7 @@ namespace Sora_Bot_1.SoraBot.Modules.HelpModule
             {
                 Color = new Color(4, 97, 247)
             };
-
-            if (cmdName == null)
-            {
-                eb.Title = "Sora Help: ([ ] are optional parameters)";
-
-                foreach (var c in service.Commands)
-                {
-                    if (!c.Module.Aliases.FirstOrDefault().Equals("o"))
-                    {
-                        eb.AddField((efb) =>
-                        {
-                            efb.Name = c.Module.Aliases.FirstOrDefault() + " " + c.Name +(c.Parameters.Count >0 ? (c.Parameters.FirstOrDefault().IsOptional ? $" [<{c.Parameters.FirstOrDefault()}>]" : $" <{c.Parameters.FirstOrDefault()}>") : "");
-                            efb.Value = c.Summary ?? "No specific description";
-                        });
-                    }
-                }
-            }
-            else
+            if(cmdName != null)
             {
                 pm = false;
                 eb.Title = $"Help for *{cmdName}*";
@@ -88,9 +71,8 @@ namespace Sora_Bot_1.SoraBot.Modules.HelpModule
             }
             else
             {
-                //await (Context.User.GetDMChannelAsync() as IMessageChannel).SendMessageAsync("", false, eb);
-                await (await Context.User.CreateDMChannelAsync()).SendMessageAsync("",false,eb);
-                await Context.Channel.SendMessageAsync("Check your PMs! :mailbox_with_mail:");
+                //await (await Context.User.CreateDMChannelAsync()).SendMessageAsync("",false,eb);
+                await Context.Channel.SendMessageAsync($"{Context.User.Mention} help can be found here <http://git.argus.moe/serenity/SoraBot/wikis/sora-help>");
             }
         }
 

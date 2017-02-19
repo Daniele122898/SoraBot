@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -57,13 +58,53 @@ namespace Sora_Bot_1.SoraBot.Services
                 {
                     await Context.Channel.SendMessageAsync(":no_entry_sign: You must be in the same channel as the me!");
                 }
-                
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
                 await SentryService.SendError(e, Context);
             }
+        }
+
+        public async Task CheckIfAlone(SocketUser user, SocketVoiceState stateOld, SocketVoiceState stateNew)
+        {
+            try
+            {
+                if (user.IsBot)
+                    return;
+                if (stateOld.VoiceChannel == null)
+                    return;
+                if (!stateOld.VoiceChannel.Users.Contains(((SocketGuildUser)user).Guild.CurrentUser)) //Compare the ids instead, also CurrentUser has an VoiceChannel property I think stateOld.VoiceChannel.Id == guild.CurrentUeser.VoiceChannel.Id could work
+                    return;
+                if (stateOld.VoiceChannel == (stateNew.VoiceChannel ?? null ))
+                    return;
+                int users = 0;
+                foreach (var u in stateOld.VoiceChannel.Users)
+                {
+                    if (!u.IsBot)
+                    {
+                        users++;
+                    }
+                }
+                if (users < 1)
+                {
+                    IAudioClient aClient;
+                    var userG = (SocketGuildUser) user;
+                    audioDict.TryGetValue(userG.Guild.Id, out aClient);
+                    if (aClient == null)
+                    {
+                        return;
+                    }
+                        await aClient.DisconnectAsync();
+                        audioDict.TryRemove(userG.Guild.Id, out aClient);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e);
+            }
+            
         }
 
         public async Task AddQueue(string url, CommandContext Context)
@@ -117,6 +158,30 @@ namespace Sora_Bot_1.SoraBot.Services
                 else
                 {
                     PlayQueueAsync(client, Context);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
+        }
+
+        public async Task ClearQueue(CommandContext Context)
+        {
+            try
+            {
+                List<string> queue = new List<string>();
+                if (!queueDict.TryGetValue(Context.Guild.Id, out queue))
+                {
+                    await Context.Channel.SendMessageAsync(
+                        ":no_entry_sign: You first have to create a Queue by adding atleast one song!");
+                }
+                else
+                {
+                    queue.Clear();
+                    queueDict.TryUpdate(Context.Guild.Id, queue);
+                    await Context.Channel.SendMessageAsync(":put_litter_in_its_place:  Cleared the entire list.");
                 }
             }
             catch (Exception e)
@@ -326,13 +391,23 @@ namespace Sora_Bot_1.SoraBot.Services
                         {
                             efb.Name = "Queue";
                             efb.IsInline = false;
-                            for (int i = 1; i < queue.Count; i++)
+                            int lenght = 0;
+                            if (queue.Count > 11)
+                            {
+                                lenght = 11;
+                            }
+                            else
+                            {
+                                lenght = queue.Count;
+                            }
+                            for (int i = 1; i < lenght; i++)
                             {
                                 var infoJson = File.ReadAllText($"{queue[i]}.info.json");
                                 var info = JObject.Parse(infoJson);
 
                                 var title = info["fulltitle"].ToString();
-
+                                if (((efb.Value == null ? 0 : efb.Value.Length) + ($"{i}. {title} \n").Length) > 1000)
+                                    break;
                                 efb.Value += $"{i}. {title} \n";
                             }
                             if (queue.Count == 1)
@@ -475,7 +550,6 @@ namespace Sora_Bot_1.SoraBot.Services
             // Create FFmpeg using the previous example
             //string betterPath = "https://www.youtube.com/watch?v="+id[1];
 
-            
 
             Process ytdl = new Process();
             if (!File.Exists(id[1] + ".mp3"))
@@ -499,13 +573,13 @@ namespace Sora_Bot_1.SoraBot.Services
                         });
                         return "f";
                     }
-                    
+
                     //var data = JObject.Parse(output);
                     IDictionary<string, JToken> json = JObject.Parse(output);
 
                     if (json.ContainsKey("is_live") && !String.IsNullOrEmpty(json["is_live"].Value<string>()))
-                    //if (data["is_live"].Value<string>() != null)
-                    //if (String.IsNullOrEmpty(data["is_live"].Value<string>()))
+                        //if (data["is_live"].Value<string>() != null)
+                        //if (String.IsNullOrEmpty(data["is_live"].Value<string>()))
                     {
                         stream = false;
                         ytdl = YtDl("");
