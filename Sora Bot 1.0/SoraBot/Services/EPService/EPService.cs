@@ -48,7 +48,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             {
                 var guild = ((SocketGuild)Context.Guild);
                 //await guild.DownloadUsersAsync();
-                //if (guild.MemberCount < 1100)
+                if (guild.MemberCount < 1100)
                 {
                     guild.DownloadUsersAsync().Wait();
                 }
