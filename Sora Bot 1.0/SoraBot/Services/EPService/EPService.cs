@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Discord;
@@ -39,6 +40,91 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             InitializeLoader();
             LoadDatabase();
             LoadDatabaseGuild();
+        }
+
+        public async Task shotTop10(CommandContext Context)
+        {
+            try
+            {
+                var guild = ((SocketGuild)Context.Guild);
+                //await guild.DownloadUsersAsync();
+                //if (guild.MemberCount < 1100)
+                //{
+                    guild.DownloadUsersAsync().Wait();
+                //}
+
+                //FEED LIST
+                Dictionary<string, float> epList = new Dictionary<string, float>();
+                foreach (var u in guild.Users)
+                {
+                    if (!u.IsBot && userEPDict.ContainsKey(u.Id))
+                    {
+                        userStruct str = new userStruct();
+                        userEPDict.TryGetValue(u.Id, out str);
+                        epList.Add($"{u.Username}#{u.Discriminator}", str.ep);
+                    }
+                }
+
+                //GETLIST
+                var sortedList = epList.OrderByDescending(pair => pair.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
+                var top10 = sortedList.Take(10);
+                /* TURN IT BACK INTO DICT
+                 * var top5 = dict.OrderByDescending(pair => pair.Value).Take(5)
+               .ToDictionary(pair => pair.Key, pair => pair.Value);
+               */
+
+                //CREATE TOP 10
+                var eb = new EmbedBuilder()
+                {
+                    Color = new Discord.Color(4, 97, 247),
+                    ThumbnailUrl = Context.Guild.IconUrl,
+                    Title = $"Top 10 in {guild.Name} (Global EP)",
+                    Footer = new EmbedFooterBuilder()
+                    {
+                        Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
+                        IconUrl = Context.User.AvatarUrl
+                    }
+                };
+                int rank = 1;
+                foreach (var u in top10)
+                {
+                    int level = (int)Math.Round(0.15F * Math.Sqrt(u.Value));
+                    eb.AddField((x) =>
+                    {
+                        x.Name = $"{rank}. {u.Key}";
+                        x.IsInline = false;
+                        x.Value = $"Lvl. {level} \tEP: {u.Value}";
+                    });
+                    rank++;
+                }
+                int index = GetIndex(sortedList, $"{Context.User.Username}#{Context.User.Discriminator}");
+                int lvl = (int)Math.Round(0.15F * Math.Sqrt(sortedList[$"{Context.User.Username}#{Context.User.Discriminator}"]));
+                eb.AddField((x) =>
+                {
+                    x.Name = $"Your Rank: {index+1}";
+                    x.IsInline = false;
+                    x.Value = $"Level: {lvl} \tEP: {sortedList[$"{Context.User.Username}#{Context.User.Discriminator}"]}";
+                });
+                await Context.Channel.SendMessageAsync("", false, eb);
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
+            
+        }
+
+        public static int GetIndex(Dictionary<string, float> dictionary, string key)
+        {
+            for (int index = 0; index < dictionary.Count; index++)
+            {
+                if (dictionary.Skip(index).First().Key == key)
+                    return index;
+            }
+
+            return -1;
         }
 
         public async Task ShowProfile(CommandContext Context, IUser user)

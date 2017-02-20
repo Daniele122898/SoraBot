@@ -18,6 +18,13 @@ namespace Sora_Bot_1.SoraBot.Modules.EPModule
             epService = ep;
         }
 
+        [Command("top10", RunMode = RunMode.Async), Summary("Posts the top 10 List of Users sorted by EP")]
+        [Alias("top", "leaderboard")]
+        public async Task Top10List()
+        {
+            await epService.shotTop10(Context);
+        }
+
         [Command(""), Summary("Displays short profile image of User, if not specified it will show yours")]
         public async Task SendProfile([Summary("User to show the picture of, if none given will show your own!")]IUser user = null)
         {

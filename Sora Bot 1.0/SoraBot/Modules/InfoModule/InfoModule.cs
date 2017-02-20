@@ -223,6 +223,20 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                     }
                 }
                 /*
+                 * 
+                 * int online2 = 0;
+                int realMemebers = 0;
+                foreach (var u in guild.Users)
+                {
+                    if (u.Status != UserStatus.Unknown && u.Status != UserStatus.Invisible && u.Status != UserStatus.Offline && !u.IsBot)
+                    {
+                        online2++;
+                    }
+                    if (!u.IsBot)
+                        realMemebers++;
+                }
+                 * 
+                 * 
                 eb.AddField((efb) =>
                 {
                     efb.Name = "Guild";

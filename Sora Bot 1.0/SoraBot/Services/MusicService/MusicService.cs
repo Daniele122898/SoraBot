@@ -96,8 +96,9 @@ namespace Sora_Bot_1.SoraBot.Services
                     {
                         return;
                     }
-                        await aClient.DisconnectAsync();
-                        audioDict.TryRemove(userG.Guild.Id, out aClient);
+                    await aClient.DisconnectAsync();
+                    aClient.Dispose();
+                    audioDict.TryRemove(userG.Guild.Id, out aClient);
                 }
             }
             catch (Exception e)
