@@ -10,6 +10,7 @@ using Discord.WebSocket;
 using Microsoft.VisualBasic;
 using Sora_Bot_1.SoraBot.Core;
 using Sora_Bot_1.SoraBot.Services;
+using Sora_Bot_1.SoraBot.Services.ChangelogService;
 using Sora_Bot_1.SoraBot.Services.EPService;
 using Sora_Bot_1.SoraBot.Services.StarBoradService;
 
@@ -64,6 +65,22 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
         public async Task SetAnnounceChannel()
         {
             await updateService.SetChannel(Context);
+        }
+
+        [Command("loadChange")]
+        [RequireOwner]
+        public async Task ReloadChangelog()
+        {
+            ChangelogService.LoadChangelog();
+            await ReplyAsync(":white_check_mark: Reloaded the Changelog");
+        }
+
+        [Command("redoChange")]
+        [RequireOwner]
+        public async Task RedoChange([Remainder] string changelog)
+        {
+            await ChangelogService.modifyChangelog(changelog);
+            await ReplyAsync(":white_check_mark: Redone the Changelog");
         }
 
         [Command("remove"), Summary("Removes current Announcement channel to stop the bot from announcing")]

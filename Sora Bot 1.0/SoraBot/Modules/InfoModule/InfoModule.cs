@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Discord;
 using System.Runtime.InteropServices;
@@ -28,6 +29,17 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
         public InfoModule(MusicService _service)
         {
             musicService = _service;
+        }
+
+        private Process ps()
+        {
+            var ps = new ProcessStartInfo
+            {
+                FileName = "ps",
+                Arguments =
+                    $"auwx {Process.GetCurrentProcess().Id}"
+            };
+            return Process.Start(ps);
         }
 
         [Command(""), Summary("Gives infos about the bot")]
@@ -68,9 +80,6 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                     IconUrl = Context.User.AvatarUrl
                 }
             };
-
-            
-
             
             eb.AddField((efb) =>
             {

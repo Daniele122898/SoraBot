@@ -176,9 +176,24 @@ namespace Sora_Bot_1.SoraBot.Core
 
             //Execute the command. (result does no indicate a return value
             // rather an object starting if the command executed successfully
+            /*
+            IResult result;
+            try
+            {
+                result = await commands.ExecuteAsync(context, argPos, map);
+                if (result.IsSuccess)
+                    await ratelimitService.checkRatelimit(context);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, context);
+            }*/
             var result = await commands.ExecuteAsync(context, argPos, map);
+
             if (result.IsSuccess)
                 await ratelimitService.checkRatelimit(context);
+
             //if (!result.IsSuccess)
             //  await context.Channel.SendMessageAsync(result.ErrorReason);
         }

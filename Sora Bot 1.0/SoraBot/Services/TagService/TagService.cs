@@ -42,14 +42,13 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
 
         public async Task CreateTag(string entry, CommandContext Context)
         {
-
             try
             {
                 if (tagRestrictDict.ContainsKey(Context.Guild.Id))
                 {
                     GuildPermission permiss;
                     tagRestrictDict.TryGetValue(Context.Guild.Id, out permiss);
-                    if (!((SocketGuildUser)Context.User).GuildPermissions.Has(permiss))
+                    if (!((SocketGuildUser) Context.User).GuildPermissions.Has(permiss))
                     {
                         await Context.Channel.SendMessageAsync(
                             ":no_entry_sign: You don't have the Permission to add a Tag!");
@@ -64,12 +63,19 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
                         $":no_entry_sign: Failed to add tag! Make sure its: `tag | what to do when tag is called`");
                     return;
                 }
-                string tag = entry.Remove(index);
+                string tag1 = entry.Remove(index);
                 string content = entry.Substring(index);
                 //if (tag.Length > 1 && !String.IsNullOrEmpty(tag[0]) && !String.IsNullOrEmpty(tag[1]))
-                if (!String.IsNullOrEmpty(tag) &&
+                if (!String.IsNullOrEmpty(tag1) &&
                     !String.IsNullOrEmpty(content.Substring(content.IndexOf('|') + 1).Trim()))
                 {
+                    var tag = tag1.ToLower();
+                    if (tag.Trim() == "taglist")
+                    {
+                        await Context.Channel.SendMessageAsync(
+                        $":no_entry_sign: `taglist` is a command and cannot be added as tag! Use any other");
+                        return;
+                    }
                     TagStruct tagStruct = new TagStruct
                     {
                         tag = tag.Trim(),
@@ -144,7 +150,7 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
         {
             try
             {
-                if (((SocketGuildUser)context.User).GuildPermissions.Has(GuildPermission.Administrator))
+                if (((SocketGuildUser) context.User).GuildPermissions.Has(GuildPermission.Administrator))
                 {
                     if (tagRestrictDict.ContainsKey(context.Guild.Id) && perms == null)
                     {
@@ -250,7 +256,7 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
                     tagDict.TryGetValue(Context.Guild.Id, out tagStruct);
                     foreach (var t in tagStruct)
                     {
-                        if (t.tag.Equals(tag.Trim()))
+                        if (t.tag.Equals(tag.Trim().ToLower()))
                         {
                             await Context.Channel.SendMessageAsync(t.value);
                             return;
@@ -280,7 +286,7 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
                     tagDict.TryGetValue(Context.Guild.Id, out tagStruct);
                     foreach (var t in tagStruct)
                     {
-                        if (t.tag.Equals(tag.Trim()))
+                        if (t.tag.Equals(tag.Trim().ToLower()))
                         {
                             GuildPermission permiss = GuildPermission.Connect;
                             if (tagRestrictDict.ContainsKey(Context.Guild.Id))
@@ -289,9 +295,9 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
                             }
                             if (Context.User.Id == t.creatorID ||
                                 ((permiss == GuildPermission.Connect)
-                                    ? ((SocketGuildUser)Context.User).GuildPermissions.Has(
+                                    ? ((SocketGuildUser) Context.User).GuildPermissions.Has(
                                         GuildPermission.ManageChannels)
-                                    : ((SocketGuildUser)Context.User).GuildPermissions.Has(permiss)))
+                                    : ((SocketGuildUser) Context.User).GuildPermissions.Has(permiss)))
                             {
                                 tagStruct.Remove(t);
                                 if (tagDict.TryUpdate(Context.Guild.Id, tagStruct))

@@ -29,7 +29,7 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
         public async Task PatCount(
             [Summary("Person to get Patcount. If not specified it will give your own")] IUser user = null)
         {
-            var userInfo = user ?? Context.Client.CurrentUser; // ?? if not null return left. if null return right
+            var userInfo = user ?? Context.User; // ?? if not null return left. if null return right
             await patService.CheckPats(userInfo, Context);
         }
 

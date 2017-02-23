@@ -47,10 +47,12 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             try
             {
                 var guild = ((SocketGuild)Context.Guild);
-                //await guild.DownloadUsersAsync();
-                if (guild.MemberCount < 1100)
+                //guild.DownloadUsersAsync();
+                
+                if (guild.MemberCount < 200)
                 {
                     guild.DownloadUsersAsync().Wait();
+                    //await guild.DownloadUsersAsync();
                 }
 
                 //FEED LIST
@@ -61,7 +63,10 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     {
                         userStruct str = new userStruct();
                         userEPDict.TryGetValue(u.Id, out str);
-                        epList.Add($"{u.Username}#{u.Discriminator}", str.ep);
+                        if (!epList.ContainsKey($"{u.Username}#{u.Discriminator}"))
+                        {
+                            epList.Add($"{u.Username}#{u.Discriminator}", str.ep);
+                        }
                     }
                 }
 

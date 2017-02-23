@@ -18,7 +18,7 @@ namespace Sora_Bot_1.SoraBot.Modules.EPModule
             epService = ep;
         }
 
-        [Command("top10", RunMode = RunMode.Async), Summary("Posts the top 10 List of Users sorted by EP")]
+        [Command("top10", RunMode = RunMode.Async), Summary("Posts the top 10 list of users sorted by EP => The EP is globaly aquired on all Guilds that Sora is on!")]
         [Alias("top", "leaderboard")]
         public async Task Top10List()
         {
