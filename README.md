@@ -39,6 +39,8 @@ Command | Parameter | Permission | Output
 
 **ATTENTION** All of the following commands need a specified permission! If the `t restrict` command is not invoked no permissions are needed to create tags. Otherwise the set permissions are needed! The `t restrict` command needs **Administrator** permissions to be run.
 
+**GENERAL** You cannot create a tag called `taglist` as it is a keyword. All tags will be created lowercase and called in lowercase no matter how you type them.
+
 **PREFIX** This Command uses a module prefix. which means infront of all commands needs to be the prefix `tag` or `t` !
 
 | Command      	| Parameter                	| Example                                  	| Output                                                                                                                                                                                          	|
@@ -54,6 +56,7 @@ Command | Parameter | Permission | Output
 **GENERAL** The starboard is a community based pin. What does that mean?
 When someone writes something funny you can react to it with :star: or :star2: . This will post it in the specified Starboard channel (if not specified nothing will be posted)!
 I recommend creating a channel called **Starboard** and restricting everyone from writing in it but able to read it. That way no one can temper with the quotes but everyone can enjoy them! When activated, Sora MUST have the permission to read the message history, otherwise he wont be able to donwload messages that he did not see to upload them to the Starboard!
+You cannot star your own message. It will not be added to the starboard. Only different users can do that. When all reactions are deleted from the message the entry in the starboard will vanish aswell. The same message can only be added and removed twice, then it will be locked for the starboard and reactions to it will be blocked.
 
 | Command      | Parameter | Example       | Permission      | Output                                                        |
 |--------------|-----------|---------------|-----------------|---------------------------------------------------------------|
