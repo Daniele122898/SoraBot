@@ -208,6 +208,12 @@ namespace Sora_Bot_1.SoraBot.Services
                     }
                     else
                     {
+                        if (queue.Count < 1)
+                        {
+                            await Context.Channel.SendMessageAsync(
+                            ":no_entry_sign: The queue is empty! Nothing to skip here..");
+                            return;
+                        }
                         queue.RemoveAt(0);
                         queueDict.TryUpdate(Context.Guild.Id, queue);
                         await Context.Channel.SendMessageAsync(":track_next: Skipped first entry in Queue");
@@ -223,6 +229,12 @@ namespace Sora_Bot_1.SoraBot.Services
                     }
                     else
                     {
+                        if (queue.Count < 1)
+                        {
+                            await Context.Channel.SendMessageAsync(
+                            ":no_entry_sign: The queue is empty! Nothing to skip here..");
+                            return;
+                        }
                         queue.RemoveAt(0);
                         queueDict.TryUpdate(Context.Guild.Id, queue);
                         if (queue.Count == 0)
