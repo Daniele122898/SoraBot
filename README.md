@@ -1,8 +1,3 @@
-# SoraBot
-Sora - A Discord Bot written in C# and with much ♥
-
-# Sora Commands -> Also in the wiki
-
 **GENERAL** If the Parameter has [ ] that means that it is optional. Leaving it will result in a different outcome.
 For further questions join my Discord: https://discord.gg/Pah4yj5
 
@@ -13,18 +8,20 @@ Sora can always be invoked with mentioning him. But using that function is proba
 
 | Command  | Parameter | Example                            | Permission    | Output                                                           |
 |----------|-----------|------------------------------------|---------------|------------------------------------------------------------------|
-| `prefix` | prefix    | `$prefix $$ /@Sora#7634 prefix $$` | Administrator | Changes the prefix of Sora in that guild to the specified prefix |
+| `prefix` | prefix    | `$prefix $$ / @Sora#7634 prefix $$` | Administrator | Changes the prefix of Sora in that guild to the specified prefix |
 | `prefix` | *none*    | `$prefix / @Sora#7634 prefix`      | *none*        | Displays the current prefix of Sora in this guild                |
 
 ## Music
 
-**GENERAL** Sora can currently only play YT-Videos and no playlists. This will be added soon™
+**GENERAL** Sora can currently only play YT-Videos and no playlists. This will be added soon™ 
+Newly added: Bot will leave the channel if no one is in it anymore
 
 Command | Parameter | Example | Output 
 --- | --- | --- | ---
 `join` | *none* | `$join` | Joins the VoiceChannel of the calling user
 `add` | YT video Url | `$add https://www.youtube.com/watch?v=Zt8Im_1fowA` | Only works with YT links. Adds the video to your queue
 `skip` | *none* | `$skip` | Skips the current song and go to the next in the queue
+`clear` | *none* | `$clear` | Clears the whole queue for the Guild. **Requires** Manage Channels permissions
 `list` | *none* | `$list` | Shows the entire current queue
 `np` | *none* | `$np` | Shows the current track that is playing
 `play` | *none* | `$play` | Starts the playback of the current queue
@@ -72,6 +69,7 @@ I recommend creating a channel called **Starboard** and restricting everyone fro
 |---------------|-----------------|--------------------------|----------------------------------------------------------------------------------------------------------------------------|
 | `p`           | [@Mention user] | `$p / $p @Serenity#0783` | Creates a profile image showing the EP and Level of the User (If specified the mentioned user otherwise the invoking user) |
 | `p subscribe` | *none*          | `$p subscribe`           | Toggles your lvl up notifies (If Sora will Message you when you level up. Standard : false)                                |
+| `p top10`     | *none*          | `$p top10`               | Posts the top 10 list of users sorted by EP => The EP is globaly aquired on all Guilds that Sora is on!                    |
 
 ## Help
 
@@ -87,8 +85,8 @@ I recommend creating a channel called **Starboard** and restricting everyone fro
 | Command      | Parameter       | Example                                    | Output                                                                                                                                                                    |
 |--------------|-----------------|--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `info`       | *none*          | `$info`                                    | Displays all the infos about Sora. (Current Guilds, Architecture, uptime, ping etc..)                                                                                     |
-| `info user`  | [@mention user] | `$info user` / `$info user @Serenity#0783` | If no user is entered as Parameter, you yourself will be the user displayed. This will post infos about the user like a link to his avatar, when he created the acc etc.. |
-| `info guild` | *none*          | $info guild                                | Posts info about the guild similar to the user command                                                                                                                    |
+| `info user`  | [@mention user] | `$info user / $info user @Serenity#0783` | If no user is entered as Parameter, you yourself will be the user displayed. This will post infos about the user like a link to his avatar, when he created the acc etc.. |
+| `info guild` | *none*          | `$info guild`                                | Posts info about the guild similar to the user command                                                                                                                    |
 
 ## Miscellaneous and Fun
 
@@ -96,7 +94,7 @@ I recommend creating a channel called **Starboard** and restricting everyone fro
 |------------|-----------------|------------------------|-----------------------------------------------------------------------------------|
 | `say`      | message to echo | `$say i love this bot` | Will echo the parameter                                                           |
 | `git`      | *none*          | `$git`                 | Will post a link to my gitlab page                                                |
-| `feedback` | *none*          | $feedback / $bug       | Posts a link to my discord in where you can report bugs or issue Feature requests |
+| `feedback` | *none*          | `$feedback / $bug`       | Posts a link to my discord in where you can report bugs or issue Feature requests |
 | `door`     | @mention        | `$door @Serenity#0783` | Shows the specified user the door. Mostly used after bad jokes                    |
 | `lenny`    | *none*          | `$lenny`               | Posts a nice lenny face ( ͡° ͜ʖ ͡°)                                                  |
 | `google`   | What to google  | `$google what is c#?`  | Googles something for you. Mostly used to google for others...                    |
@@ -117,4 +115,4 @@ I recommend creating a channel called **Starboard** and restricting everyone fro
 
 | Command     | Parameter | Example      | Output                            |
 |-------------|-----------|--------------|-----------------------------------|
-| `changelog` | *none*    | `$changelog` | See what the last update changed! | 
+| `changelog` | *none*    | `$changelog` | See what the last update changed! |
