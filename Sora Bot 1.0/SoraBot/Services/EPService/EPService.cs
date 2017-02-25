@@ -87,7 +87,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     Footer = new EmbedFooterBuilder()
                     {
                         Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
-                        IconUrl = Context.User.AvatarUrl
+                        IconUrl = Context.User.GetAvatarUrl()
                     }
                 };
                 int rank = 1;
@@ -158,14 +158,14 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     var cooldown = Environment.TickCount + 30000;
                     userCooldown.TryAdd(Context.User.Id, cooldown);
                 }
-                var img = await DrawText(user.AvatarUrl, user);
+                var img = await DrawText(user.GetAvatarUrl(), user);
                 //await Context.Channel.SendMessageAsync($"Image \n{img}");
-                if (File.Exists($"{user.Username}.jpg"))
+                if (File.Exists($"{user.Username}.png"))
                 {
-                    await Context.Channel.SendFileAsync($"{user.Username}.jpg", null, false, null);
-                    File.Delete($"{user.Username}.jpg");
-                    File.Delete($"{user.Username}Avatar.jpg");
-                    File.Delete($"{user.Username}AvatarF.jpg");
+                    await Context.Channel.SendFileAsync($"{user.Username}.png", null, false, null);
+                    File.Delete($"{user.Username}.png");
+                    File.Delete($"{user.Username}Avatar.png");
+                    File.Delete($"{user.Username}AvatarF.png");
                 }
                 else
                 {
@@ -199,16 +199,16 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
 
                 Uri requestUri = new Uri(AvatarUrl);
 
-                if (File.Exists($"{userInfo.Username}Avatar.jpg"))
+                if (File.Exists($"{userInfo.Username}Avatar.png"))
                 {
-                    File.Delete($"{userInfo.Username}Avatar.jpg");
+                    File.Delete($"{userInfo.Username}Avatar.png");
                 }
 
                 using (var client = new HttpClient())
                 using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
                 using (
                     Stream contentStream = await (await client.SendAsync(request)).Content.ReadAsStreamAsync(),
-                        stream = new FileStream($"{userInfo.Username}Avatar.jpg", FileMode.Create, FileAccess.Write,
+                        stream = new FileStream($"{userInfo.Username}Avatar.png", FileMode.Create, FileAccess.Write,
                             FileShare.None, 3145728, true))
                 {
                     await contentStream.CopyToAsync(stream);
@@ -234,11 +234,11 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 const int size = 57;
                 const int quality = 75;
 
-                Configuration.Default.AddImageFormat(new JpegFormat());
+                Configuration.Default.AddImageFormat(new PngFormat());
 
-                using (var input = File.OpenRead($"{userInfo.Username}Avatar.jpg"))
+                using (var input = File.OpenRead($"{userInfo.Username}Avatar.png"))
                 {
-                    using (var output = File.OpenWrite($"{userInfo.Username}AvatarF.jpg"))
+                    using (var output = File.OpenWrite($"{userInfo.Username}AvatarF.png"))
                     {
                         var image = new ImageSharp.Image(input)
                             .Resize(new ResizeOptions
@@ -253,7 +253,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 }
                 //IMAGE RESIZE END
 
-                var avatarIMG = System.Drawing.Image.FromFile($"{userInfo.Username}AvatarF.jpg");
+                var avatarIMG = System.Drawing.Image.FromFile($"{userInfo.Username}AvatarF.png");
                 if (avatarIMG == null)
                 {
                     Console.WriteLine("COULDNT DOWNLOAD IMAGE. AVATAR NULL");
@@ -296,11 +296,11 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 var myEncoderParameter = new EncoderParameter(myEncoder, 75L);
                 myEncoderParameters.Param[0] = myEncoderParameter;
                 //img.Save("test.jpg", myImageCodecInfo, myEncoderParameter);
-                if (File.Exists($"{userInfo.Username}.jpg"))
+                if (File.Exists($"{userInfo.Username}.png"))
                 {
-                    File.Delete($"{userInfo.Username}.jpg");
+                    File.Delete($"{userInfo.Username}.png");
                 }
-                img.Save($"{userInfo.Username}.jpg");
+                img.Save($"{userInfo.Username}.png");
 
                 //Dispose avatar so it can be deleted
                 avatarIMG.Dispose();

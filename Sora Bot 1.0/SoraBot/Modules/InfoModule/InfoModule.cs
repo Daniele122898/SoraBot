@@ -73,11 +73,11 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
             var eb = new EmbedBuilder()
             {
                 Color = new Color(4, 97, 247),
-                ThumbnailUrl = Context.Client.CurrentUser.AvatarUrl,
+                ThumbnailUrl = Context.Client.CurrentUser.GetAvatarUrl(),
                 Footer = new EmbedFooterBuilder()
                 {
                     Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
-                    IconUrl = Context.User.AvatarUrl
+                    IconUrl = Context.User.GetAvatarUrl()
                 }
             };
             
@@ -131,13 +131,13 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                 var eb = new EmbedBuilder()
                 {
                     Color = new Color(4, 97, 247),
-                    ThumbnailUrl = userInfo.AvatarUrl,
+                    ThumbnailUrl = userInfo.GetAvatarUrl(),
                     Title = $"{userInfo.Username}#{userInfo.Discriminator} Info",
                     Description = $"Joined Discord on: {userInfo.CreatedAt.ToString().Remove(userInfo.CreatedAt.ToString().Length - 6)}",
                     Footer = new EmbedFooterBuilder()
                     {
                         Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator} | {userInfo.Username} ID: {userInfo.Id}",
-                        IconUrl = Context.User.AvatarUrl
+                        IconUrl = Context.User.GetAvatarUrl()
                     }
                 };
 
@@ -159,7 +159,7 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                 {
                     x.Name = "Avatar";
                     x.IsInline = true;
-                    x.Value = $"[Click to View]({userInfo.AvatarUrl})";
+                    x.Value = $"[Click to View]({userInfo.GetAvatarUrl()})";
                 });
 
                 eb.AddField((x) =>
@@ -214,7 +214,7 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                     Footer = new EmbedFooterBuilder()
                     {
                         Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator} | Guild ID: {Context.Guild.Id}",
-                        IconUrl = Context.User.AvatarUrl
+                        IconUrl = Context.User.GetAvatarUrl()
                     }
                 };
                 var guild = ((SocketGuild)Context.Guild);

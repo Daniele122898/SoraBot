@@ -120,7 +120,7 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                                     Author = new EmbedAuthorBuilder()
                                     {
                                         IconUrl =
-                                            (specified ? reaction.Message.Value.Author.AvatarUrl : dmsg.Author.AvatarUrl),
+                                            (specified ? reaction.Message.Value.Author.GetAvatarUrl() : dmsg.Author.GetAvatarUrl()),
                                         Name =
                                             $"{(specified ? reaction.Message.Value.Author.Username : dmsg.Author.Username)}#{(specified ? reaction.Message.Value.Author.Discriminator : dmsg.Author.Discriminator)}"
                                     },
@@ -146,7 +146,7 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                                     Author = new EmbedAuthorBuilder()
                                     {
                                         IconUrl =
-                                            (specified ? reaction.Message.Value.Author.AvatarUrl : dmsg.Author.AvatarUrl),
+                                            (specified ? reaction.Message.Value.Author.GetAvatarUrl() : dmsg.Author.GetAvatarUrl()),
                                         Name =
                                             $"{(specified ? reaction.Message.Value.Author.Username : dmsg.Author.Username)}#{(specified ? reaction.Message.Value.Author.Discriminator : dmsg.Author.Discriminator)}"
                                     },

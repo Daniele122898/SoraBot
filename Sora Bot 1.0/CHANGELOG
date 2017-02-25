@@ -1,14 +1,10 @@
 **Version**
-0.0.9.8
+0.0.9.9.1
 
 **Date**
-20.2.2017
+24.2.2017 017:00 UTC +1
 
 **Changes**
-  - Added missing permission answer
-	used to just ignore command..
-  - Added top10 list
-	List is global EP ($p top10)
-  - Actually made sora leave when 
-	voicechannel is mepty
-  - Fixed major bugs
+  - Fixed manual reconnect
+  - Updated to new Discord.net version
+  - Fixed the welcoming message bug!

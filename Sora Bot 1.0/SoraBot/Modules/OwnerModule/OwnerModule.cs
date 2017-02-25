@@ -162,6 +162,13 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
             }
         }
 
+        [Command("writeline")]
+        [RequireOwner]
+        public async Task ConsoleWrite([Remainder] string write)
+        {
+            Console.WriteLine(write);
+        }
+
         [Command("shutdown")]
         [RequireOwner]
         public async Task ShutDown()

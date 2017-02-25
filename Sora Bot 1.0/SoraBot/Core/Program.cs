@@ -27,6 +27,8 @@ namespace Sora_Bot_1.SoraBot.Core
             ConfigService.LoadConfig();
             configDict = ConfigService.getConfig();
 
+            client = createClient().Result;
+            /*
             client = new DiscordSocketClient(new DiscordSocketConfig() {
                 LogLevel = LogSeverity.Info,
                 AudioMode = AudioMode.Outgoing,
@@ -40,7 +42,7 @@ namespace Sora_Bot_1.SoraBot.Core
                     Console.WriteLine($"{message.ToString()}");
                 }
                 return Task.CompletedTask;
-            };
+            };*/
 
             //Place the token of your bot account here
             //= File.ReadAllText("token2.txt");
@@ -57,7 +59,7 @@ namespace Sora_Bot_1.SoraBot.Core
 
             commands = new CommandHandler();
             await commands.Install(client);
-
+             
             client.Disconnected += Client_Disconnected;
 
             //Block this task until the program is exited
@@ -66,10 +68,50 @@ namespace Sora_Bot_1.SoraBot.Core
 
         private async Task Client_Disconnected(Exception e)
         {
-            Console.WriteLine(e);
-            //await SentryService.SendError(e);
-            await client.LoginAsync(TokenType.Bot, token);
-            await client.ConnectAsync();
+            try
+            {
+                await Task.Delay(20000);
+                if (client.ConnectionState == ConnectionState.Connected)
+                {
+                    await SentryService.SendMessage("**Disconnected and Wrapper reconnected himself**");
+                    return;
+                }
+                Console.WriteLine("TRYING TO RECOVER WITH RECONNECT");
+                Console.WriteLine(e);
+                //await SentryService.SendError(e);
+                client = createClient().Result;
+                await client.LoginAsync(TokenType.Bot, token);
+                await client.ConnectAsync();
+                commands = new CommandHandler();
+                await commands.Install(client);
+                client.Disconnected += Client_Disconnected;
+                await SentryService.SendMessage($"**THE BOT HAS DISCONNECTED AND SUCCESFULLY RECONNECTED**\n{e}");
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+            }
+            
+        }
+
+        private async Task<DiscordSocketClient> createClient()
+        {
+            var _client = new DiscordSocketClient(new DiscordSocketConfig()
+            {
+                LogLevel = LogSeverity.Info,
+                AudioMode = AudioMode.Outgoing,
+                MessageCacheSize = 50
+            });
+
+            _client.Log += (message) =>
+            {
+                if (!message.ToString().Contains("Unknown OpCode (Speaking)"))
+                {
+                    Console.WriteLine($"{message.ToString()}");
+                }
+                return Task.CompletedTask;
+            };
+            return _client;
         }
 
         public async void DisconnectAsync()

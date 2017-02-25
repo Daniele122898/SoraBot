@@ -67,11 +67,11 @@ namespace Sora_Bot_1.SoraBot.Modules.FunModule
             {
                 Title = "About",
                 Color = new Color(4, 97, 247),
-                ThumbnailUrl = Context.Client.CurrentUser.AvatarUrl,
+                ThumbnailUrl = Context.Client.CurrentUser.GetAvatarUrl(),
                 Footer = new EmbedFooterBuilder()
                 {
                     Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
-                    IconUrl = Context.User.AvatarUrl
+                    IconUrl = Context.User.GetAvatarUrl()
                 }
             };
             eb.AddField((efb) =>
@@ -119,7 +119,7 @@ namespace Sora_Bot_1.SoraBot.Modules.FunModule
                 Footer = new EmbedFooterBuilder()
                 {
                     Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
-                    IconUrl = Context.User.AvatarUrl
+                    IconUrl = Context.User.GetAvatarUrl()
                 },
                 Description =
                     "Just uncheck the permissions you dont feel like giving, this might break Sora though. Atleast give him these permissions:\n" +

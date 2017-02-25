@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -81,6 +82,92 @@ namespace Sora_Bot_1.SoraBot.Core
             client.ReactionAdded += starBoardService.StarAdded;
             client.ReactionRemoved += starBoardService.StarRemoved;
             client.UserVoiceStateUpdated += musicService.CheckIfAlone;
+            client.JoinedGuild += Client_JoinedGuild;
+            client.LeftGuild += Client_LeftGuild;
+        }
+
+        private async Task Client_LeftGuild(SocketGuild arg)
+        {
+            try
+            {
+                await SentryService.SendMessage($"Left Guild {arg.Name} / {arg.Id} with {arg.MemberCount} members");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e);
+            }
+        }
+
+        private async Task Client_JoinedGuild(SocketGuild guild)
+        {
+            try
+            {
+                bool send = true;
+                foreach (var p in guild.DefaultChannel.PermissionOverwrites)
+                {
+                    if (p.Permissions.SendMessages == PermValue.Deny)
+                        send = false;
+                }
+                var eb = new EmbedBuilder()
+                {
+                    Color = new Color(4, 97, 247),
+                    Footer = new EmbedFooterBuilder()
+                    {
+                        Text = $"Bot created by Serenity#0783"
+                    },
+                    Title = $"Hello {guild.Name} :wave:",
+                    Description =
+                            $"Thank you for inviting me. My name is Sora and I hope I can make your Guild a little bit better :)" +
+                            $" Sora's functions are extensively documented so that you can use him to his full potential.\nFor the docs [click this link](http://git.argus.moe/serenity/SoraBot/wikis/sora-help)"
+                };
+                eb.AddField((x) =>
+                {
+                    x.Name = "Live Support and Feedback";
+                    x.IsInline = false;
+                    x.Value =
+                        "If you need live support or simply want to give me feedback / bug reports or issue a Feature request head to this guild:\n[Click to Join](https://discord.gg/Pah4yj5)";
+                });
+                if (!send)
+                {
+                    SocketTextChannel channel = null;
+                    bool pes = true;
+                    foreach (var cha in guild.TextChannels)
+                    {
+                        pes = true;
+                        foreach (var per in cha.PermissionOverwrites)
+                        {
+                            if (per.Permissions.SendMessages == PermValue.Deny)
+                            {
+                                pes = false;
+                                break;
+                            }
+                        }
+                        if (pes == true)
+                        {
+                            channel = cha;
+                            break;
+                        }
+                    }
+                    eb.AddField((x) =>
+                    {
+                        x.Name = "Sorry :(";
+                        x.IsInline = false;
+                        x.Value = "I could not send a message in the default channel of this guild and had to take another one. That is why this message may be in a random channel. Sorry!";
+                    });
+                    await channel.SendMessageAsync("", false, eb);
+                }
+                else
+                {
+                    await guild.DefaultChannel.SendMessageAsync("", false, eb);
+                }
+                await SentryService.SendMessage($"Joined Guild {guild.Name} / {guild.Id} with {guild.MemberCount} members");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e);
+            }
         }
 
         private void InitializeLoader()

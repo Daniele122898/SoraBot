@@ -20,7 +20,7 @@ namespace Sora_Bot_1.SoraBot.Modules.ChangelogModule
                 Footer = new EmbedFooterBuilder()
                 {
                     Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
-                    IconUrl = Context.User.AvatarUrl
+                    IconUrl = Context.User.GetAvatarUrl()
                 }
             };
 
