@@ -1,73 +1,18 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Discord;
+using System.Runtime.InteropServices;
 using Discord.Commands;
 using Discord.WebSocket;
 using Sora_Bot_1.SoraBot.Core;
+using Sora_Bot_1.SoraBot.Services;
 
 namespace Sora_Bot_1.SoraBot.Modules.InfoModule
 {
-    public class InfoModule : ModuleBase
-    {
-
-        //$say hello -> hello
-        [Command("say"), Summary("Echos a message")]
-        public async Task Say([Remainder, Summary("The text to echo")] string echo)
-        {
-            //ReplyAsync is a mtheod on modulebase
-            await ReplyAsync(echo);
-        }
-
-        //$lenny lenny -> ( ͡° ͜ʖ ͡°)
-        [Command("lenny"), Summary("Posts a lenny face")]
-        public async Task Lenny()
-        {
-            await ReplyAsync("( ͡° ͜ʖ ͡°)");
-        }
-
-        [Command("google"), Summary("Will google for you")]
-        public async Task Google([Summary("Subject to google"), Remainder]string google)
-        {
-            string search = google.Replace(" ", "%20");
-            await Context.Channel.SendMessageAsync("<https://lmgtfy.com/?q=" + search + ">");
-        }
-
-        //$swag  ( ͡° ͜ʖ ͡°)>⌐■-■ -> ( ͡⌐■ ͜ʖ ͡-■)
-        [Command("swag"), Summary("Swags the chat")]
-        public async Task Swag()
-        {
-            var msg = await ReplyAsync("( ͡° ͜ʖ ͡°)>⌐■-■");
-            await Task.Delay(1000);
-            await msg.ModifyAsync(x =>
-            {
-                x.Content = "( ͡⌐■ ͜ʖ ͡-■)";
-            });
-        }
-
-        [Command("about"), Summary("Gives an about page")]
-        public async Task AboutInfo()
-        {
-            await ReplyAsync("This bot was made by Serenity using Discord.Net");
-        }
-
-        [Command("ping"), Summary("Gives the ping of the Server on which the bot resides and the discord servers")]
-        public async Task Ping()
-        {
-            await ReplyAsync($"Pong! {(Context.Client as DiscordSocketClient).Latency} ms :ping_pong:");
-        }
-
-        [Command("invite"), Summary("Gives an invite link to invite Sora to your own Guild!")]
-        [Alias("inv")]
-        public async Task InviteAsync()
-        {
-            await ReplyAsync("To invite Me just open this link and choose the Server:\nhttps://discordapp.com/oauth2/authorize?client_id=270931284489011202&scope=bot&permissions=30720");
-        }
-
-    }
-
     //create a module with the 'sample' prefix
     [Group("info")]
-    public class Sample : ModuleBase
+    public class InfoModule : ModuleBase
     {
         /*
         //$sample square 20 -> 400
@@ -79,6 +24,23 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
         }
         */
 
+        private MusicService musicService;
+
+        public InfoModule(MusicService _service)
+        {
+            musicService = _service;
+        }
+
+        private Process ps()
+        {
+            var ps = new ProcessStartInfo
+            {
+                FileName = "ps",
+                Arguments =
+                    $"auwx {Process.GetCurrentProcess().Id}"
+            };
+            return Process.Start(ps);
+        }
 
         [Command(""), Summary("Gives infos about the bot")]
         public async Task BotInfo()
@@ -87,7 +49,6 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
             var proc = System.Diagnostics.Process.GetCurrentProcess();
 
             DiscordSocketClient _client = Context.Client as DiscordSocketClient;
-
             Func<double, double> formatRamValue = d =>
             {
                 while (d > 1024)
@@ -111,24 +72,28 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
 
             var eb = new EmbedBuilder()
             {
-                Color = new Color(4, 97, 247)
+                Color = new Color(4, 97, 247),
+                ThumbnailUrl = Context.Client.CurrentUser.GetAvatarUrl(),
+                Footer = new EmbedFooterBuilder()
+                {
+                    Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
+                    IconUrl = Context.User.GetAvatarUrl()
+                }
             };
-
-            
-
             
             eb.AddField((efb) =>
             {
                 efb.Name = "System";
                 efb.IsInline = true;
-                efb.Value = $"os version:\t{System.Runtime.InteropServices.RuntimeInformation.OSDescription}\narchitecture:\t{System.Runtime.InteropServices.RuntimeInformation.OSArchitecture}\nframework:\t{System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription}";
+                efb.Value =
+                        $"**OS version:**\t{(RuntimeInformation.OSDescription.Length >= 37 ? RuntimeInformation.OSDescription.Remove(37) : RuntimeInformation.OSDescription)}\n**Architecture:**\t{RuntimeInformation.OSArchitecture}\n**Framework:**\t{RuntimeInformation.FrameworkDescription}";
             });
 
             eb.AddField((efb) =>
             {
                 efb.Name = "Sora";
                 efb.IsInline = true;
-                efb.Value = $"architecture:\t{System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture}\nup time:\t{(DateTime.Now - proc.StartTime).ToString(@"d'd 'hh\:mm\:ss")}\nmemory:\t{formatRamValue(proc.PagedMemorySize64).ToString("f2")} {formatRamUnit(proc.PagedMemorySize64)}\nprocessor time:\t{proc.TotalProcessorTime.ToString(@"d'd 'hh\:mm\:ss")}";
+                efb.Value = $"**Up time:**\t{(DateTime.Now - proc.StartTime).ToString(@"d'd 'hh\:mm\:ss")}\n**Memory:**\t{formatRamValue(proc.PagedMemorySize64).ToString("f2")} {formatRamUnit(proc.PagedMemorySize64)}\n**Processor time:**\t{proc.TotalProcessorTime.ToString(@"d'd 'hh\:mm\:ss")}\n**Feedback or Suggestions here:**\n[Click to Join](https://discord.gg/Pah4yj5)";
             });
 
             eb.AddField((efb) =>
@@ -141,10 +106,10 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                 foreach (var g in _client.Guilds)
                 {
                     channelCount += g.Channels.Count;
-                    userCount += g.Users.Count;
+                    userCount += g.MemberCount;
                 }
 
-                efb.Value = $"state:\t{_client.ConnectionState}\nguilds:\t{_client.Guilds.Count}\nchannels:\t{channelCount}\nusers:\t{userCount}\nping:\t{_client.Latency} ms";
+                efb.Value = $"**State:**\t{_client.ConnectionState}\n**Guilds:**\t{_client.Guilds.Count}\n**Channels:**\t{channelCount}\n**Users:**\t{userCount}\n**Playing music for:** \t{musicService.PlayingFor()} guilds\n**Ping:**\t{_client.Latency} ms";
             });
             
             await Context.Channel.SendMessageAsync("", false, eb);
@@ -160,47 +125,188 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
         [Alias("userinfo", "whois")]
         public async Task UserInfo([Summary("The (optional) user to get info for")] IUser user = null)
         {
-            var userInfo = user ?? Context.Client.CurrentUser; // ?? if not null return left. if null return right
-
-            var eb = new EmbedBuilder()
+            try
             {
-                Color = new Color(4, 97, 247),
-                ThumbnailUrl = userInfo.AvatarUrl
-            };
-            eb.AddField((efb) =>
-            {
-                efb.Name = "User";
-                efb.IsInline = true;
-                efb.Value = $"Name + Discriminator: {userInfo.Username}#{userInfo.Discriminator} \n" +
-                            $"Created at: {userInfo.CreatedAt} \n" +
-                            $"Status: {userInfo.Status}";
-            });
+                var userInfo = user ?? Context.User; // ?? if not null return left. if null return right
+                var eb = new EmbedBuilder()
+                {
+                    Color = new Color(4, 97, 247),
+                    ThumbnailUrl = userInfo.GetAvatarUrl(),
+                    Title = $"{userInfo.Username}#{userInfo.Discriminator} Info",
+                    Description = $"Joined Discord on: {userInfo.CreatedAt.ToString().Remove(userInfo.CreatedAt.ToString().Length - 6)}",
+                    Footer = new EmbedFooterBuilder()
+                    {
+                        Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator} | {userInfo.Username} ID: {userInfo.Id}",
+                        IconUrl = Context.User.GetAvatarUrl()
+                    }
+                };
 
-            await Context.Channel.SendMessageAsync("", false, eb);
+                eb.AddField((x) =>
+                {
+                    x.Name = "Status";
+                    x.IsInline = true;
+                    x.Value = userInfo.Status.ToString();
+                });
+
+                eb.AddField((x) =>
+                {
+                    x.Name = "Game";
+                    x.IsInline = true;
+                    x.Value = $"{(userInfo.Game.HasValue ? userInfo.Game.Value.Name : "none")}";
+                });
+
+                eb.AddField((x) =>
+                {
+                    x.Name = "Avatar";
+                    x.IsInline = true;
+                    x.Value = $"[Click to View]({userInfo.GetAvatarUrl()})";
+                });
+
+                eb.AddField((x) =>
+                {
+                    x.Name = "Joined Guild";
+                    x.IsInline = true;
+                    x.Value = $"{(userInfo as SocketGuildUser)?.JoinedAt.ToString().Remove((userInfo as SocketGuildUser).JoinedAt.ToString().Length - 6)}";
+                });
+
+                string permissions = "";
+                (userInfo as SocketGuildUser)?.GuildPermissions.ToList().ForEach(x => { permissions += x.ToString() + " | "; });
+                eb.AddField((x) =>
+                {
+                    x.Name = "Guild Permissions";
+                    x.IsInline = true;
+                    x.Value = $"{permissions}";
+                });
+                /*
+                eb.AddField((efb) =>
+                {
+                    efb.Name = "User Info";
+                    efb.IsInline = true;
+                    efb.Value = $"**Name + Discriminator:** \t{userInfo.Username}#{userInfo.Discriminator} \n" +
+                                $"**ID** \t{userInfo.Id}\n" +
+                                $"**Created at:** \t{userInfo.CreatedAt.ToString().Remove(userInfo.CreatedAt.ToString().Length -6)} \n" +
+                                $"**Status:** \t{userInfo.Status}\n" +
+                                $"**Avatar:** \t[Link]({userInfo.AvatarUrl})";
+                });*/
+
+                await Context.Channel.SendMessageAsync("", false, eb);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
+            
         }
 
-        [Command("guild"), Summary("Returns info about the current Guild")]
+        [Command("guild", RunMode = RunMode.Async), Summary("Returns info about the current Guild")]
         [Alias("server", "serverinfo")]
         public async Task ServerInfo()
         {
-            var eb = new EmbedBuilder()
+            try
             {
-                Color = new Color(4, 97, 247),
-                ThumbnailUrl = Context.Guild.IconUrl
-            };
+                var eb = new EmbedBuilder()
+                {
+                    Color = new Color(4, 97, 247),
+                    ThumbnailUrl = Context.Guild.IconUrl,
+                    Title = $"{Context.Guild.Name} info",
+                    Description = $"Created on {Context.Guild.CreatedAt.ToString().Remove(Context.Guild.CreatedAt.ToString().Length - 6)}",
+                    Footer = new EmbedFooterBuilder()
+                    {
+                        Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator} | Guild ID: {Context.Guild.Id}",
+                        IconUrl = Context.User.GetAvatarUrl()
+                    }
+                };
+                var guild = ((SocketGuild)Context.Guild);
+                //await guild.DownloadUsersAsync();
 
-            var GuildOwner = await Context.Guild.GetUserAsync(Context.Guild.OwnerId);
+                //var onlineCount = users.Count(u => u.Status != UserStatus.Unknown && u.Status != UserStatus.Invisible && u.Status != UserStatus.Offline);
+                
+                var GuildOwner = await Context.Guild.GetUserAsync(Context.Guild.OwnerId);
+                int online = 0;
+                foreach (var u in guild.Users)
+                {
+                    if (u.Status != UserStatus.Unknown && u.Status != UserStatus.Invisible && u.Status != UserStatus.Offline)
+                    {
+                        online++;
+                    }
+                }
+                /*
+                 * 
+                 * int online2 = 0;
+                int realMemebers = 0;
+                foreach (var u in guild.Users)
+                {
+                    if (u.Status != UserStatus.Unknown && u.Status != UserStatus.Invisible && u.Status != UserStatus.Offline && !u.IsBot)
+                    {
+                        online2++;
+                    }
+                    if (!u.IsBot)
+                        realMemebers++;
+                }
+                 * 
+                 * 
+                eb.AddField((efb) =>
+                {
+                    efb.Name = "Guild";
+                    efb.IsInline = true;
+                    efb.Value = $"**Name:** \t{Context.Guild.Name} \n" + $"**ID:** \t{Context.Guild.Id}\n" + $"**Owner:** \t{GuildOwner}\n" +
+                                $"**Voice Region ID:** \t{Context.Guild.VoiceRegionId}\n" +
+                                $"**Created At:** \t{Context.Guild.CreatedAt.ToString().Remove(Context.Guild.CreatedAt.ToString().Length - 6)}";
+                });*/
 
-            eb.AddField((efb) =>
+                eb.AddField((x) =>
+                {
+                    x.Name = "Owner";
+                    x.IsInline = true;
+                    x.Value = GuildOwner.Username;
+                });
+
+                eb.AddField((x) =>
+                {
+                    x.Name = "Region";
+                    x.IsInline = true;
+                    x.Value = Context.Guild.VoiceRegionId;
+                });
+
+                eb.AddField((x) =>
+                {
+                    x.Name = "Roles";
+                    x.IsInline = true;
+                    x.Value = "" + Context.Guild.Roles.Count;
+                });
+
+                int voice = Context.Guild.GetVoiceChannelsAsync().Result.Count;
+                int text = Context.Guild.GetChannelsAsync().Result.Count - voice;
+                eb.AddField((x) =>
+                {
+                    x.Name = "Channels";
+                    x.IsInline = true;
+                    x.Value = $"{text} text, {voice} voice";
+                });
+
+                eb.AddField((x) =>
+                {
+                    x.Name = "Total Members";
+                    x.IsInline = true;
+                    x.Value = $"{online}/{((SocketGuild)Context.Guild).MemberCount}";
+                });
+
+                eb.AddField((x) =>
+                {
+                    x.Name = "Avatar Url";
+                    x.IsInline = true;
+                    x.Value = $"[Click to view]({Context.Guild.IconUrl})";
+                });
+
+                await Context.Channel.SendMessageAsync("", false, eb);
+            }
+            catch (Exception e)
             {
-                efb.Name = "Guild";
-                efb.IsInline = true;
-                efb.Value = $"Name: {Context.Guild.Name} \n" + $"ID: {Context.Guild.Id}\n" + $"Owner: {GuildOwner}\n" +
-                            $"Voice Region ID: {Context.Guild.VoiceRegionId}\n" +
-                            $"Created At: {Context.Guild.CreatedAt}";
-            });
-
-            await Context.Channel.SendMessageAsync("", false, eb);
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
+            
         }
     }
 }
