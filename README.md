@@ -1,6 +1,7 @@
 # SoraBot
 
 ## To stay updated please visit http://git.argus.moe/serenity/SoraBot ! commits will only be done there
+## For official and updated wiki go to: http://git.argus.moe/serenity/SoraBot/wikis/sora-help
 
 **GENERAL** If the Parameter has [ ] that means that it is optional. Leaving it will result in a different outcome.
 For further questions join my Discord: https://discord.gg/Pah4yj5
