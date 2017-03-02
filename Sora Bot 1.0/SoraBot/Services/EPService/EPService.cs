@@ -6,6 +6,7 @@ using System.Text;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -28,11 +29,21 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
     public class EPService
     {
         ConcurrentDictionary<ulong, userStruct> userEPDict = new ConcurrentDictionary<ulong, userStruct>();
+        ConcurrentDictionary<ulong, bool> userBG = new ConcurrentDictionary<ulong, bool>();
         ConcurrentDictionary<ulong, int> userCooldown = new ConcurrentDictionary<ulong, int>();
+        ConcurrentDictionary<ulong, int> userBGUpdateCD = new ConcurrentDictionary<ulong, int>();
         private DiscordSocketClient client;
         private JsonSerializer jSerializer = new JsonSerializer();
         private int timeToUpdate = Environment.TickCount + 30000;
         private List<ulong> lvlSubsriberList = new List<ulong>();
+        private int profileX = 26;
+        private int profileY = 15;
+        private int profileSIZE = 121;
+
+        private int profileX1 = 155;
+        private int profileY1 = 273;
+        private int profileSIZE1 = 155;
+
 
         public EPService(DiscordSocketClient c)
         {
@@ -42,13 +53,201 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             LoadDatabaseGuild();
         }
 
+        public async Task SetBG(string url, CommandContext Context)
+        {
+            try
+            {
+                if (String.IsNullOrEmpty(url))
+                {
+                    bool ig = false;
+                    if (userBG.TryRemove(Context.User.Id, out ig))
+                    {
+                        await Context.Channel.SendMessageAsync(
+                            ":white_check_mark: Removed custom Background and reverted to defualt card!");
+                        if (File.Exists($"{Context.User.Username}#{Context.User.Discriminator}BGF.jpg"))
+                        {
+                            File.Delete($"{Context.User.Username}#{Context.User.Discriminator}BGF.jpg");
+                        }
+                        return;
+                    }
+                    else
+                    {
+                        await Context.Channel.SendMessageAsync(
+                            ":no_entry_sign: User already had no BG so there is nothing to remove!");
+                        if (File.Exists($"{Context.User.Username}#{Context.User.Discriminator}BGF.jpg"))
+                        {
+                            File.Delete($"{Context.User.Username}#{Context.User.Discriminator}BGF.jpg");
+                        }
+                        return;
+                    }
+                }
+                if (Context.User.Id != 192750776005689344 && userCooldown.ContainsKey(Context.User.Id))
+                {
+                    int cooldown = 0;
+                    userBGUpdateCD.TryGetValue(Context.User.Id, out cooldown);
+                    if (Environment.TickCount >= cooldown)
+                    {
+                        cooldown = Environment.TickCount + 45000;
+                        userBGUpdateCD.TryUpdate(Context.User.Id, cooldown);
+                    }
+                    else
+                    {
+                        float time = (cooldown - Environment.TickCount) / 1000;
+                        int remainingTime = (int)Math.Round(time);
+                        await Context.Channel.SendMessageAsync(
+                            $":no_entry_sign: You are still on cooldown! Wait another {remainingTime} seconds!");
+                        return;
+                    }
+                }
+                else
+                {
+                    var cooldown = Environment.TickCount + 45000;
+                    userBGUpdateCD.TryAdd(Context.User.Id, cooldown);
+                }
+
+                Uri requestUri = new Uri(url);
+
+                if (File.Exists($"{Context.User.Username}#{Context.User.Discriminator}BGF.jpg"))
+                {
+                    File.Delete($"{Context.User.Username}#{Context.User.Discriminator}BGF.jpg");
+                }
+
+                using (var client = new HttpClient())
+                using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
+                using (
+                    Stream contentStream = await (await client.SendAsync(request)).Content.ReadAsStreamAsync(),
+                        stream = new FileStream($"{Context.User.Username}#{Context.User.Discriminator}BG.jpg", FileMode.Create, FileAccess.Write,
+                            FileShare.None, 3145728, true))
+                {
+                    await contentStream.CopyToAsync(stream);
+                    await contentStream.FlushAsync();
+                    contentStream.Dispose();
+                    await stream.FlushAsync();
+                    stream.Dispose();
+                    Console.WriteLine("DONE BG STREAM");
+                }
+
+                //IMAGE RESIZE
+                int size = profileSIZE;
+                const int quality = 75;
+
+                Configuration.Default.AddImageFormat(new PngFormat());
+
+                using (var input = File.OpenRead($"{Context.User.Username}#{Context.User.Discriminator}BG.jpg"))
+                {
+                    using (var output = File.OpenWrite($"{Context.User.Username}#{Context.User.Discriminator}BGF.jpg"))
+                    {
+                        var image = new ImageSharp.Image(input);
+                        //int divide = image.Width / 900;
+                        //int width = image.Width / divide;
+                        //int height = image.Height / divide;
+                        image.Resize(new ResizeOptions
+                        {
+                            Size = new ImageSharp.Size(900, 10000),
+                            Mode = ResizeMode.Max
+                        });
+                        //image.ExifProfile = null; TODO FIX THIS
+                        //image.Quality = quality;
+                        image.Save(output);
+                        image.Dispose();
+
+                        /*.Resize(new ResizeOptions
+                            {
+                                Size = new ImageSharp.Size(size, size),
+                                Mode = ResizeMode.Max
+                            });*/
+                    }
+                }
+                //IMAGE RESIZE END
+                if (File.Exists($"{Context.User.Username}#{Context.User.Discriminator}BG.jpg"))
+                {
+                    File.Delete($"{Context.User.Username}#{Context.User.Discriminator}BG.jpg");
+                }
+                
+
+                if (userBG.ContainsKey(Context.User.Id))
+                {
+                }
+                else
+                {
+                    userBG.TryAdd(Context.User.Id, true);
+                }
+                await Context.Channel.SendMessageAsync(":white_check_mark: Successfully set new BG!");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
+        }
+
+        public async Task changeProfileCord(string cords, CommandContext context)
+        {
+            try
+            {
+                string[] cordS = cords.Split(' ');
+                if (cordS.Length != 2)
+                {
+                    await context.Channel.SendMessageAsync(":no_entry_sign: Coordinates have to be 2 integers => x y");
+                    return;
+                }
+                /*
+                    var coolInput = "abcd123!!!E$%$§&$%";
+                    var sanitized = Regex.Replace(coolInput, @"\D", "");
+                    cordS[1].Any(char.IsDigit)
+                */
+                        int x;
+                int y;
+                if (Int32.TryParse(cordS[0], NumberStyles.Integer, new NumberFormatInfo(), out x) &&
+                    Int32.TryParse(cordS[1], NumberStyles.Integer, new NumberFormatInfo(), out y))
+                {
+                    profileX1 = x;
+                    profileY1 = y;
+                    await context.Channel.SendMessageAsync($":white_check_mark: Set coordinates to {x} {y}");
+                    return;
+                }
+                else
+                {
+                    await context.Channel.SendMessageAsync(":no_entry_sign: Coordinates have to be 2 integers => x y");
+                    return;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, context);
+            }
+        }
+
+        public async Task size(string sizeS, CommandContext context)
+        {
+            try
+            {
+                int size;
+                if (Int32.TryParse(sizeS, NumberStyles.Integer, new NumberFormatInfo(), out size))
+                {
+                    profileSIZE1 = size;
+                    await context.Channel.SendMessageAsync($":white_check_mark: Size set to {size}");
+                }
+                else
+                {
+                    await context.Channel.SendMessageAsync(":no_entry_sign: Size has to be an integer");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, context);
+            }
+        }
+
         public async Task shotTop10(CommandContext Context)
         {
             try
             {
-                var guild = ((SocketGuild)Context.Guild);
+                var guild = ((SocketGuild) Context.Guild);
                 //guild.DownloadUsersAsync();
-                
+
                 if (guild.MemberCount < 200)
                 {
                     guild.DownloadUsersAsync().Wait();
@@ -71,7 +270,8 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 }
 
                 //GETLIST
-                var sortedList = epList.OrderByDescending(pair => pair.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
+                var sortedList = epList.OrderByDescending(pair => pair.Value)
+                    .ToDictionary(pair => pair.Key, pair => pair.Value);
                 var top10 = sortedList.Take(10);
                 /* TURN IT BACK INTO DICT
                  * var top5 = dict.OrderByDescending(pair => pair.Value).Take(5)
@@ -93,7 +293,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 int rank = 1;
                 foreach (var u in top10)
                 {
-                    int level = (int)Math.Round(0.15F * Math.Sqrt(u.Value));
+                    int level = (int) Math.Round(0.15F * Math.Sqrt(u.Value));
                     eb.AddField((x) =>
                     {
                         x.Name = $"{rank}. {u.Key}";
@@ -103,22 +303,23 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     rank++;
                 }
                 int index = GetIndex(sortedList, $"{Context.User.Username}#{Context.User.Discriminator}");
-                int lvl = (int)Math.Round(0.15F * Math.Sqrt(sortedList[$"{Context.User.Username}#{Context.User.Discriminator}"]));
+                int lvl =
+                    (int)
+                    Math.Round(0.15F * Math.Sqrt(sortedList[$"{Context.User.Username}#{Context.User.Discriminator}"]));
                 eb.AddField((x) =>
                 {
-                    x.Name = $"Your Rank: {index+1}";
+                    x.Name = $"Your Rank: {index + 1}";
                     x.IsInline = false;
-                    x.Value = $"Level: {lvl} \tEP: {sortedList[$"{Context.User.Username}#{Context.User.Discriminator}"]}";
+                    x.Value =
+                        $"Level: {lvl} \tEP: {sortedList[$"{Context.User.Username}#{Context.User.Discriminator}"]}";
                 });
                 await Context.Channel.SendMessageAsync("", false, eb);
-
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
                 await SentryService.SendError(e, Context);
             }
-            
         }
 
         public static int GetIndex(Dictionary<string, float> dictionary, string key)
@@ -136,13 +337,14 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
         {
             try
             {
-                if (userCooldown.ContainsKey(Context.User.Id))
+                if (Context.User.Id != 192750776005689344 && userCooldown.ContainsKey(Context.User.Id))
                 {
                     int cooldown = 0;
                     userCooldown.TryGetValue(Context.User.Id, out cooldown);
                     if (Environment.TickCount >= cooldown)
                     {
                         cooldown = Environment.TickCount + 30000;
+                        userCooldown.TryUpdate(Context.User.Id, cooldown);
                     }
                     else
                     {
@@ -158,7 +360,14 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     var cooldown = Environment.TickCount + 30000;
                     userCooldown.TryAdd(Context.User.Id, cooldown);
                 }
-                var img = await DrawText(user.GetAvatarUrl(), user);
+                if (userBG.ContainsKey(user.Id))
+                {
+                    await DrawText(user.GetAvatarUrl(), user, Context);
+                }
+                else
+                {
+                    await DrawText2(user.GetAvatarUrl(), user, Context);
+                }
                 //await Context.Channel.SendMessageAsync($"Image \n{img}");
                 if (File.Exists($"{user.Username}.png"))
                 {
@@ -179,23 +388,30 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             }
         }
 
-        private async Task<System.Drawing.Image> DrawText(String AvatarUrl, IUser userInfo)
+        private async Task DrawText(String AvatarUrl, IUser userInfo, CommandContext Context)
         {
             try
             {
                 var fontFamily = new FontFamily("lato");
-                Font font = new Font(fontFamily, 18.0F, FontStyle.Bold);
-                System.Drawing.Image img = new Bitmap(300, 100);
+                System.Drawing.Image img = new Bitmap(900, 500);
 
                 Graphics drawing = Graphics.FromImage(img);
 
                 System.Drawing.Color backColor = Color.Gainsboro;
-                System.Drawing.Color textColor = Color.White;
-                var bgIMG = System.Drawing.Image.FromFile($"AvatarTemplate.jpg");
+
+                var bgIMG = System.Drawing.Image.FromFile($"{userInfo.Username}#{userInfo.Discriminator}BGF.jpg");
+                var statMask = System.Drawing.Image.FromFile($"moreBGtemp.png");
 
                 Point point = new Point(0, 0);
 
                 drawing.DrawImage(bgIMG, point);
+                drawing.DrawImage(statMask, point);
+                bgIMG.Dispose();
+                statMask.Dispose();
+
+                if (String.IsNullOrEmpty(AvatarUrl))
+                    AvatarUrl =
+                        "http://is2.mzstatic.com/image/pf/us/r30/Purple7/v4/89/51/05/89510540-66df-9f6f-5c91-afa5e48af4e8/mzl.sbwqpbfh.png";
 
                 Uri requestUri = new Uri(AvatarUrl);
 
@@ -227,12 +443,11 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     img = new Bitmap(bmpTemp);
                 }*/
 
-                var pointA = new Point(16, 14);
+                var pointA = new Point(profileX1, profileY1);
                 //var resizedImg = ResizeImage(avatarIMG, 57, 57);
 
                 //IMAGE RESIZE
-                const int size = 57;
-                const int quality = 75;
+                int size = profileSIZE1;
 
                 Configuration.Default.AddImageFormat(new PngFormat());
 
@@ -249,6 +464,11 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                         //image.ExifProfile = null; TODO FIX THIS
                         //image.Quality = quality;
                         image.Save(output);
+                        image.Dispose();
+                        await output.FlushAsync();
+                        output.Dispose();
+                        await input.FlushAsync();
+                        input.Dispose();
                     }
                 }
                 //IMAGE RESIZE END
@@ -257,24 +477,26 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 if (avatarIMG == null)
                 {
                     Console.WriteLine("COULDNT DOWNLOAD IMAGE. AVATAR NULL");
-                    return null;
+                    return;
                 }
 
                 drawing.DrawImage(avatarIMG, pointA);
 
+                Font font = new Font(fontFamily, 54.0F, FontStyle.Bold);
+                System.Drawing.Color textColor = Color.White;
                 Brush textBrush = new SolidBrush(textColor);
                 System.Drawing.Color epColor = Color.Gray;
                 Brush epBrush = new SolidBrush(epColor);
 
-                drawing.DrawString($"{userInfo.Username}", font, textBrush, 80 + 20, 26);
+                drawing.DrawString($"{userInfo.Username}", font, textBrush, 370, 300);
 
-                var fontEP = new Font(fontFamily, 12F, FontStyle.Bold);
+                var fontEP = new Font(fontFamily, 36F, FontStyle.Bold);
                 userStruct user = new userStruct();
                 if (userEPDict.ContainsKey(userInfo.Id))
                 {
                     userEPDict.TryGetValue(userInfo.Id, out user);
-                    drawing.DrawString($"EP: {user.ep}", fontEP, epBrush, 80, 70);
-                    drawing.DrawString($"Level: {user.level}", fontEP, epBrush, 170, 70);
+                    drawing.DrawString($"EP: {user.ep}", fontEP, epBrush, 370, 600);
+                    drawing.DrawString($"Level: {user.level}", fontEP, epBrush, 170*3, 70*3 + 200);
                 }
                 else
                 {
@@ -305,14 +527,194 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 //Dispose avatar so it can be deleted
                 avatarIMG.Dispose();
 
-                return img;
+                img.Dispose();
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
                 await SentryService.SendError(e);
             }
-            return null;
+        }
+
+        private async Task DrawText2(String AvatarUrl, IUser userInfo, CommandContext Context)
+        {
+            try
+            {
+                var fontFamily = new FontFamily("lato");
+                System.Drawing.Image img = new Bitmap(1000, 150);
+
+                Graphics drawing = Graphics.FromImage(img);
+
+                System.Drawing.Color backColor = Color.Gainsboro;
+                var bgIMG = System.Drawing.Image.FromFile($"profilecardtemplate.png");
+                var mask = System.Drawing.Image.FromFile($"ProfileMASK.png");
+
+                Point point = new Point(0, 0);
+
+                drawing.DrawImage(bgIMG, point);
+                bgIMG.Dispose();
+                
+
+                if (String.IsNullOrEmpty(AvatarUrl))
+                    AvatarUrl =
+                        "http://is2.mzstatic.com/image/pf/us/r30/Purple7/v4/89/51/05/89510540-66df-9f6f-5c91-afa5e48af4e8/mzl.sbwqpbfh.png";
+
+                Uri requestUri = new Uri(AvatarUrl);
+
+                if (File.Exists($"{userInfo.Username}Avatar.png"))
+                {
+                    File.Delete($"{userInfo.Username}Avatar.png");
+                }
+
+                using (var client = new HttpClient())
+                using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
+                using (
+                    Stream contentStream = await (await client.SendAsync(request)).Content.ReadAsStreamAsync(),
+                        stream = new FileStream($"{userInfo.Username}Avatar.png", FileMode.Create, FileAccess.Write,
+                            FileShare.None, 3145728, true))
+                {
+                    await contentStream.CopyToAsync(stream);
+                    await contentStream.FlushAsync();
+                    contentStream.Dispose();
+                    await stream.FlushAsync();
+                    stream.Dispose();
+                    Console.WriteLine("DONE STREAM");
+                }
+
+
+                /*
+                Image img;
+                using (var bmpTemp = new Bitmap("image_file_path"))
+                {
+                    img = new Bitmap(bmpTemp);
+                }*/
+
+                var pointA = new Point(profileX, profileY);
+                //var resizedImg = ResizeImage(avatarIMG, 57, 57);
+
+                //IMAGE RESIZE
+                int size = profileSIZE;
+
+                Configuration.Default.AddImageFormat(new PngFormat());
+
+                using (var input = File.OpenRead($"{userInfo.Username}Avatar.png"))
+                {
+                    using (var output = File.OpenWrite($"{userInfo.Username}AvatarF.png"))
+                    {
+                        var image = new ImageSharp.Image(input)
+                            .Resize(new ResizeOptions
+                            {
+                                Size = new ImageSharp.Size(size, size),
+                                Mode = ResizeMode.Max
+                            });
+                        //image.ExifProfile = null; TODO FIX THIS
+                        //image.Quality = quality;
+                        image.Save(output);
+                        image.Dispose();
+                        await output.FlushAsync();
+                        output.Dispose();
+                        await input.FlushAsync();
+                        input.Dispose();
+                    }
+                }
+                //IMAGE RESIZE END
+
+                var avatarIMG = System.Drawing.Image.FromFile($"{userInfo.Username}AvatarF.png");
+                if (avatarIMG == null)
+                {
+                    Console.WriteLine("COULDNT DOWNLOAD IMAGE. AVATAR NULL");
+                    return;
+                }
+
+                drawing.DrawImage(avatarIMG, pointA);
+                drawing.DrawImage(mask, point);
+                mask.Dispose();
+                Font font = new Font(fontFamily, 45.0F, FontStyle.Bold);
+                System.Drawing.Color textColor = Color.FromArgb(35, 152, 225);
+                Brush textBrush = new SolidBrush(textColor);
+                System.Drawing.Color epColor = Color.Black;
+                Brush epBrush = new SolidBrush(epColor);
+
+                //GET RANK
+
+                var guild = ((SocketGuild) Context.Guild);
+                //guild.DownloadUsersAsync();
+
+                if (guild.MemberCount < 200)
+                {
+                    guild.DownloadUsersAsync().Wait();
+                    //await guild.DownloadUsersAsync();
+                }
+
+                //FEED LIST
+                Dictionary<string, float> epList = new Dictionary<string, float>();
+                foreach (var u in guild.Users)
+                {
+                    if (!u.IsBot && userEPDict.ContainsKey(u.Id))
+                    {
+                        userStruct str = new userStruct();
+                        userEPDict.TryGetValue(u.Id, out str);
+                        if (!epList.ContainsKey($"{u.Username}#{u.Discriminator}"))
+                        {
+                            epList.Add($"{u.Username}#{u.Discriminator}", str.ep);
+                        }
+                    }
+                }
+
+                //GETLIST
+                var sortedList = epList.OrderByDescending(pair => pair.Value)
+                    .ToDictionary(pair => pair.Key, pair => pair.Value);
+                var rank = GetIndex(sortedList, $"{userInfo.Username}#{userInfo.Discriminator}") + 1;
+                //END RANK
+
+                drawing.DrawString($"{userInfo.Username}", font, textBrush, 200, 10);
+
+                var fontEP = new Font(fontFamily, 30F, FontStyle.Bold);
+                userStruct user = new userStruct();
+                if (userEPDict.ContainsKey(userInfo.Id))
+                {
+                    userEPDict.TryGetValue(userInfo.Id, out user);
+                    drawing.DrawString($"EP: {user.ep}", fontEP, epBrush, 200, 80);
+                    drawing.DrawString($"Level: {user.level}", fontEP, epBrush, 450, 80);
+                    drawing.DrawString($"Rank: {rank}", fontEP, epBrush, 700, 80);
+                }
+                else
+                {
+                    drawing.DrawString($"EP: 0", fontEP, epBrush, 200, 80);
+                    drawing.DrawString($"Level: 0", fontEP, epBrush, 450, 80);
+                    drawing.DrawString($"Rank: 0", fontEP, epBrush, 700, 80);
+                }
+                //level = constant * sqrt(XP)
+
+                //DONE DRAWING
+                drawing.Save();
+
+                textBrush.Dispose();
+                drawing.Dispose();
+
+                var myEncoderParameters = new EncoderParameters(1);
+                var myEncoder = System.Drawing.Imaging.Encoder.Quality;
+                var myImageCodecInfo = GetEncoderInfo("image/jpeg");
+                // Save the bitmap as a JPEG file with quality level 25.
+                var myEncoderParameter = new EncoderParameter(myEncoder, 75L);
+                myEncoderParameters.Param[0] = myEncoderParameter;
+                //img.Save("test.jpg", myImageCodecInfo, myEncoderParameter);
+                if (File.Exists($"{userInfo.Username}.png"))
+                {
+                    File.Delete($"{userInfo.Username}.png");
+                }
+                img.Save($"{userInfo.Username}.png");
+
+                //Dispose avatar so it can be deleted
+                avatarIMG.Dispose();
+
+                img.Dispose();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e);
+            }
         }
 
         public async Task ToggleEPSubscribe(CommandContext context)

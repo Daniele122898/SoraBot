@@ -23,6 +23,7 @@ guildlist.txt
 *.msi
 *.msm
 *.msp
+*.png
 
 # Windows shortcuts
 *.lnk
