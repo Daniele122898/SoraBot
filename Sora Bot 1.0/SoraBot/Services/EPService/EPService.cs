@@ -40,7 +40,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
         private int profileY = 15;
         private int profileSIZE = 121;
 
-        private int profileX1 = 155;
+        private int profileX1 = 73;
         private int profileY1 = 273;
         private int profileSIZE1 = 155;
 
@@ -488,15 +488,17 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 System.Drawing.Color epColor = Color.Gray;
                 Brush epBrush = new SolidBrush(epColor);
 
-                drawing.DrawString($"{userInfo.Username}", font, textBrush, 370, 300);
+                drawing.DrawString($"{userInfo.Username}", font, textBrush, 288, 300);
 
                 var fontEP = new Font(fontFamily, 36F, FontStyle.Bold);
                 userStruct user = new userStruct();
                 if (userEPDict.ContainsKey(userInfo.Id))
                 {
                     userEPDict.TryGetValue(userInfo.Id, out user);
-                    drawing.DrawString($"EP: {user.ep}", fontEP, epBrush, 370, 600);
-                    drawing.DrawString($"Level: {user.level}", fontEP, epBrush, 170*3, 70*3 + 200);
+                    drawing.DrawString($"Rank: 10", fontEP, epBrush, 230, 420);
+                    drawing.DrawString($"Level: {user.level}", fontEP, epBrush, 440, 420);
+                    drawing.DrawString($"EP: {user.ep}", fontEP, epBrush, 620, 420);
+                    
                 }
                 else
                 {
