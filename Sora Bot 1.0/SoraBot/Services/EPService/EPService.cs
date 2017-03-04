@@ -129,7 +129,6 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
 
                 //IMAGE RESIZE
                 int size = profileSIZE;
-                const int quality = 75;
 
                 Configuration.Default.AddImageFormat(new PngFormat());
 
@@ -150,6 +149,10 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                         //image.Quality = quality;
                         image.Save(output);
                         image.Dispose();
+                        await input.FlushAsync();
+                        input.Dispose();
+                        await output.FlushAsync();
+                        output.Dispose();
 
                         /*.Resize(new ResizeOptions
                             {

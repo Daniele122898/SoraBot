@@ -79,8 +79,8 @@ namespace Sora_Bot_1.SoraBot.Core
             client.MessageReceived += HandleCommand;
             client.UserJoined += updateService.UserJoined;
             client.UserLeft += updateService.UserLeft;
-            client.ReactionAdded += starBoardService.StarAdded;
-            client.ReactionRemoved += starBoardService.StarRemoved;
+            client.ReactionAdded += starBoardService.StarAddedNew;
+            client.ReactionRemoved += starBoardService.StarRemovedNew;
             client.UserVoiceStateUpdated += musicService.CheckIfAlone;
             client.JoinedGuild += Client_JoinedGuild;
             client.LeftGuild += Client_LeftGuild;

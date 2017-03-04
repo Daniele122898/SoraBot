@@ -176,7 +176,7 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
             await Context.Channel.SendMessageAsync("I wanted to leave anyway :information_desk_person:");
             //await Context.Client.DisconnectAsync();
             //await ((DiscordSocketClient) Context.Client).LogoutAsync();
-            ((DiscordSocketClient)Context.Client).DisconnectAsync();
+            await ((DiscordSocketClient) Context.Client).StopAsync();
         }
 
         [Command("ban")]

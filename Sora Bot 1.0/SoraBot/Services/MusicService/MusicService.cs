@@ -51,7 +51,7 @@ namespace Sora_Bot_1.SoraBot.Services
                 var channel = (Context.Guild as SocketGuild).CurrentUser.VoiceChannel as IVoiceChannel;
                 if (channel.Id == _channel.Id)
                 {
-                    await aClient.DisconnectAsync();
+                    await aClient.StopAsync();
                     aClient.Dispose();
                     audioDict.TryRemove(Context.Guild.Id, out aClient);
                 }
@@ -96,7 +96,7 @@ namespace Sora_Bot_1.SoraBot.Services
                     {
                         return;
                     }
-                    await aClient.DisconnectAsync();
+                    await aClient.StopAsync();
                     aClient.Dispose();
                     audioDict.TryRemove(userG.Guild.Id, out aClient);
                 }
@@ -282,7 +282,7 @@ namespace Sora_Bot_1.SoraBot.Services
                         }
                         else
                         {
-                            strToken.audioStream = client.CreatePCMStream(960);
+                            strToken.audioStream = client.CreatePCMStream(AudioApplication.Music, 1920, 2, null);
                             strToken.tokenSource = new CancellationTokenSource();
                             strToken.token = strToken.tokenSource.Token;
                             audioStreamDict.TryAdd(client, strToken);
@@ -420,7 +420,7 @@ namespace Sora_Bot_1.SoraBot.Services
                                 var info = JObject.Parse(infoJson);
 
                                 var title = info["fulltitle"].ToString();
-                                if (((efb.Value == null ? 0 : efb.Value.Length) + ($"{i}. {title} \n").Length) > 1000)
+                                if (((efb.Value == null ? 0 : efb.Value.ToString().Length) + ($"{i}. {title} \n").Length) > 1000)
                                     break;
                                 efb.Value += $"{i}. {title} \n";
                             }
