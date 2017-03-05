@@ -14,6 +14,9 @@
   - Fixed some music bugs, should lagg less
   (=> working on support for all websites like
       youporn ;), soundcloud etc should all work later)
+	  
+	  
+# Help => Can be found in Wiki as well (updated more frequently)
 
 **GENERAL** If the Parameter has [ ] that means that it is optional. Leaving it will result in a different outcome.
 For further questions join my Discord: https://discord.gg/Pah4yj5
