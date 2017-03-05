@@ -58,7 +58,7 @@ namespace Sora_Bot_1.SoraBot.Modules.EPModule
             await epService.size(size, Context);
         }
 
-        [Command("setbg"), Summary("Set's your profile BG with the provided URL")]
+        [Command("setbg"), Summary("Set's your profile BG with the provided URL. If no URL is specified it will return to the default Profile Crad. **this feature requires lvl 20!**")]
         public async Task setBG(string url = null)
         {
             await epService.SetBG(url, Context);
