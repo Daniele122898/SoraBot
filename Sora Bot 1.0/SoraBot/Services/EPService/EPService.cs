@@ -198,7 +198,6 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     userBG.TryAdd(Context.User.Id, true);
                 }
                 SaveDatabaseBG();
-                GC.Collect(); //TODO Change this system
 
                 await Context.Channel.SendMessageAsync(":white_check_mark: Successfully set new BG!");
             }
@@ -543,7 +542,13 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 System.Drawing.Color epColor = Color.Gray;
                 Brush epBrush = new SolidBrush(epColor);
 
-                drawing.DrawString($"{userInfo.Username}", font, textBrush, 288, 300);
+                var username = userInfo.Username;
+                if (userInfo.Username.Length > 20)
+                {
+                    username = userInfo.Username.Remove(20) + "...";
+                }
+
+                drawing.DrawString($"{username}", font, textBrush, 288, 300);
 
                 //GET RANK
 
@@ -629,7 +634,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             try
             {
                 var fontFamily = new FontFamily("lato");
-                System.Drawing.Image img = new Bitmap(1000, 150);
+                System.Drawing.Image img = new Bitmap(890, 150);
 
                 Graphics drawing = Graphics.FromImage(img);
 
@@ -756,8 +761,12 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     .ToDictionary(pair => pair.Key, pair => pair.Value);
                 var rank = GetIndex(sortedList, userInfo.Id) + 1;
                 //END RANK
-
-                drawing.DrawString($"{userInfo.Username}", font, textBrush, 200, 10);
+                var username = userInfo.Username;
+                if (userInfo.Username.Length > 20)
+                {
+                    username = userInfo.Username.Remove(20)+"...";
+                }
+                drawing.DrawString($"{username}", font, textBrush, 200, 10);
 
                 var fontEP = new Font(fontFamily, 30F, FontStyle.Bold);
                 userStruct user = new userStruct();
