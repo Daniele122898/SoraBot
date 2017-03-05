@@ -60,7 +60,7 @@ namespace Sora_Bot_1.SoraBot.Core
             commands = new CommandHandler();
             await commands.Install(client);
              
-            client.Disconnected += Client_Disconnected;
+            //client.Disconnected += Client_Disconnected;
 
             //Block this task until the program is exited
             await Task.Delay(-1);
