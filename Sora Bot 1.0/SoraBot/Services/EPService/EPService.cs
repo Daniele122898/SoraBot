@@ -273,7 +273,10 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
         {
             try
             {
-                var guild = ((SocketGuild) Context.Guild);
+
+                //GET RANK
+
+                var guild = ((SocketGuild)Context.Guild);
                 //guild.DownloadUsersAsync();
 
                 if (guild.MemberCount < 200)
@@ -281,6 +284,27 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     guild.DownloadUsersAsync().Wait();
                     //await guild.DownloadUsersAsync();
                 }
+
+                //FEED LIST
+                Dictionary<ulong, float> epList = new Dictionary<ulong, float>();
+                foreach (var u in guild.Users)
+                {
+                    if (!u.IsBot && userEPDict.ContainsKey(u.Id))
+                    {
+                        userStruct str = new userStruct();
+                        userEPDict.TryGetValue(u.Id, out str);
+                        if (!epList.ContainsKey(u.Id))
+                        {
+                            epList.Add(u.Id, str.ep);
+                        }
+                    }
+                }
+                /*
+                //GETLIST
+                var sortedList = epList.OrderByDescending(pair => pair.Value)
+                    .ToDictionary(pair => pair.Key, pair => pair.Value);
+                var rank = GetIndex(sortedList, userInfo.Id) + 1;
+                //END RANK
 
                 //FEED LIST
                 Dictionary<string, float> epList = new Dictionary<string, float>();
@@ -295,7 +319,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                             epList.Add($"{u.Username}#{u.Discriminator}", str.ep);
                         }
                     }
-                }
+                }*/
 
                 //GETLIST
                 var sortedList = epList.OrderByDescending(pair => pair.Value)
@@ -322,24 +346,25 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 foreach (var u in top10)
                 {
                     int level = (int) Math.Round(0.15F * Math.Sqrt(u.Value));
+                    var us = guild.GetUser(u.Key);
                     eb.AddField((x) =>
                     {
-                        x.Name = $"{rank}. {u.Key}";
+                        x.Name = $"{rank}. {us.Username}#{us.Discriminator}";
                         x.IsInline = false;
                         x.Value = $"Lvl. {level} \tEP: {u.Value}";
                     });
                     rank++;
                 }
-                int index = GetIndex(sortedList, $"{Context.User.Username}#{Context.User.Discriminator}");
+                int index = GetIndex(sortedList, Context.User.Id);
                 int lvl =
                     (int)
-                    Math.Round(0.15F * Math.Sqrt(sortedList[$"{Context.User.Username}#{Context.User.Discriminator}"]));
+                    Math.Round(0.15F * Math.Sqrt(sortedList[Context.User.Id]));
                 eb.AddField((x) =>
                 {
                     x.Name = $"Your Rank: {index + 1}";
                     x.IsInline = false;
                     x.Value =
-                        $"Level: {lvl} \tEP: {sortedList[$"{Context.User.Username}#{Context.User.Discriminator}"]}";
+                        $"Level: {lvl} \tEP: {sortedList[Context.User.Id]}";
                 });
                 await Context.Channel.SendMessageAsync("", false, eb);
             }
@@ -350,7 +375,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             }
         }
 
-        public static int GetIndex(Dictionary<string, float> dictionary, string key)
+        public static int GetIndex(Dictionary<ulong, float> dictionary, ulong key)
         {
             for (int index = 0; index < dictionary.Count; index++)
             {
@@ -520,12 +545,45 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
 
                 drawing.DrawString($"{userInfo.Username}", font, textBrush, 288, 300);
 
+                //GET RANK
+
+                var guild = ((SocketGuild)Context.Guild);
+                //guild.DownloadUsersAsync();
+
+                if (guild.MemberCount < 200)
+                {
+                    guild.DownloadUsersAsync().Wait();
+                    //await guild.DownloadUsersAsync();
+                }
+
+                //FEED LIST
+                Dictionary<ulong, float> epList = new Dictionary<ulong, float>();
+                foreach (var u in guild.Users)
+                {
+                    if (!u.IsBot && userEPDict.ContainsKey(u.Id))
+                    {
+                        userStruct str = new userStruct();
+                        userEPDict.TryGetValue(u.Id, out str);
+                        if (!epList.ContainsKey(u.Id))
+                        {
+                            epList.Add(u.Id, str.ep);
+                        }
+                    }
+                }
+
+                //GETLIST
+                var sortedList = epList.OrderByDescending(pair => pair.Value)
+                    .ToDictionary(pair => pair.Key, pair => pair.Value);
+                var rank = GetIndex(sortedList, userInfo.Id) + 1;
+                //END RANK
+
+
                 var fontEP = new Font(fontFamily, 32F, FontStyle.Bold);
                 userStruct user = new userStruct();
                 if (userEPDict.ContainsKey(userInfo.Id))
                 {
                     userEPDict.TryGetValue(userInfo.Id, out user);
-                    drawing.DrawString($"Rank: 10", fontEP, epBrush, 230, 420);
+                    drawing.DrawString($"Rank: {rank}", fontEP, epBrush, 230, 420);
                     drawing.DrawString($"Level: {user.level}", fontEP, epBrush, 430, 420);
                     drawing.DrawString($"EP: {user.ep}", fontEP, epBrush, 630, 420);
                 }
@@ -679,16 +737,16 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 }
 
                 //FEED LIST
-                Dictionary<string, float> epList = new Dictionary<string, float>();
+                Dictionary<ulong, float> epList = new Dictionary<ulong, float>();
                 foreach (var u in guild.Users)
                 {
                     if (!u.IsBot && userEPDict.ContainsKey(u.Id))
                     {
                         userStruct str = new userStruct();
                         userEPDict.TryGetValue(u.Id, out str);
-                        if (!epList.ContainsKey($"{u.Username}#{u.Discriminator}"))
+                        if (!epList.ContainsKey(u.Id))
                         {
-                            epList.Add($"{u.Username}#{u.Discriminator}", str.ep);
+                            epList.Add(u.Id, str.ep);
                         }
                     }
                 }
@@ -696,7 +754,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 //GETLIST
                 var sortedList = epList.OrderByDescending(pair => pair.Value)
                     .ToDictionary(pair => pair.Key, pair => pair.Value);
-                var rank = GetIndex(sortedList, $"{userInfo.Username}#{userInfo.Discriminator}") + 1;
+                var rank = GetIndex(sortedList, userInfo.Id) + 1;
                 //END RANK
 
                 drawing.DrawString($"{userInfo.Username}", font, textBrush, 200, 10);
@@ -714,7 +772,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 {
                     drawing.DrawString($"EP: 0", fontEP, epBrush, 200, 80);
                     drawing.DrawString($"Level: 0", fontEP, epBrush, 450, 80);
-                    drawing.DrawString($"Rank: 0", fontEP, epBrush, 700, 80);
+                    drawing.DrawString($"Rank: -", fontEP, epBrush, 700, 80);
                 }
                 //level = constant * sqrt(XP)
 
