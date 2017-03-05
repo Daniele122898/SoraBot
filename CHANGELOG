@@ -1,0 +1,14 @@
+**Version**
+0.0.9.9.2
+
+**Date**
+05.3.2017 01:50 UTC +1
+
+**Changes**
+  - Updated to new Discord.Net version
+  - Fixed bugs
+  - Complete redo of Profile card
+ => Level 20 can set their OWN BG
+  - Fixed some music bugs, should lagg less
+  (=> working on support for all websites like
+      youporn ;), soundcloud etc should all work later)
