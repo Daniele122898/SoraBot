@@ -1,3 +1,20 @@
+## Major Changelogs (check frequent one with ´$changelog´
+
+**Version**
+0.0.9.9.2
+
+**Date**
+05.3.2017 01:50 UTC +1
+
+**Changes**
+  - Updated to new Discord.Net version
+  - Fixed bugs
+  - Complete redo of Profile card
+ => Level 20 can set their OWN BG
+  - Fixed some music bugs, should lagg less
+  (=> working on support for all websites like
+      youporn ;), soundcloud etc should all work later)
+
 **GENERAL** If the Parameter has [ ] that means that it is optional. Leaving it will result in a different outcome.
 For further questions join my Discord: https://discord.gg/Pah4yj5
 
@@ -68,11 +85,12 @@ You cannot star your own message. It will not be added to the starboard. Only di
 **PREFIX** This Command uses a module prefix. which means infront of all commands needs to be the prefix `p`!
 **GENERAL** You will gain EP by writing messages... duh.
 
-| Command       | Parameter       | Example                  | Output                                                                                                                     |
-|---------------|-----------------|--------------------------|----------------------------------------------------------------------------------------------------------------------------|
-| `p`           | [@Mention user] | `$p / $p @Serenity#0783` | Creates a profile image showing the EP and Level of the User (If specified the mentioned user otherwise the invoking user) |
-| `p subscribe` | *none*          | `$p subscribe`           | Toggles your lvl up notifies (If Sora will Message you when you level up. Standard : false)                                |
-| `p top10`     | *none*          | `$p top10`               | Posts the top 10 list of users sorted by EP => The EP is globaly aquired on all Guilds that Sora is on!                    |
+| Command       | Parameter       | Example                                           | Output                                                                                                                                  |
+|---------------|-----------------|---------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| `p`           | [@Mention user] | `$p / $p @Serenity#0783`                          | Creates a profile image showing the EP and Level of the User (If specified the mentioned user otherwise the invoking user)              |
+| `p subscribe` | *none*          | `$p subscribe`                                    | Toggles your lvl up notifies (If Sora will Message you when you level up. Standard : false)                                             |
+| `p top10`     | *none*          | `$p top10`                                        | Posts the top 10 list of users sorted by EP => The EP is globaly aquired on all Guilds that Sora is on!                                 |
+| `p setbg`     | [URL to Image]  | `$p setbg www.example.com/image.jpg` / `$p setbg` | Not specifing the URL will remove your set BG and reset to the default profile card. This feature requires you to have atleast lvl 20!  |
 
 ## Help
 

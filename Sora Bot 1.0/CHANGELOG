@@ -1,10 +1,14 @@
 **Version**
-0.0.9.9.1
+0.0.9.9.2
 
 **Date**
-24.2.2017 017:00 UTC +1
+05.3.2017 01:50 UTC +1
 
 **Changes**
-  - Fixed manual reconnect
-  - Updated to new Discord.net version
-  - Fixed the welcoming message bug!
+  - Updated to new Discord.Net version
+  - Fixed bugs
+  - Complete redo of Profile card
+ => Level 20 can set their OWN BG
+  - Fixed some music bugs, should lagg less
+  (=> working on support for all websites like
+      youporn ;), soundcloud etc should all work later)

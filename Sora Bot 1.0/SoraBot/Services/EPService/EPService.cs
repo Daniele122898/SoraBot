@@ -51,12 +51,24 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             InitializeLoader();
             LoadDatabase();
             LoadDatabaseGuild();
+            LoadDatabaseBG();
         }
 
         public async Task SetBG(string url, CommandContext Context)
         {
             try
             {
+
+                userStruct str = new userStruct();
+                if (userEPDict.ContainsKey(Context.User.Id))
+                {
+                    userEPDict.TryGetValue(Context.User.Id, out str);
+                    if (str.level < 20)
+                    {
+                        await Context.Channel.SendMessageAsync(":no_entry_sign: You must be level 20 to unlock custom BGs!");
+                        return;
+                    }
+                }
                 if (String.IsNullOrEmpty(url))
                 {
                     bool ig = false;
@@ -64,23 +76,32 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     {
                         await Context.Channel.SendMessageAsync(
                             ":white_check_mark: Removed custom Background and reverted to defualt card!");
-                        if (File.Exists($"{Context.User.Username}#{Context.User.Discriminator}BGF.jpg"))
+                        if (File.Exists($"{Context.User.Id}BGF.jpg"))
                         {
-                            File.Delete($"{Context.User.Username}#{Context.User.Discriminator}BGF.jpg");
+                            File.Delete($"{Context.User.Id}BGF.jpg");
                         }
+                        SaveDatabaseBG();
                         return;
                     }
                     else
                     {
                         await Context.Channel.SendMessageAsync(
                             ":no_entry_sign: User already had no BG so there is nothing to remove!");
-                        if (File.Exists($"{Context.User.Username}#{Context.User.Discriminator}BGF.jpg"))
+                        if (File.Exists($"{Context.User.Id}BGF.jpg"))
                         {
-                            File.Delete($"{Context.User.Username}#{Context.User.Discriminator}BGF.jpg");
+                            File.Delete($"{Context.User.Id}BGF.jpg");
                         }
+                        SaveDatabaseBG();
                         return;
                     }
                 }
+
+                if (!url.EndsWith(".jpg") && !url.EndsWith(".png") && !url.EndsWith(".gif"))
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: You must link an Image!");
+                    return;
+                }
+
                 if (Context.User.Id != 192750776005689344 && userCooldown.ContainsKey(Context.User.Id))
                 {
                     int cooldown = 0;
@@ -93,7 +114,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     else
                     {
                         float time = (cooldown - Environment.TickCount) / 1000;
-                        int remainingTime = (int)Math.Round(time);
+                        int remainingTime = (int) Math.Round(time);
                         await Context.Channel.SendMessageAsync(
                             $":no_entry_sign: You are still on cooldown! Wait another {remainingTime} seconds!");
                         return;
@@ -107,16 +128,17 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
 
                 Uri requestUri = new Uri(url);
 
-                if (File.Exists($"{Context.User.Username}#{Context.User.Discriminator}BGF.jpg"))
+                if (File.Exists($"{Context.User.Id}BGF.jpg"))
                 {
-                    File.Delete($"{Context.User.Username}#{Context.User.Discriminator}BGF.jpg");
+                    File.Delete($"{Context.User.Id}BGF.jpg");
                 }
 
                 using (var client = new HttpClient())
                 using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
                 using (
                     Stream contentStream = await (await client.SendAsync(request)).Content.ReadAsStreamAsync(),
-                        stream = new FileStream($"{Context.User.Username}#{Context.User.Discriminator}BG.jpg", FileMode.Create, FileAccess.Write,
+                        stream = new FileStream($"{Context.User.Id}BG.jpg",
+                            FileMode.Create, FileAccess.Write,
                             FileShare.None, 3145728, true))
                 {
                     await contentStream.CopyToAsync(stream);
@@ -132,9 +154,9 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
 
                 Configuration.Default.AddImageFormat(new PngFormat());
 
-                using (var input = File.OpenRead($"{Context.User.Username}#{Context.User.Discriminator}BG.jpg"))
+                using (var input = File.OpenRead($"{Context.User.Id}BG.jpg"))
                 {
-                    using (var output = File.OpenWrite($"{Context.User.Username}#{Context.User.Discriminator}BGF.jpg"))
+                    using (var output = File.OpenWrite($"{Context.User.Id}BGF.jpg"))
                     {
                         var image = new ImageSharp.Image(input);
                         //int divide = image.Width / 900;
@@ -162,11 +184,11 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     }
                 }
                 //IMAGE RESIZE END
-                if (File.Exists($"{Context.User.Username}#{Context.User.Discriminator}BG.jpg"))
+                if (File.Exists($"{Context.User.Id}BG.jpg"))
                 {
-                    File.Delete($"{Context.User.Username}#{Context.User.Discriminator}BG.jpg");
+                    File.Delete($"{Context.User.Id}BG.jpg");
                 }
-                
+
 
                 if (userBG.ContainsKey(Context.User.Id))
                 {
@@ -175,6 +197,9 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 {
                     userBG.TryAdd(Context.User.Id, true);
                 }
+                SaveDatabaseBG();
+                GC.Collect(); //TODO Change this system
+
                 await Context.Channel.SendMessageAsync(":white_check_mark: Successfully set new BG!");
             }
             catch (Exception e)
@@ -199,7 +224,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     var sanitized = Regex.Replace(coolInput, @"\D", "");
                     cordS[1].Any(char.IsDigit)
                 */
-                        int x;
+                int x;
                 int y;
                 if (Int32.TryParse(cordS[0], NumberStyles.Integer, new NumberFormatInfo(), out x) &&
                     Int32.TryParse(cordS[1], NumberStyles.Integer, new NumberFormatInfo(), out y))
@@ -372,16 +397,16 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     await DrawText2(user.GetAvatarUrl(), user, Context);
                 }
                 //await Context.Channel.SendMessageAsync($"Image \n{img}");
-                if (File.Exists($"{user.Username}.png"))
+                if (File.Exists($"{user.Id}.png"))
                 {
-                    await Context.Channel.SendFileAsync($"{user.Username}.png", null, false, null);
-                    File.Delete($"{user.Username}.png");
-                    File.Delete($"{user.Username}Avatar.png");
-                    File.Delete($"{user.Username}AvatarF.png");
+                    await Context.Channel.SendFileAsync($"{user.Id}.png", null, false, null);
+                    File.Delete($"{user.Id}.png");
+                    File.Delete($"{user.Id}Avatar.png");
+                    File.Delete($"{user.Id}AvatarF.png");
                 }
                 else
                 {
-                    await Context.Channel.SendMessageAsync("Failed to create Image");
+                    await Context.Channel.SendMessageAsync("Failed to create Image! This may be due to the Image you linked is damaged or unsupported. Try a new Custom Pic or use the default Image (p setbg with no parameter sets it to the default image)");
                 }
             }
             catch (Exception e)
@@ -402,7 +427,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
 
                 System.Drawing.Color backColor = Color.Gainsboro;
 
-                var bgIMG = System.Drawing.Image.FromFile($"{userInfo.Username}#{userInfo.Discriminator}BGF.jpg");
+                var bgIMG = System.Drawing.Image.FromFile($"{userInfo.Id}BGF.jpg");
                 var statMask = System.Drawing.Image.FromFile($"moreBGtemp.png");
 
                 Point point = new Point(0, 0);
@@ -418,16 +443,16 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
 
                 Uri requestUri = new Uri(AvatarUrl);
 
-                if (File.Exists($"{userInfo.Username}Avatar.png"))
+                if (File.Exists($"{userInfo.Id}Avatar.png"))
                 {
-                    File.Delete($"{userInfo.Username}Avatar.png");
+                    File.Delete($"{userInfo.Id}Avatar.png");
                 }
 
                 using (var client = new HttpClient())
                 using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
                 using (
                     Stream contentStream = await (await client.SendAsync(request)).Content.ReadAsStreamAsync(),
-                        stream = new FileStream($"{userInfo.Username}Avatar.png", FileMode.Create, FileAccess.Write,
+                        stream = new FileStream($"{userInfo.Id}Avatar.png", FileMode.Create, FileAccess.Write,
                             FileShare.None, 3145728, true))
                 {
                     await contentStream.CopyToAsync(stream);
@@ -454,9 +479,9 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
 
                 Configuration.Default.AddImageFormat(new PngFormat());
 
-                using (var input = File.OpenRead($"{userInfo.Username}Avatar.png"))
+                using (var input = File.OpenRead($"{userInfo.Id}Avatar.png"))
                 {
-                    using (var output = File.OpenWrite($"{userInfo.Username}AvatarF.png"))
+                    using (var output = File.OpenWrite($"{userInfo.Id}AvatarF.png"))
                     {
                         var image = new ImageSharp.Image(input)
                             .Resize(new ResizeOptions
@@ -476,7 +501,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 }
                 //IMAGE RESIZE END
 
-                var avatarIMG = System.Drawing.Image.FromFile($"{userInfo.Username}AvatarF.png");
+                var avatarIMG = System.Drawing.Image.FromFile($"{userInfo.Id}AvatarF.png");
                 if (avatarIMG == null)
                 {
                     Console.WriteLine("COULDNT DOWNLOAD IMAGE. AVATAR NULL");
@@ -484,6 +509,8 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 }
 
                 drawing.DrawImage(avatarIMG, pointA);
+                //Dispose avatar so it can be deleted
+                avatarIMG.Dispose();
 
                 Font font = new Font(fontFamily, 54.0F, FontStyle.Bold);
                 System.Drawing.Color textColor = Color.White;
@@ -493,15 +520,14 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
 
                 drawing.DrawString($"{userInfo.Username}", font, textBrush, 288, 300);
 
-                var fontEP = new Font(fontFamily, 36F, FontStyle.Bold);
+                var fontEP = new Font(fontFamily, 32F, FontStyle.Bold);
                 userStruct user = new userStruct();
                 if (userEPDict.ContainsKey(userInfo.Id))
                 {
                     userEPDict.TryGetValue(userInfo.Id, out user);
                     drawing.DrawString($"Rank: 10", fontEP, epBrush, 230, 420);
-                    drawing.DrawString($"Level: {user.level}", fontEP, epBrush, 440, 420);
-                    drawing.DrawString($"EP: {user.ep}", fontEP, epBrush, 620, 420);
-                    
+                    drawing.DrawString($"Level: {user.level}", fontEP, epBrush, 430, 420);
+                    drawing.DrawString($"EP: {user.ep}", fontEP, epBrush, 630, 420);
                 }
                 else
                 {
@@ -523,14 +549,13 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 var myEncoderParameter = new EncoderParameter(myEncoder, 75L);
                 myEncoderParameters.Param[0] = myEncoderParameter;
                 //img.Save("test.jpg", myImageCodecInfo, myEncoderParameter);
-                if (File.Exists($"{userInfo.Username}.png"))
+                if (File.Exists($"{userInfo.Id}.png"))
                 {
-                    File.Delete($"{userInfo.Username}.png");
+                    File.Delete($"{userInfo.Id}.png");
                 }
-                img.Save($"{userInfo.Username}.png");
+                img.Save($"{userInfo.Id}.png");
 
-                //Dispose avatar so it can be deleted
-                avatarIMG.Dispose();
+                
 
                 img.Dispose();
             }
@@ -558,7 +583,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
 
                 drawing.DrawImage(bgIMG, point);
                 bgIMG.Dispose();
-                
+
 
                 if (String.IsNullOrEmpty(AvatarUrl))
                     AvatarUrl =
@@ -566,16 +591,16 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
 
                 Uri requestUri = new Uri(AvatarUrl);
 
-                if (File.Exists($"{userInfo.Username}Avatar.png"))
+                if (File.Exists($"{userInfo.Id}Avatar.png"))
                 {
-                    File.Delete($"{userInfo.Username}Avatar.png");
+                    File.Delete($"{userInfo.Id}Avatar.png");
                 }
 
                 using (var client = new HttpClient())
                 using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
                 using (
                     Stream contentStream = await (await client.SendAsync(request)).Content.ReadAsStreamAsync(),
-                        stream = new FileStream($"{userInfo.Username}Avatar.png", FileMode.Create, FileAccess.Write,
+                        stream = new FileStream($"{userInfo.Id}Avatar.png", FileMode.Create, FileAccess.Write,
                             FileShare.None, 3145728, true))
                 {
                     await contentStream.CopyToAsync(stream);
@@ -602,9 +627,9 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
 
                 Configuration.Default.AddImageFormat(new PngFormat());
 
-                using (var input = File.OpenRead($"{userInfo.Username}Avatar.png"))
+                using (var input = File.OpenRead($"{userInfo.Id}Avatar.png"))
                 {
-                    using (var output = File.OpenWrite($"{userInfo.Username}AvatarF.png"))
+                    using (var output = File.OpenWrite($"{userInfo.Id}AvatarF.png"))
                     {
                         var image = new ImageSharp.Image(input)
                             .Resize(new ResizeOptions
@@ -624,7 +649,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 }
                 //IMAGE RESIZE END
 
-                var avatarIMG = System.Drawing.Image.FromFile($"{userInfo.Username}AvatarF.png");
+                var avatarIMG = System.Drawing.Image.FromFile($"{userInfo.Id}AvatarF.png");
                 if (avatarIMG == null)
                 {
                     Console.WriteLine("COULDNT DOWNLOAD IMAGE. AVATAR NULL");
@@ -634,6 +659,8 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 drawing.DrawImage(avatarIMG, pointA);
                 drawing.DrawImage(mask, point);
                 mask.Dispose();
+                //Dispose avatar so it can be deleted
+                avatarIMG.Dispose();
                 Font font = new Font(fontFamily, 45.0F, FontStyle.Bold);
                 System.Drawing.Color textColor = Color.FromArgb(35, 152, 225);
                 Brush textBrush = new SolidBrush(textColor);
@@ -704,14 +731,11 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 var myEncoderParameter = new EncoderParameter(myEncoder, 75L);
                 myEncoderParameters.Param[0] = myEncoderParameter;
                 //img.Save("test.jpg", myImageCodecInfo, myEncoderParameter);
-                if (File.Exists($"{userInfo.Username}.png"))
+                if (File.Exists($"{userInfo.Id}.png"))
                 {
-                    File.Delete($"{userInfo.Username}.png");
+                    File.Delete($"{userInfo.Id}.png");
                 }
-                img.Save($"{userInfo.Username}.png");
-
-                //Dispose avatar so it can be deleted
-                avatarIMG.Dispose();
+                img.Save($"{userInfo.Id}.png");
 
                 img.Dispose();
             }
@@ -871,6 +895,38 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 {
                     jSerializer.Serialize(writer, lvlSubsriberList);
                 }
+            }
+        }
+
+        public void SaveDatabaseBG()
+        {
+            using (StreamWriter sw = File.CreateText(@"UserCustomBG.json"))
+            {
+                using (JsonWriter writer = new JsonTextWriter(sw))
+                {
+                    jSerializer.Serialize(writer, userBG);
+                }
+            }
+        }
+
+        private void LoadDatabaseBG()
+        {
+            if (File.Exists("UserCustomBG.json"))
+            {
+                using (StreamReader sr = File.OpenText(@"UserCustomBG.json"))
+                {
+                    using (JsonReader reader = new JsonTextReader(sr))
+                    {
+                        var userBGTemp = jSerializer.Deserialize<ConcurrentDictionary<ulong, bool>>(reader);
+                        if (userBGTemp == null)
+                            return;
+                        userBG = userBGTemp;
+                    }
+                }
+            }
+            else
+            {
+                File.Create("UserEPSubscriber.json").Dispose();
             }
         }
 
