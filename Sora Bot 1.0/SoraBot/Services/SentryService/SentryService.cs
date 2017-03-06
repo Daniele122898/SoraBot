@@ -12,7 +12,7 @@ namespace Sora_Bot_1.SoraBot.Services
     public static class SentryService
     {
         public static DiscordSocketClient client;
-        private static IUser serenity;
+        private static SocketUser serenity;
 
 
         public static void Install()
