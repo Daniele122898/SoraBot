@@ -1,10 +1,12 @@
 **Version**
-0.0.9.9.4
+0.0.9.9.4.1
 
 **Date**
 19.3.2017 20:00 UTC +1
 
 **Changes**
+  - Music queues get saved 
+    so they wont be lost after a restart
   - Better Image processing
   => weird characters used to break
 	 the whole profile card.

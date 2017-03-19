@@ -27,7 +27,15 @@ namespace Sora_Bot_1.SoraBot.Services
         private readonly ConcurrentDictionary<IAudioClient, audioStream_Token> audioStreamDict =
             new ConcurrentDictionary<IAudioClient, audioStream_Token>();
 
+        private JsonSerializer _jSerializer = new JsonSerializer();
+
         private ConcurrentDictionary<ulong, List<string>> queueDict = new ConcurrentDictionary<ulong, List<string>>();
+
+        public MusicService()
+        {
+            InitializeLoader();
+            LoadDatabase();
+        }
 
 
         public async Task JoinChannel(IVoiceChannel channel, ulong guildID)
@@ -133,6 +141,7 @@ namespace Sora_Bot_1.SoraBot.Services
                             tempList.Add(name);
                             queueDict.TryAdd(Context.Guild.Id, tempList);
                         }
+                        SaveDatabase();
                         //await Context.Channel.SendMessageAsync(":musical_note: Successfully Downloaded. Will play shortly");
                     }
                 }
@@ -184,6 +193,7 @@ namespace Sora_Bot_1.SoraBot.Services
                     queue.Clear();
                     queueDict.TryUpdate(Context.Guild.Id, queue);
                     await Context.Channel.SendMessageAsync(":put_litter_in_its_place:  Cleared the entire list.");
+                    SaveDatabase();
                 }
             }
             catch (Exception e)
@@ -216,6 +226,7 @@ namespace Sora_Bot_1.SoraBot.Services
                         }
                         queue.RemoveAt(0);
                         queueDict.TryUpdate(Context.Guild.Id, queue);
+                        SaveDatabase();
                         await Context.Channel.SendMessageAsync(":track_next: Skipped first entry in Queue");
                     }
                 }
@@ -237,6 +248,7 @@ namespace Sora_Bot_1.SoraBot.Services
                         }
                         queue.RemoveAt(0);
                         queueDict.TryUpdate(Context.Guild.Id, queue);
+                        SaveDatabase();
                         if (queue.Count == 0)
                         {
                             await Context.Channel.SendMessageAsync(":track_next: Queue is now empty!");
@@ -660,127 +672,6 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
-        /*
-        private async Task SendAsync(IAudioClient client, string path, IUserMessage msg, CommandContext Context)
-        {
-            try
-            {
-                /*
-                bool stream = false;
-                LoadDatabse();
-                string[] id = new string[2];
-                string[] idL = path.Split('=');
-                if (!path.Equals("random") && !path.Equals("rand") && idL[1] != null)
-                {
-                    if (idL[1].Contains("&"))
-                    {
-                        string[] temp = idL[1].Split('&');
-                        idL[1] = temp[0];
-                    }
-                    id[1] = idL[1];
-                }
-
-                if (path.Equals("random") || path.Equals("rand"))
-                {
-                    if (songDataBase.Count < 1)
-                    {
-                        await msg.ModifyAsync(
-                            x =>
-                            {
-                                x.Content = ":no_entry_sign: Current Song Database is empty. Cannot play random song";
-                            });
-                    }
-                    else
-                    {
-                        Random rand = new Random();
-                        int index = rand.Next(songDataBase.Count);
-                        id[1] = "" + songDataBase[index];
-                    }
-                }
-
-                // Create FFmpeg using the previous example
-                if (!File.Exists(id[1] + ".mp3"))
-                {
-                    var ytdl = YtDl(path);
-                }
-
-                if (id[1] != null)
-                {
-                    Stopwatch stopwatch = Stopwatch.StartNew();
-                    stopwatch.Start();
-                    while (!File.Exists(id[1] + ".mp3") && stopwatch.ElapsedMilliseconds < 30000)
-                    {
-                    }
-                    if (File.Exists(id[1] + ".mp3"))
-                    {
-                        await msg.ModifyAsync(
-                            x => { x.Content = ":musical_note: Successfully Downloaded. Will play shortly"; });
-                        if (!songDataBase.Contains(id[1]))
-                        {
-                            if (songDataBase.Count < 1)
-                            {
-                                LoadDatabse();
-                            }
-                            songDataBase.Add(id[1]);
-                            SaveDatabase();
-                        }
-                        stream = true;
-                    }
-                    else
-                    {
-                        await msg.ModifyAsync(x =>
-                        {
-                            x.Content =
-                                ":no_entry_sign: Failed to Download. Possible reasons: Video is blocked in Bot's country, Video was too long, NO PLAYLISTS!";
-                        });
-                    }
-                }
-                else
-                {
-                    if (!path.Equals("rand") && !path.Equals("random"))
-                    {
-                        await msg.ModifyAsync(x => { x.Content = "It must be a YT link! Failed to Download."; });
-                    }
-                }
-                string name = await Download(path, msg, Context);
-
-                if (!name.Equals("f"))
-                {
-                    var ffmpeg = CreateStream(name);
-                    audioStream_Token strToken;
-                    if (audioStreamDict.ContainsKey(client))
-                    {
-                        audioStreamDict.TryGetValue(client, out strToken);
-                        strToken.tokenSource.Cancel();
-                        strToken.tokenSource.Dispose();
-                        strToken.tokenSource = new CancellationTokenSource();
-                        strToken.token = strToken.tokenSource.Token;
-                        audioStreamDict.TryUpdate(client, strToken);
-                    }
-                    else
-                    {
-                        strToken.audioStream = client.CreatePCMStream(960);
-                        strToken.tokenSource = new CancellationTokenSource();
-                        strToken.token = strToken.tokenSource.Token;
-                        audioStreamDict.TryAdd(client, strToken);
-                    }
-
-                    var output = ffmpeg.StandardOutput.BaseStream; //1920, 2880, 960
-                    await output.CopyToAsync(strToken.audioStream, 960, strToken.token).ContinueWith(task =>
-                    {
-                        if (!task.IsCanceled && task.IsFaulted) //supress cancel exception
-                            Console.WriteLine(task.Exception);
-                    });
-                    ffmpeg.WaitForExit();
-                    await strToken.audioStream.FlushAsync();
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-        }*/
-
         public struct audioStream_Token
         {
             public AudioOutStream audioStream;
@@ -799,6 +690,45 @@ namespace Sora_Bot_1.SoraBot.Services
         {
             return audioDict.Count;
         }
+
+        private void InitializeLoader()
+        {
+            _jSerializer.Converters.Add(new JavaScriptDateTimeConverter());
+            _jSerializer.NullValueHandling = NullValueHandling.Ignore;
+        }
+
+        public void SaveDatabase()
+        {
+            using (StreamWriter sw = File.CreateText(@"MusicQueue.json"))
+            {
+                using (JsonWriter writer = new JsonTextWriter(sw))
+                {
+                    _jSerializer.Serialize(writer, queueDict);
+                }
+            }
+        }
+
+        private void LoadDatabase()
+        {
+            if (File.Exists("MusicQueue.json"))
+            {
+                using (StreamReader sr = File.OpenText(@"MusicQueue.json"))
+                {
+                    using (JsonReader reader = new JsonTextReader(sr))
+                    {
+                        var temp = _jSerializer.Deserialize<ConcurrentDictionary<ulong, List<string>>>(reader);
+                        if (temp == null)
+                            return;
+                        queueDict = temp;
+                    }
+                }
+            }
+            else
+            {
+                File.Create("MusicQueue.json").Dispose();
+            }
+        }
+
     } // CLASS
 
 
