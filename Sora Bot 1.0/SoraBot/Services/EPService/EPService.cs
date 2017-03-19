@@ -548,7 +548,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     username = userInfo.Username.Remove(20) + "...";
                 }
 
-                drawing.DrawString($"{username}", font, textBrush, 288, 300);
+                
 
                 //GET RANK
 
@@ -598,6 +598,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     drawing.DrawString($"Level: 0", fontEP, epBrush, 170, 70);
                 }
                 //level = constant * sqrt(XP)
+                drawing.DrawString($"{username}", font, textBrush, 288, 300);
 
                 //DONE DRAWING
                 drawing.Save();
@@ -766,7 +767,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 {
                     username = userInfo.Username.Remove(20)+"...";
                 }
-                drawing.DrawString($"{username}", font, textBrush, 200, 10);
+                
 
                 var fontEP = new Font(fontFamily, 30F, FontStyle.Bold);
                 userStruct user = new userStruct();
@@ -783,6 +784,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     drawing.DrawString($"Level: 0", fontEP, epBrush, 450, 80);
                     drawing.DrawString($"Rank: -", fontEP, epBrush, 700, 80);
                 }
+                drawing.DrawString($"{username}", font, textBrush, 200, 10);
                 //level = constant * sqrt(XP)
 
                 //DONE DRAWING

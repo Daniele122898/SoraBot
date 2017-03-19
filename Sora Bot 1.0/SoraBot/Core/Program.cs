@@ -99,7 +99,6 @@ namespace Sora_Bot_1.SoraBot.Core
             var _client = new DiscordSocketClient(new DiscordSocketConfig()
             {
                 LogLevel = LogSeverity.Info,
-                AudioMode = AudioMode.Outgoing,
                 MessageCacheSize = 50
             });
 

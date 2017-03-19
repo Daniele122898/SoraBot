@@ -107,6 +107,13 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
             await starBoardService.RemoveChannel(Context);
         }
 
+        [Command("msgme")]
+        [RequireOwner]
+        public async Task SendSentryMessage([Remainder] string message)
+        {
+            await SentryService.SendMessage(message);
+        }
+
         //END STARBOARD
 
         //CREATE EXCEPTION

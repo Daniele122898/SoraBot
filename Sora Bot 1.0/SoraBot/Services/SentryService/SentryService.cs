@@ -15,11 +15,14 @@ namespace Sora_Bot_1.SoraBot.Services
         private static SocketUser serenity;
 
 
-        public static void Install()
+        public async static void Install()
         {
             try
             {
-                serenity = client.GetUser(192750776005689344);
+                var guild = client.GetGuild(180818466847064065);
+                await guild.DownloadUsersAsync();
+                serenity = guild.GetUser(192750776005689344);
+                Console.WriteLine($"Got user {serenity.Username}");
             }
             catch (Exception e)
             {

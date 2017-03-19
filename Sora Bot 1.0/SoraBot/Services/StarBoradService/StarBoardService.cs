@@ -126,14 +126,14 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                                         Name =
                                             $"{msg.Author.Username}#{msg.Author.Discriminator}"
                                     },
-                                    Description =
-                                        msg.Content
+                                    Description = (msg.Content.Contains("http") ? "Link detected. Copied outside to embed link/picture" : msg.Content)
                                 };
-                                sentMessage = await(((reaction.Channel as IGuildChannel).Guild as SocketGuild)
+                                sentMessage = await (((reaction.Channel as IGuildChannel).Guild as SocketGuild)
                                     .GetChannel(channelID) as
                                     IMessageChannel).SendMessageAsync(
-                                    $"{reaction.Emoji.Name} in #{msg.Channel.Name}\n",
-                                    false, eb);
+                                    $"{reaction.Emoji.Name} in #{msg.Channel.Name}{(msg.Content.Contains("http") ? $" by {msg.Author.Username}#{msg.Author.Discriminator}\n{msg.Content}" : "")}",
+                                    false, (msg.Content.Contains("http") ? null : eb));
+
                             }
                             else
                             {
@@ -153,7 +153,7 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                                     Description =
                                         msg.Content
                                 };
-                                sentMessage = await(((reaction.Channel as IGuildChannel).Guild as SocketGuild)
+                                sentMessage = await (((reaction.Channel as IGuildChannel).Guild as SocketGuild)
                                     .GetChannel(channelID) as
                                     IMessageChannel).SendMessageAsync(
                                     $"{reaction.Emoji.Name} in #{msg.Channel.Name}\n",
@@ -177,149 +177,6 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
             }
         }
 
-        /*
-        public async Task StarAdded(ulong msgID, Optional<SocketUserMessage> msg, SocketReaction reaction)
-        {   
-            try
-            {
-                //MSG BLACKLIST
-                if (msgStarBlackDict.ContainsKey(msgID))
-                {
-                    short count;
-                    msgStarBlackDict.TryGetValue(msgID, out count);
-                    if (count >= 2)
-                    {
-                        return;
-                    }
-                }
-
-                ulong channelID;
-                IUserMessage sentMessage = null;
-                IMessage dmsg = null;
-                bool specified = true;
-                ulong guildID = (reaction.Channel as IGuildChannel).GuildId;
-
-                if (starChannelDict.TryGetValue(guildID, out channelID))
-                {
-                    if (reaction.Emoji.Name.Equals("⭐") || reaction.Emoji.Name.Equals("🌟"))
-                    {
-                        if (!msg.IsSpecified) //!String.IsNullOrEmpty(tag)
-                        {
-                            dmsg = await reaction.Channel.GetMessageAsync(msgID, CacheMode.AllowDownload, null);
-                            specified = false;
-                        }
-
-                        if (reaction.UserId == (specified ? reaction.Message.Value.Author.Id : dmsg.Author.Id))
-                        {
-                            return;
-                        }
-
-                        if (client.CurrentUser.Id == (specified ? reaction.Message.Value.Author.Id : dmsg.Author.Id))
-                        {
-                            return;
-                        }
-
-                        Random rand = new Random(DateTime.Now.Millisecond);
-                        await Task.Delay(rand.Next(50));
-
-                        if (msgIdDictionary.ContainsKey(msgID))
-                        {
-                            //USER BLACKLIST
-                            if (await CheckBlacklist(msgID, reaction.UserId))
-                            {
-                                return;
-                            }
-
-                            starMsg msgStruct = new starMsg();
-                            msgIdDictionary.TryGetValue(msgID, out msgStruct);
-                            msgStruct.counter += 1;
-                            /*var guild = ((reaction.Channel as IGuildChannel)?.Guild as SocketGuild);
-                            var channel = guild?.GetChannel(channelID) as IMessageChannel;
-                            var msgToEdit =
-                                (IUserMessage)
-                                await channel.GetMessageAsync(msgStruct.starMSGID, CacheMode.AllowDownload, null);
-                            msgIdDictionary.TryUpdate(msgID, msgStruct);
-                            /*await msgToEdit.ModifyAsync(x => { x.Content = $"{msgStruct.counter} {msgToEdit.Content}"; });*/
-
-        /*
-                        SaveDatabase();
-                        return;
-                    }
-                    else
-                    {
-                        //USER BLACKLIST
-                        if (await CheckBlacklist(msgID, reaction.UserId))
-                        {
-                            return;
-                        }
-
-
-                        if ((specified ? reaction.Message.Value.Attachments.Count : dmsg.Attachments.Count) < 1)
-                        {
-                            var eb = new EmbedBuilder()
-                            {
-                                Color = new Color(4, 97, 247),
-                                Timestamp = DateTimeOffset.UtcNow,
-                                Author = new EmbedAuthorBuilder()
-                                {
-                                    IconUrl =
-                                        (specified ? reaction.Message.Value.Author.GetAvatarUrl() : dmsg.Author.GetAvatarUrl()),
-                                    Name =
-                                        $"{(specified ? reaction.Message.Value.Author.Username : dmsg.Author.Username)}#{(specified ? reaction.Message.Value.Author.Discriminator : dmsg.Author.Discriminator)}"
-                                },
-                                Description =
-                                    (specified ? reaction.Message.Value.Content : dmsg.Content)
-                            };
-                            sentMessage = await (((reaction.Channel as IGuildChannel).Guild as SocketGuild)
-                                .GetChannel(channelID) as
-                                IMessageChannel).SendMessageAsync(
-                                $"{reaction.Emoji.Name} in #{((specified ? reaction.Message.GetValueOrDefault().Channel : dmsg.Channel) as IMessageChannel).Name}\n",
-                                false, eb);
-                        }
-                        else
-                        {
-                            var eb = new EmbedBuilder()
-                            {
-                                Color = new Color(4, 97, 247),
-                                Timestamp = DateTimeOffset.UtcNow,
-                                ImageUrl =
-                                (specified
-                                    ? reaction.Message.Value.Attachments.FirstOrDefault().Url
-                                    : dmsg.Attachments.FirstOrDefault().Url),
-                                Author = new EmbedAuthorBuilder()
-                                {
-                                    IconUrl =
-                                        (specified ? reaction.Message.Value.Author.GetAvatarUrl() : dmsg.Author.GetAvatarUrl()),
-                                    Name =
-                                        $"{(specified ? reaction.Message.Value.Author.Username : dmsg.Author.Username)}#{(specified ? reaction.Message.Value.Author.Discriminator : dmsg.Author.Discriminator)}"
-                                },
-                                Description =
-                                    (specified ? reaction.Message.Value.Content : dmsg.Content)
-                            };
-                            sentMessage = await (((reaction.Channel as IGuildChannel).Guild as SocketGuild)
-                                .GetChannel(channelID) as
-                                IMessageChannel).SendMessageAsync(
-                                $"{reaction.Emoji.Name} in #{((specified ? reaction.Message.GetValueOrDefault().Channel : dmsg.Channel) as IMessageChannel).Name}\n",
-                                false, eb);
-                        }
-                        starMsg msgStruct = new starMsg
-                        {
-                            starMSGID = sentMessage.Id,
-                            counter = 1
-                        };
-                        msgIdDictionary.TryAdd(msgID, msgStruct);
-                        SaveDatabase();
-                    }
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            await SentryService.SendError(e);
-            throw;
-        }
-    }*/
 
         public async Task StarRemovedNew(Cacheable<IUserMessage, ulong> msgCacheable, ISocketMessageChannel msgChannel, SocketReaction reaction)
         {
@@ -382,59 +239,6 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                 await SentryService.SendError(e);
             }
         }
-        /*
-        public async Task StarRemoved(ulong msgID, Optional<SocketUserMessage> msg, SocketReaction reaction)
-        {
-            ulong channelID;
-            ulong guildID = (reaction.Channel as IGuildChannel).GuildId;
-
-            if (starChannelDict.TryGetValue(guildID, out channelID))
-            {
-                starMsg msgStruct = new starMsg();
-                if (msgIdDictionary.TryGetValue(msgID, out msgStruct))
-                {
-                    msgStruct.counter -= 1;
-                    var guild = ((reaction.Channel as IGuildChannel)?.Guild as SocketGuild);
-                    var channel = guild?.GetChannel(channelID) as IMessageChannel;
-                    var msgToEdit =
-                        (IUserMessage)
-                        await channel.GetMessageAsync(msgStruct.starMSGID, CacheMode.AllowDownload, null);
-
-                    if (msgStruct.counter < 1)
-                    {
-                        await msgToEdit.DeleteAsync();
-                        msgIdDictionary.TryRemove(msgID, out msgStruct);
-                        if (msgStarBlackDict.ContainsKey(msgID))
-                        {
-                            short count;
-                            msgStarBlackDict.TryGetValue(msgID, out count);
-                            count++;
-                            msgStarBlackDict.TryUpdate(msgID, count);
-                        }
-                        else
-                        {
-                            msgStarBlackDict.TryAdd(msgID, 1);
-                        }
-                    }
-                    else
-                    {
-                        /*
-                        if (msgToEdit.Content.Contains("⭐"))
-                        {
-                            string subString = msgToEdit.Content.Substring(msgToEdit.Content.IndexOf("⭐"));
-                            await msgToEdit.ModifyAsync(x => { x.Content = $"{msgStruct.counter} {subString}"; });
-                        }
-                        else if(msgToEdit.Content.Contains("🌟"))
-                        {
-                            string subString = msgToEdit.Content.Substring(msgToEdit.Content.IndexOf("🌟"));
-                            await msgToEdit.ModifyAsync(x => { x.Content = $"{msgStruct.counter} {subString}"; });
-                        }
-                        msgIdDictionary.TryUpdate(msgID, msgStruct);
-                    }
-                    SaveDatabase();
-                }
-            }
-        }*/
 
         public async Task SetChannel(CommandContext Context)
         {

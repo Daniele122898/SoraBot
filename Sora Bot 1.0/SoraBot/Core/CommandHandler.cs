@@ -31,6 +31,7 @@ namespace Sora_Bot_1.SoraBot.Core
         private StarBoardService starBoardService;
         private ReminderService remService;
         private PatService patService;
+        private SelfRoleService _selfRoleService;
         private TagService tagService;
         private RatelimitService ratelimitService;
         private EPService epService;
@@ -47,6 +48,7 @@ namespace Sora_Bot_1.SoraBot.Core
             starBoardService = new StarBoardService(client);
             musicService = new MusicService();
             ratelimitService = new RatelimitService();
+            _selfRoleService = new SelfRoleService();
             //remService = new ReminderService();
 
             tagService = new TagService();
@@ -54,7 +56,7 @@ namespace Sora_Bot_1.SoraBot.Core
             epService = new EPService(client);
             playingWith = new PlayingWith(client);
             SentryService.client = client;
-            SentryService.Install();
+            //SentryService.Install();
 
             commands = new CommandService();
             map = new DependencyMap();
@@ -62,7 +64,8 @@ namespace Sora_Bot_1.SoraBot.Core
 
             map.Add(musicService);
             map.Add(handler);
-            map.Add(commands);
+            map.Add(_selfRoleService);
+            //map.Add(commands);
             map.Add(updateService);
             map.Add(patService);
             map.Add(tagService);
@@ -84,6 +87,15 @@ namespace Sora_Bot_1.SoraBot.Core
             client.UserVoiceStateUpdated += musicService.CheckIfAlone;
             client.JoinedGuild += Client_JoinedGuild;
             client.LeftGuild += Client_LeftGuild;
+            client.GuildAvailable += Client_GuildAvailable;
+        }
+
+        private async Task Client_GuildAvailable(SocketGuild guild)
+        {
+            if(guild.Id == 180818466847064065)
+            {
+                SentryService.Install();
+            }
         }
 
         private async Task Client_LeftGuild(SocketGuild arg)

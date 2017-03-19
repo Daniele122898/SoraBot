@@ -1,19 +1,19 @@
 ## Major Changelogs (check frequent one with ´$changelog´
 
 **Version**
-0.0.9.9.2
+0.0.9.9.4
 
 **Date**
-05.3.2017 01:50 UTC +1
+19.3.2017 20:00 UTC +1
 
 **Changes**
-  - Updated to new Discord.Net version
-  - Fixed bugs
-  - Complete redo of Profile card
- => Level 20 can set their OWN BG
-  - Fixed some music bugs, should lagg less
-  (=> working on support for all websites like
-      youporn ;), soundcloud etc should all work later)
+  - Better Image processing
+  => weird characters used to break
+	 the whole profile card.
+  - Added Self-Assignable Roles!
+  - A starboard entry that includes 
+    any form of link will be posted 
+    without the embed!
 	  
 	  
 # Help => Can be found in Wiki as well (updated more frequently)
@@ -30,6 +30,18 @@ Sora can always be invoked with mentioning him. But using that function is proba
 |----------|-----------|------------------------------------|---------------|------------------------------------------------------------------|
 | `prefix` | prefix    | `$prefix $$ / @Sora#7634 prefix $$` | Administrator | Changes the prefix of Sora in that guild to the specified prefix |
 | `prefix` | *none*    | `$prefix / @Sora#7634 prefix`      | *none*        | Displays the current prefix of Sora in this guild                |
+
+## Self-Assignable Roles
+**GENERAL** Don't add any roles with high permissions in here or they `will` be abused by some angry member. Keep in mind that when you remove a role from the self-assignable roles list, someone that has the role cannot remove it from themselfs using the `$iamnot` command!
+
+| Command       | Parameter    | Example            | Permission   | Output                                                                                                                                                                       |
+|---------------|--------------|--------------------|--------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `addRole`     | Name of Role | `$addRole test`    | Manage Roles | Adds the specified role to the self assignable roles. Other users can then add them to themselfs using the bot                                                               |
+| `removeRole`  | Name of Role | `$removeRole test` | Manage Roles | Removes the specified role from the self assignable roles. Keep in mind that afterwards users that have that role cannot remove it from themselfs using the $iamnot command! |
+| `iam`         | Name of Role | `$iam test`        | *none*       | Adds the specified role to yourself                                                                                                                                          |
+| `iamnot`      | Name of Role | `$iamnot test`     | *none*       | Removes the specified role from yourself                                                                                                                                     |
+| `getRoles`    | *none*       | `$getRoles`        | *none*       | Posts a list of all self-assignable roles in the Guild                                                                                                                       |
+| `getAllRoles` | *none*       | `$getAllRoles`     | *none*       | Posts a list of all roles in the Guild ordered by Position in the hirachy                                                                                                    |
 
 ## Music
 

@@ -232,7 +232,7 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                 int online = 0;
                 foreach (var u in guild.Users)
                 {
-                    if (u.Status != UserStatus.Unknown && u.Status != UserStatus.Invisible && u.Status != UserStatus.Offline)
+                    if (u.Status != UserStatus.Invisible && u.Status != UserStatus.Offline)
                     {
                         online++;
                     }

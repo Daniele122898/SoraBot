@@ -1,14 +1,14 @@
 **Version**
-0.0.9.9.2
+0.0.9.9.4
 
 **Date**
-05.3.2017 01:50 UTC +1
+19.3.2017 20:00 UTC +1
 
 **Changes**
-  - Updated to new Discord.Net version
-  - Fixed bugs
-  - Complete redo of Profile card
- => Level 20 can set their OWN BG
-  - Fixed some music bugs, should lagg less
-  (=> working on support for all websites like
-      youporn ;), soundcloud etc should all work later)
+  - Better Image processing
+  => weird characters used to break
+	 the whole profile card.
+  - Added Self-Assignable Roles!
+  - A starboard entry that includes 
+    any form of link will be posted 
+    without the embed!
