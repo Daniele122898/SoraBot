@@ -30,6 +30,7 @@ namespace Sora_Bot_1.SoraBot.Core
         private UserGuildUpdateService updateService;
         private StarBoardService starBoardService;
         private ReminderService remService;
+        private AfkSertvice _afkService;
         private PatService patService;
         private SelfRoleService _selfRoleService;
         private TagService tagService;
@@ -48,6 +49,7 @@ namespace Sora_Bot_1.SoraBot.Core
             starBoardService = new StarBoardService(client);
             musicService = new MusicService();
             ratelimitService = new RatelimitService();
+            _afkService = new AfkSertvice();
             _selfRoleService = new SelfRoleService();
             //remService = new ReminderService();
 
@@ -64,6 +66,7 @@ namespace Sora_Bot_1.SoraBot.Core
 
             map.Add(musicService);
             map.Add(handler);
+            map.Add(_afkService);
             map.Add(_selfRoleService);
             //map.Add(commands);
             map.Add(updateService);
@@ -79,6 +82,7 @@ namespace Sora_Bot_1.SoraBot.Core
 
             ChangelogService.LoadChangelog();
             client.MessageReceived += epService.IncreaseEP;
+            client.MessageReceived += _afkService.Client_MessageReceived;
             client.MessageReceived += HandleCommand;
             client.UserJoined += updateService.UserJoined;
             client.UserLeft += updateService.UserLeft;
@@ -89,6 +93,8 @@ namespace Sora_Bot_1.SoraBot.Core
             client.LeftGuild += Client_LeftGuild;
             client.GuildAvailable += Client_GuildAvailable;
         }
+
+        
 
         private async Task Client_GuildAvailable(SocketGuild guild)
         {
