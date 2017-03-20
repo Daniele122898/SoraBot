@@ -18,26 +18,26 @@ namespace Sora_Bot_1.SoraBot.Modules.TagModule
             tagService = _tagService;
         }
 
-        [Command("create"), Summary("Creates a Tag")]
+        [Command("create"), Summary("Creates a Tag"), Priority(1)]
         [Alias("add")]
         public async Task CreateTag([Summary("tag to create <tag | what to display>"), Remainder] string tagEntry)
         {
             await tagService.CreateTag(tagEntry, Context);
         }
 
-        [Command("remove"), Summary("Removes specified Tag")]
+        [Command("remove"), Summary("Removes specified Tag"), Priority(1)]
         public async Task RemoveTag([Summary("tag to remove"), Remainder] string tag)
         {
             await tagService.RemoveTag(tag, Context);
         }
 
-        [Command("taglist"), Summary("Lists all tags"), Priority(2)]
+        [Command("taglist"), Summary("Lists all tags"), Priority(1)]
         public async Task ListTags()
         {
             await tagService.ListTags(Context);
         }
 
-        [Command(""), Summary("Displays the value of the Tag specified if it exists"), Priority(1)]
+        [Command(""), Summary("Displays the value of the Tag specified if it exists"), Priority(0)]
         public async Task SearchTag([Summary("tag to search"), Remainder] string tag)
         {
             await tagService.SearchTagAndSend(tag, Context);
@@ -46,7 +46,7 @@ namespace Sora_Bot_1.SoraBot.Modules.TagModule
         [Command("restrict"),
          Summary(
              "Restricts the Tag Command to the specified permissions (If no permission is entered the restriction will be removed!) => `ManageChannels , Administrator, KickMembers, BanMembers, ManageGuild`"
-         )]
+         ), Priority(1)]
         public async Task RestrictTask(
             [Summary("Choose one of the permissions to add, if none given the current restriction will be removed")] string perm = null)
         {
