@@ -1,4 +1,4 @@
-## Major Changelogs (check frequent one with ´$changelog´
+## Major Changelogs (check frequent one with ´$changelog´)
 
 **Version**
 0.0.9.9.4
