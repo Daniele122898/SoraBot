@@ -31,13 +31,13 @@ namespace Sora_Bot_1.SoraBot.Modules.TagModule
             await tagService.RemoveTag(tag, Context);
         }
 
-        [Command("taglist"), Summary("Lists all tags")]
+        [Command("taglist"), Summary("Lists all tags"), Priority(2)]
         public async Task ListTags()
         {
             await tagService.ListTags(Context);
         }
 
-        [Command(""), Summary("Displays the value of the Tag specified if it exists")]
+        [Command(""), Summary("Displays the value of the Tag specified if it exists"), Priority(1)]
         public async Task SearchTag([Summary("tag to search"), Remainder] string tag)
         {
             await tagService.SearchTagAndSend(tag, Context);
