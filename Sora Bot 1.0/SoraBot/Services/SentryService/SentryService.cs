@@ -36,18 +36,39 @@ namespace Sora_Bot_1.SoraBot.Services
         {
             try
             {
-                var eb = new EmbedBuilder()
+                var err = e.ToString();
+                if (err.Length <2000)
                 {
-                    Color = new Color(4, 97, 247)
-                };
+                    var eb = new EmbedBuilder()
+                    {
+                        Color = new Color(4, 97, 247),
+                        Title = "Exception Occured",
+                        Description = err
+                    };
+                    await (await serenity.CreateDMChannelAsync()).SendMessageAsync("", false, eb);
+                }
+                else
+                {
+                    string errE = err.Substring(2000);
+                    string errS = err.Remove(2000);
+                    var eb = new EmbedBuilder()
+                    {
+                        Color = new Color(4, 97, 247),
+                        Title = "Exception Occured 1",
+                        Description = errS
+                    };
 
-                eb.AddField((efb) =>
-                {
-                    efb.Name = "Exception Occured";
-                    efb.IsInline = true;
-                    efb.Value = e.ToString();
-                });
-                await (await serenity.CreateDMChannelAsync()).SendMessageAsync("", false, eb);
+                    await (await serenity.CreateDMChannelAsync()).SendMessageAsync("", false, eb);
+
+                    var eb2 = new EmbedBuilder()
+                    {
+                        Color = new Color(4, 97, 247),
+                        Title = "Exception Occured 2",
+                        Description = errE
+                    };
+                    await (await serenity.CreateDMChannelAsync()).SendMessageAsync("", false, eb2);
+                }
+                
             }
             catch (Exception exception)
             {

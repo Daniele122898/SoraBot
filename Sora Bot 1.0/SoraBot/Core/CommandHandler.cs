@@ -32,8 +32,10 @@ namespace Sora_Bot_1.SoraBot.Core
         private ReminderService remService;
         private AfkSertvice _afkService;
         private PatService patService;
+        private ImdbService _imdbService;
         private SelfRoleService _selfRoleService;
         private TagService tagService;
+        private UbService _ubService;
         private RatelimitService ratelimitService;
         private EPService epService;
         private PlayingWith playingWith;
@@ -51,6 +53,8 @@ namespace Sora_Bot_1.SoraBot.Core
             ratelimitService = new RatelimitService();
             _afkService = new AfkSertvice();
             _selfRoleService = new SelfRoleService();
+            _ubService = new UbService();
+            _imdbService = new ImdbService();
             //remService = new ReminderService();
 
             tagService = new TagService();
@@ -70,7 +74,9 @@ namespace Sora_Bot_1.SoraBot.Core
             map.Add(_selfRoleService);
             //map.Add(commands);
             map.Add(updateService);
+            map.Add(_imdbService);
             map.Add(patService);
+            map.Add(_ubService);
             map.Add(tagService);
             map.Add(starBoardService);
             map.Add(epService);

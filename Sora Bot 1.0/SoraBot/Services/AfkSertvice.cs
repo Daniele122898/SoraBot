@@ -85,7 +85,7 @@ namespace Sora_Bot_1.SoraBot.Services
             {
                 Console.WriteLine(e);
                 await SentryService.SendError(e);
-                await SentryService.SendMessage($"MSG WITH ERROR: \n{msg}");
+                //await SentryService.SendMessage($"MSG WITH ERROR: \n{msg}");
             }
         }
 
