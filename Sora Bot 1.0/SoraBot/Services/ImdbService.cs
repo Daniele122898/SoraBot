@@ -86,6 +86,6 @@ namespace Sora_Bot_1.SoraBot.Services
             .AddField(x => x.WithName("Director").WithValue(Director).WithIsInline(true))
             .AddField(x => x.WithName("Writer").WithValue(Writer).WithIsInline(true))
             .AddField(x => x.WithName("Type").WithValue(type).WithIsInline(true))
-            .WithThumbnailUrl(Poster);
+            .WithImageUrl(Poster);
     }
 }

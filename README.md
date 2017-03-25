@@ -43,6 +43,17 @@ Sora can always be invoked with mentioning him. But using that function is proba
 | `getRoles`    | *none*       | `$getRoles`        | *none*       | Posts a list of all self-assignable roles in the Guild                                                                                                                       |
 | `getAllRoles` | *none*       | `$getAllRoles`     | *none*       | Posts a list of all roles in the Guild ordered by Position in the hirachy                                                                                                    |
 
+## Searches
+
+**GENERAL** With these you can make search queries for ub definitions, movies, series, animes and mangas!
+
+| Command | Parameter                              | Example                        | Output                                                                                 |
+|---------|----------------------------------------|--------------------------------|----------------------------------------------------------------------------------------|
+| `imdb`  | Title of Movie / Series                | `$imdb Inception`              | Gives you data about the movie / series from IMDb like plot, rating, genres etc..      |
+| `ub`    | Term to search for in Urban Dictionary | `$ub ohayou`                   | Gives you the definition of the Term with examples and its ub ratings                  |
+| `anime` | Title of Anime Series / Movie          | `$anime Overlord`              | Gives you data about the Series / Movie from Anilist like plot, raiting, genres etc... |
+| `manga` | Title of Manga                         | `$manga Boku no hero academia` | Gives you data about the Manga from Anilist like plot, raiting, genres etc...          |
+
 ## Music
 
 **GENERAL** Sora can currently only play YT-Videos and no playlists. This will be added soon™ 

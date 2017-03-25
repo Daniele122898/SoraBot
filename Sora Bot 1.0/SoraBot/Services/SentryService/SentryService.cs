@@ -80,6 +80,8 @@ namespace Sora_Bot_1.SoraBot.Services
         {
             try
             {
+                if (serenity == null)
+                    return;
                 await (await serenity.CreateDMChannelAsync()).SendMessageAsync(message);
             }
             catch (Exception e)

@@ -34,6 +34,7 @@ namespace Sora_Bot_1.SoraBot.Core
         private PatService patService;
         private ImdbService _imdbService;
         private SelfRoleService _selfRoleService;
+        private AnimeService _animeService;
         private TagService tagService;
         private UbService _ubService;
         private RatelimitService ratelimitService;
@@ -55,6 +56,7 @@ namespace Sora_Bot_1.SoraBot.Core
             _selfRoleService = new SelfRoleService();
             _ubService = new UbService();
             _imdbService = new ImdbService();
+            _animeService = new AnimeService();
             //remService = new ReminderService();
 
             tagService = new TagService();
@@ -75,6 +77,7 @@ namespace Sora_Bot_1.SoraBot.Core
             //map.Add(commands);
             map.Add(updateService);
             map.Add(_imdbService);
+            map.Add(_animeService);
             map.Add(patService);
             map.Add(_ubService);
             map.Add(tagService);
