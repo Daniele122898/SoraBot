@@ -26,7 +26,13 @@ namespace Sora_Bot_1.SoraBot.Services
                 }
                 else
                 {
-                    await Context.Channel.SendMessageAsync("", false, movie.GetEmbed());
+                    var eb = movie.GetEmbed();
+                    eb.WithFooter(x => {
+                        x.Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}";
+                        x.IconUrl = Context.User.GetAvatarUrl();
+                    });
+                    eb.Build();
+                    await Context.Channel.SendMessageAsync("", false, eb);
                 }
             }
             catch (Exception e)
@@ -67,7 +73,7 @@ namespace Sora_Bot_1.SoraBot.Services
         public string Director { get; set; }
         public string Writer { get; set; }
         public string type { get; set; }
-        public Embed GetEmbed() =>
+        public EmbedBuilder GetEmbed() =>
             new EmbedBuilder()
             .WithColor(new Color(4, 97, 247))
             .WithAuthor(x => { x.Name = "IMDb"; x.IconUrl = "http://image.prntscr.com/image/6fdc466f14524542afbd3f923a4595ee.png"; })
@@ -80,7 +86,6 @@ namespace Sora_Bot_1.SoraBot.Services
             .AddField(x => x.WithName("Director").WithValue(Director).WithIsInline(true))
             .AddField(x => x.WithName("Writer").WithValue(Writer).WithIsInline(true))
             .AddField(x => x.WithName("Type").WithValue(type).WithIsInline(true))
-            .WithThumbnailUrl(Poster)
-            .Build();
+            .WithThumbnailUrl(Poster);
     }
 }
