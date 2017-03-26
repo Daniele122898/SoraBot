@@ -37,9 +37,7 @@ namespace Sora_Bot_1.SoraBot.Services
             }
             catch (Exception e)
             {
-                await Context.Channel.SendMessageAsync(":no_entry_sign: Couldn't find movie/series");
-                Console.WriteLine(e);
-                await SentryService.SendError(e, Context);
+                await Context.Channel.SendMessageAsync(":no_entry_sign: Couldn't find IMDb entry. Try later or try another one.");
             }
         }
     }
