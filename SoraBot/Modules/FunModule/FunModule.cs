@@ -122,8 +122,8 @@ namespace Sora_Bot_1.SoraBot.Modules.FunModule
                     IconUrl = Context.User.GetAvatarUrl()
                 },
                 Description =
-                    "Just uncheck the permissions you dont feel like giving, this might break Sora though. Atleast give him these permissions:\n" +
-                    "Read/Send Messages, Embed Links, Attack Files, Mention Everyone, Add Reactions, Read Message History\n" +
+                    "Just uncheck the permissions you dont feel like giving, this might break Sora though. At least give him these permissions:\n" +
+                    "Read/Send Messages, Embed Links, Attach Files, Mention Everyone, Add Reactions, Read Message History\n" +
                     "Connect to voice and speak!\n" +
                     "[Click to Invite](https://discordapp.com/oauth2/authorize?client_id=270931284489011202&scope=bot&permissions=2146958463)"
             };

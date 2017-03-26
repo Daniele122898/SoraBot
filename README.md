@@ -3,6 +3,26 @@
 ## To stay updated please visit http://git.argus.moe/serenity/SoraBot ! commits will only be done there
 ## For official and updated wiki go to: http://git.argus.moe/serenity/SoraBot/wikis/sora-help
 
+## Major Changelogs (check frequent one with ´$changelog´)
+
+**Version**
+0.0.9.9.4
+
+**Date**
+19.3.2017 20:00 UTC +1
+
+**Changes**
+  - Better Image processing
+  => weird characters used to break
+	 the whole profile card.
+  - Added Self-Assignable Roles!
+  - A starboard entry that includes 
+    any form of link will be posted 
+    without the embed!
+	  
+	  
+# Help => Can be found in Wiki as well (updated more frequently)
+
 **GENERAL** If the Parameter has [ ] that means that it is optional. Leaving it will result in a different outcome.
 For further questions join my Discord: https://discord.gg/Pah4yj5
 
@@ -15,6 +35,29 @@ Sora can always be invoked with mentioning him. But using that function is proba
 |----------|-----------|------------------------------------|---------------|------------------------------------------------------------------|
 | `prefix` | prefix    | `$prefix $$ / @Sora#7634 prefix $$` | Administrator | Changes the prefix of Sora in that guild to the specified prefix |
 | `prefix` | *none*    | `$prefix / @Sora#7634 prefix`      | *none*        | Displays the current prefix of Sora in this guild                |
+
+## Self-Assignable Roles
+**GENERAL** Don't add any roles with high permissions in here or they `will` be abused by some angry member. Keep in mind that when you remove a role from the self-assignable roles list, someone that has the role cannot remove it from themselfs using the `$iamnot` command!
+
+| Command       | Parameter    | Example            | Permission   | Output                                                                                                                                                                       |
+|---------------|--------------|--------------------|--------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `addRole`     | Name of Role | `$addRole test`    | Manage Roles | Adds the specified role to the self assignable roles. Other users can then add them to themselfs using the bot                                                               |
+| `removeRole`  | Name of Role | `$removeRole test` | Manage Roles | Removes the specified role from the self assignable roles. Keep in mind that afterwards users that have that role cannot remove it from themselfs using the $iamnot command! |
+| `iam`         | Name of Role | `$iam test`        | *none*       | Adds the specified role to yourself                                                                                                                                          |
+| `iamnot`      | Name of Role | `$iamnot test`     | *none*       | Removes the specified role from yourself                                                                                                                                     |
+| `getRoles`    | *none*       | `$getRoles`        | *none*       | Posts a list of all self-assignable roles in the Guild                                                                                                                       |
+| `getAllRoles` | *none*       | `$getAllRoles`     | *none*       | Posts a list of all roles in the Guild ordered by Position in the hirachy                                                                                                    |
+
+## Searches
+
+**GENERAL** With these you can make search queries for ub definitions, movies, series, animes and mangas!
+
+| Command | Parameter                              | Example                        | Output                                                                                 |
+|---------|----------------------------------------|--------------------------------|----------------------------------------------------------------------------------------|
+| `imdb`  | Title of Movie / Series                | `$imdb Inception`              | Gives you data about the movie / series from IMDb like plot, rating, genres etc..      |
+| `ub`    | Term to search for in Urban Dictionary | `$ub ohayou`                   | Gives you the definition of the Term with examples and its ub ratings                  |
+| `anime` | Title of Anime Series / Movie          | `$anime Overlord`              | Gives you data about the Series / Movie from Anilist like plot, raiting, genres etc... |
+| `manga` | Title of Manga                         | `$manga Boku no hero academia` | Gives you data about the Manga from Anilist like plot, raiting, genres etc...          |
 
 ## Music
 
@@ -33,12 +76,34 @@ Command | Parameter | Example | Output
 `leave` | *none* | `$leave` | Leaves the channel of the user
 `stop` | *none* | `$stop` | Stops the audio playback
 
-## Announcements
+## AFK / Away
+**GENERAL** Keep in mind that your AFK status is GLOBAL. So if you want to say `i suck dick` in one guild but rather not in another then.. Do it at your own risk ;) I might add local / guild bound AFK in the future. The AFK message will only trigger every 30 seconds to prevent spam.
 
-Command | Parameter | Permission | Output 
---- | --- | --- | ---
-`here` | *none* | Requires Mange Channel Permissions | Sets the channel in which the message was written as channel to announce joining or leaving members
-`remove` | *none* | Requires Mange Channel Permissions | Removes the channel to announce joining or leaving members
+| Command | Parameter                                  | Example               | Output                                                                                                                                                                                              |
+|---------|--------------------------------------------|-----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `afk`   | [Optional message for when you get tagged] | `$afk not fapping...` | If you were set AFK before, the afk status gets removed. Otherwise will set you GLOBALY AFK on all guilds that Sora is on. Whenever you get @mentioned Sora will respond with your creative message |
+
+## Custom Member Join / Leave Announcements
+
+**ATTENTION** This system has changed and the Database has been wiped on 26.03.2017. 
+
+**GENERAL** With this you can set custom leave and welcoming messages. These can be projected to different channels or independently turned off!
+
+**IMPORTANT** In the messages themselfs you can use `{user}` to @Mention the user, ``{user#} for Name#Discriminator (mostly used in leave messages since the member can't be @Mentioned anymore), `{server}` for the server name, `{count}` for member count!
+Example: `$a welcome Welcome {user} to {server} you are our {count}th member!`
+
+**PREFIX** This command uses a module prefix. This means infront of all commands must be the prefix `a` or `announcement` !
+
+| Command        | Parameter | Example                                                                  | Permission      | Output                                                                                                                 |
+|----------------|-----------|--------------------------------------------------------------------------|-----------------|------------------------------------------------------------------------------------------------------------------------|
+| `a welcome`    | [message] | `$a welcome Welcome {user} to {server} you are our {count}th member!`    | Manage Channels | Sets the Welcome channel to the current one and adds the Welcome message! => If left blank it will use the default one |
+| `a welcomemsg` | [message] | `$a welcomemsg Welcome {user} to {server} you are our {count}th member!` | Manage Channels | Sets the custom Welcome message => If left blank it will use the default one                                           |
+| `a welcomecha` | #channel  | `$a welcomecha #general`                                                 | Manage Channels | Sets the Welcome channel                                                                                               |
+| `a rmwelcome`  | *none*    | `$a rmwelcome`                                                           | Manage Channels | Removes the whole Welcome announcement resetting the message aswell                                                    |
+| `a leave`      | [message] | `$a leave {user} has sadly left us. RIP`                                 | Manage Channels | Sets the Leave channel to the current one and adds the Leave message! => If left blank it will use the default one     |
+| `a leavemsg`   | [message] | `$a leavemsg {user} has sadly left us. RIP`                              | Manage Channels | Sets the custom Leave message => If left blank it will use the default one                                             |
+| `a leavecha`   | #channel  | `$a welcomecha #general`                                                 | Manage Channels | Sets the Leave Channel                                                                                                 |
+| `a rmleave`    | *none*    | `$a rmleave`                                                             | Manage Channels | Removes the whole Leave announcement resetting the message aswell                                                      |
 
 ## Tags
 
@@ -73,11 +138,12 @@ You cannot star your own message. It will not be added to the starboard. Only di
 **PREFIX** This Command uses a module prefix. which means infront of all commands needs to be the prefix `p`!
 **GENERAL** You will gain EP by writing messages... duh.
 
-| Command       | Parameter       | Example                  | Output                                                                                                                     |
-|---------------|-----------------|--------------------------|----------------------------------------------------------------------------------------------------------------------------|
-| `p`           | [@Mention user] | `$p / $p @Serenity#0783` | Creates a profile image showing the EP and Level of the User (If specified the mentioned user otherwise the invoking user) |
-| `p subscribe` | *none*          | `$p subscribe`           | Toggles your lvl up notifies (If Sora will Message you when you level up. Standard : false)                                |
-| `p top10`     | *none*          | `$p top10`               | Posts the top 10 list of users sorted by EP => The EP is globaly aquired on all Guilds that Sora is on!                    |
+| Command       | Parameter       | Example                                           | Output                                                                                                                                  |
+|---------------|-----------------|---------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| `p`           | [@Mention user] | `$p / $p @Serenity#0783`                          | Creates a profile image showing the EP and Level of the User (If specified the mentioned user otherwise the invoking user)              |
+| `p subscribe` | *none*          | `$p subscribe`                                    | Toggles your lvl up notifies (If Sora will Message you when you level up. Standard : false)                                             |
+| `p top10`     | *none*          | `$p top10`                                        | Posts the top 10 list of users sorted by EP => The EP is globaly aquired on all Guilds that Sora is on!                                 |
+| `p setbg`     | [URL to Image]  | `$p setbg www.example.com/image.jpg` / `$p setbg` | Not specifing the URL will remove your set BG and reset to the default profile card. This feature requires you to have atleast lvl 20!  |
 
 ## Help
 
@@ -111,12 +177,14 @@ You cannot star your own message. It will not be added to the starboard. Only di
 | `ping`     | *none*          | `$ping`                | Shows the current ping of Sora                                                    |
 | `invite`   | *none*          | `$invite`              | Posts a link to invite Sora to your guild :> plz ♥                                |
 
-## Pats
+## Pats, Hugs and Pokes
 
-| Command    | Parameter               | Example                                  | Output                                                                                                                  |
-|------------|-------------------------|------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
-| `pat`      | @mention of user to pat | `$pat @Serenity#0783`                    | Will pat the specified user and add it to his global patcount. Spread love ♥ or pats :>                                 |
-| `patcount` | [@mention]              | `$patcount` / `$patcount @Serenity#0783` | If no user is given as parameter you yourself will be displayed. Posts the global amount of pats the user has received. |
+| Command    | Parameter                | Example                                  | Output                                                                                                                  |
+|------------|--------------------------|------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| `pat`      | @mention of user to pat  | `$pat @Serenity#0783`                    | Will pat the specified user and add it to his global patcount. Spread love ♥ or pats :>                                 |
+| `patcount` | [@mention]               | `$patcount` / `$patcount @Serenity#0783` | If no user is given as parameter you yourself will be displayed. Posts the global amount of pats the user has received. |
+| `hug`      | @mention of user to hug  | `$hug @Serenity#0783`                    | Hugs the specified user with a randomly chosen hug gif                                                                  |
+| `poke`     | @mention of user to poke | `$poke @Serenity#0783`                   | Pokes the specified user with a randomly chosen poke gif                                                                |
 
 
 ## Changelog

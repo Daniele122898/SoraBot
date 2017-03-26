@@ -55,12 +55,12 @@ namespace Sora_Bot_1.SoraBot.Core
             //configure the client to use a bot token and use our token
             await client.LoginAsync(TokenType.Bot, token);
             //connect the cline tot discord gateway
-            await client.ConnectAsync();
+            await client.StartAsync();
 
             commands = new CommandHandler();
             await commands.Install(client);
              
-            client.Disconnected += Client_Disconnected;
+            //client.Disconnected += Client_Disconnected;
 
             //Block this task until the program is exited
             await Task.Delay(-1);
@@ -81,7 +81,7 @@ namespace Sora_Bot_1.SoraBot.Core
                 //await SentryService.SendError(e);
                 client = createClient().Result;
                 await client.LoginAsync(TokenType.Bot, token);
-                await client.ConnectAsync();
+                //await client.ConnectAsync(); TODO StartAsync();
                 commands = new CommandHandler();
                 await commands.Install(client);
                 client.Disconnected += Client_Disconnected;
@@ -99,7 +99,6 @@ namespace Sora_Bot_1.SoraBot.Core
             var _client = new DiscordSocketClient(new DiscordSocketConfig()
             {
                 LogLevel = LogSeverity.Info,
-                AudioMode = AudioMode.Outgoing,
                 MessageCacheSize = 50
             });
 
@@ -117,8 +116,8 @@ namespace Sora_Bot_1.SoraBot.Core
         public async void DisconnectAsync()
         {
             await client.LogoutAsync();
-            await client.DisconnectAsync();
-            
+            await client.StopAsync();
+
         }
 
     }

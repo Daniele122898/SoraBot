@@ -128,10 +128,14 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
             try
             {
                 var userInfo = user ?? Context.User; // ?? if not null return left. if null return right
+                var avatarURL = userInfo.GetAvatarUrl() ??
+                                "http://ravegames.net/ow_userfiles/themes/theme_image_22.jpg";
+                   // if (String.IsNullOrEmpty(AvatarUrl))
+                    //AvatarUrl = "http://is2.mzstatic.com/image/pf/us/r30/Purple7/v4/89/51/05/89510540-66df-9f6f-5c91-afa5e48af4e8/mzl.sbwqpbfh.png";
                 var eb = new EmbedBuilder()
                 {
                     Color = new Color(4, 97, 247),
-                    ThumbnailUrl = userInfo.GetAvatarUrl(),
+                    ThumbnailUrl = avatarURL,
                     Title = $"{userInfo.Username}#{userInfo.Discriminator} Info",
                     Description = $"Joined Discord on: {userInfo.CreatedAt.ToString().Remove(userInfo.CreatedAt.ToString().Length - 6)}",
                     Footer = new EmbedFooterBuilder()
@@ -159,7 +163,7 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                 {
                     x.Name = "Avatar";
                     x.IsInline = true;
-                    x.Value = $"[Click to View]({userInfo.GetAvatarUrl()})";
+                    x.Value = $"[Click to View]({avatarURL})";
                 });
 
                 eb.AddField((x) =>
@@ -205,10 +209,12 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
         {
             try
             {
+                var avatarURL = Context.Guild.IconUrl ??
+                                "http://ravegames.net/ow_userfiles/themes/theme_image_22.jpg";
                 var eb = new EmbedBuilder()
                 {
                     Color = new Color(4, 97, 247),
-                    ThumbnailUrl = Context.Guild.IconUrl,
+                    ThumbnailUrl = avatarURL,
                     Title = $"{Context.Guild.Name} info",
                     Description = $"Created on {Context.Guild.CreatedAt.ToString().Remove(Context.Guild.CreatedAt.ToString().Length - 6)}",
                     Footer = new EmbedFooterBuilder()
@@ -226,7 +232,7 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                 int online = 0;
                 foreach (var u in guild.Users)
                 {
-                    if (u.Status != UserStatus.Unknown && u.Status != UserStatus.Invisible && u.Status != UserStatus.Offline)
+                    if (u.Status != UserStatus.Invisible && u.Status != UserStatus.Offline)
                     {
                         online++;
                     }
@@ -296,7 +302,7 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                 {
                     x.Name = "Avatar Url";
                     x.IsInline = true;
-                    x.Value = $"[Click to view]({Context.Guild.IconUrl})";
+                    x.Value = $"[Click to view]({avatarURL})";
                 });
 
                 await Context.Channel.SendMessageAsync("", false, eb);

@@ -15,8 +15,8 @@ namespace Sora_Bot_1.SoraBot.Services
 {
     public class UserGuildUpdateService
     {
-        ConcurrentDictionary<ulong, ulong> updateChannelPreferenceDict =
-            new ConcurrentDictionary<ulong, ulong>();
+        ConcurrentDictionary<ulong, annoucementStruct> updateChannelPreferenceDict =
+            new ConcurrentDictionary<ulong, annoucementStruct>();
 
         private readonly JsonSerializer jSerializer = new JsonSerializer();
 
@@ -28,37 +28,86 @@ namespace Sora_Bot_1.SoraBot.Services
 
         public async Task UserLeft(SocketGuildUser user)
         {
-            ulong channelID;
-            if (updateChannelPreferenceDict.TryGetValue(user.Guild.Id, out channelID))
+            try
             {
-                await (user.Guild.GetChannel(channelID) as IMessageChannel).SendMessageAsync($"`{user.Username}` has left us :frowning:");
+                annoucementStruct str = new annoucementStruct();
+                if (updateChannelPreferenceDict.TryGetValue(user.Guild.Id, out str))
+                {
+                    IMessageChannel channel = user.Guild.GetChannel(str.leaveID) as IMessageChannel;
+                    if (channel == null)
+                    {
+                        return;
+                    }
+                    if (String.IsNullOrWhiteSpace(str.leaveMsg))
+                    {
+                        await channel.SendMessageAsync($"`{user.Username}` has left us :frowning:");
+                    }
+                    else
+                    {
+                        await channel.SendMessageAsync(ReplaceInfo(user, str.leaveMsg));
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e);
             }
         }
 
         public async Task UserJoined(SocketGuildUser user)
         {
-            ulong channelID;
-            if (updateChannelPreferenceDict.TryGetValue(user.Guild.Id, out channelID))
+            try
             {
-                await (user.Guild.GetChannel(channelID) as IMessageChannel).SendMessageAsync($"Welcome {user.Mention} to **{user.Guild.Name}**!");
+                annoucementStruct str = new annoucementStruct();
+                if (updateChannelPreferenceDict.TryGetValue(user.Guild.Id, out str))
+                {
+                    IMessageChannel channel = user.Guild.GetChannel(str.channelID) as IMessageChannel;
+                    if (channel == null)
+                    {
+                        return;
+                    }
+                    if (String.IsNullOrWhiteSpace(str.message))
+                    {
+                        await channel.SendMessageAsync($"Welcome {user.Mention} to **{user.Guild.Name}**!");
+                    }
+                    else
+                    {
+                        await channel.SendMessageAsync(ReplaceInfo(user, str.message));
+                    }
+                }
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e);
+            }
+            
         }
 
-        public async Task SetChannel(CommandContext Context)
+        //WELCOME
+
+        public async Task SetWelcome(CommandContext Context, string message)
         {
             try
             {
+                annoucementStruct str = new annoucementStruct();
                 if (!updateChannelPreferenceDict.ContainsKey(Context.Guild.Id))
                 {
-                    updateChannelPreferenceDict.TryAdd(Context.Guild.Id, Context.Channel.Id);
+                    str.channelID=Context.Channel.Id;
+                    str.message = message;
+                    updateChannelPreferenceDict.TryAdd(Context.Guild.Id, str);
                 }
                 else
                 {
-                    updateChannelPreferenceDict.TryUpdate(Context.Guild.Id, Context.Channel.Id);
+                    updateChannelPreferenceDict.TryGetValue(Context.Guild.Id, out str);
+                    str.channelID = Context.Channel.Id;
+                    str.message = message;
+                    updateChannelPreferenceDict.TryUpdate(Context.Guild.Id, str);
                 }
                 SaveDatabase();
                 await Context.Channel.SendMessageAsync(
-                    $"Successfully set Announcement Channel to `{Context.Channel.Name}`!");
+                    $":white_check_mark: Successfully set Welcome Channel to `{Context.Channel.Name}` with message:\n{str.message} (if this is empty the default message is chosen)");
             }
             catch (Exception e)
             {
@@ -67,20 +116,217 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
-        public async Task RemoveChannel(CommandContext Context)
+        public async Task SetWelcomeMessage (CommandContext Context, string message)
         {
-            
-            if (!updateChannelPreferenceDict.ContainsKey(Context.Guild.Id))
+            try
             {
-                await Context.Channel.SendMessageAsync("No Announcement Channel set in this Guild!");
-            }
-            else
-            {
-                ulong ignore;
-                updateChannelPreferenceDict.TryRemove(Context.Guild.Id, out ignore);
-                await Context.Channel.SendMessageAsync("Announcement Channel for this Guild was removed. No Announcements will be done anymore!");
+                annoucementStruct str = new annoucementStruct();
+                if (!updateChannelPreferenceDict.ContainsKey(Context.Guild.Id))
+                {
+                    str.message = message;
+                    updateChannelPreferenceDict.TryAdd(Context.Guild.Id, str);
+                }
+                else
+                {
+                    updateChannelPreferenceDict.TryGetValue(Context.Guild.Id, out str);
+                    str.message = message;
+                    updateChannelPreferenceDict.TryUpdate(Context.Guild.Id, str);
+                }
                 SaveDatabase();
+                await Context.Channel.SendMessageAsync(
+                    $":white_check_mark: Successfully set Welcome Message to `{message}` and {(str.channelID!=0 ? ($"with Channel {((Context.Guild as SocketGuild).GetChannel(str.channelID)).Name}") : "with no channel yet!")}");
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
+        }
+
+        public async Task SetWelcomeChannel(CommandContext Context, IMessageChannel channel)
+        {
+            try
+            {
+                annoucementStruct str = new annoucementStruct();
+                if (!updateChannelPreferenceDict.ContainsKey(Context.Guild.Id))
+                {
+                    str.channelID = channel.Id;
+                    updateChannelPreferenceDict.TryAdd(Context.Guild.Id, str);
+                }
+                else
+                {
+                    updateChannelPreferenceDict.TryGetValue(Context.Guild.Id, out str);
+                    str.channelID = channel.Id;
+                    updateChannelPreferenceDict.TryUpdate(Context.Guild.Id, str);
+                }
+                SaveDatabase();
+                await Context.Channel.SendMessageAsync(
+                    $":white_check_mark: Successfully set Welcome Channel to `{channel.Name}`!");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
+        }
+
+        public async Task RemoveWelcome(CommandContext Context)
+        {
+            try
+            {
+                if (!updateChannelPreferenceDict.ContainsKey(Context.Guild.Id))
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: No Announcement Channel set in this Guild!");
+                }
+                else
+                {
+                    annoucementStruct str = new annoucementStruct();
+                    updateChannelPreferenceDict.TryGetValue(Context.Guild.Id, out str);
+                    str.channelID = 0;
+                    str.message = null;
+                    updateChannelPreferenceDict.TryUpdate(Context.Guild.Id, str);
+                    await Context.Channel.SendMessageAsync(":white_check_mark: Welcome Channel for this Guild was removed. No Announcements will be done anymore!");
+                    SaveDatabase();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
+
+        }
+
+        //LEAVE 
+
+        public async Task SetLeave(CommandContext Context, string message)
+        {
+            try
+            {
+                annoucementStruct str = new annoucementStruct();
+                if (!updateChannelPreferenceDict.ContainsKey(Context.Guild.Id))
+                {
+                    str.leaveID = Context.Channel.Id;
+                    str.leaveMsg = message;
+                    updateChannelPreferenceDict.TryAdd(Context.Guild.Id, str);
+                }
+                else
+                {
+                    updateChannelPreferenceDict.TryGetValue(Context.Guild.Id, out str);
+                    str.leaveID = Context.Channel.Id;
+                    str.leaveMsg = message;
+                    updateChannelPreferenceDict.TryUpdate(Context.Guild.Id, str);
+                }
+                SaveDatabase();
+                await Context.Channel.SendMessageAsync(
+                    $":white_check_mark: Successfully set Leave Channel to `{Context.Channel.Name}` with message:\n{str.message} (if this is empty the default message is chosen)");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
+        }
+
+        public async Task SetLeaveMessage(CommandContext Context, string message)
+        {
+            try
+            {
+                annoucementStruct str = new annoucementStruct();
+                if (!updateChannelPreferenceDict.ContainsKey(Context.Guild.Id))
+                {
+                    str.leaveMsg = message;
+                    updateChannelPreferenceDict.TryAdd(Context.Guild.Id, str);
+                }
+                else
+                {
+                    updateChannelPreferenceDict.TryGetValue(Context.Guild.Id, out str);
+                    str.leaveMsg = message;
+                    updateChannelPreferenceDict.TryUpdate(Context.Guild.Id, str);
+                }
+                SaveDatabase();
+                await Context.Channel.SendMessageAsync(
+                    $":white_check_mark: Successfully set Leave Message to `{message}` and {(str.leaveID != 0 ? ($"with Channel {((Context.Guild as SocketGuild).GetChannel(str.leaveID)).Name}") : "with no channel yet!")}");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
+        }
+
+        public async Task SetLeaveChannel(CommandContext Context, IMessageChannel channel)
+        {
+            try
+            {
+                annoucementStruct str = new annoucementStruct();
+                if (!updateChannelPreferenceDict.ContainsKey(Context.Guild.Id))
+                {
+                    str.leaveID = channel.Id;
+                    updateChannelPreferenceDict.TryAdd(Context.Guild.Id, str);
+                }
+                else
+                {
+                    updateChannelPreferenceDict.TryGetValue(Context.Guild.Id, out str);
+                    str.leaveID = channel.Id;
+                    updateChannelPreferenceDict.TryUpdate(Context.Guild.Id, str);
+                }
+                SaveDatabase();
+                await Context.Channel.SendMessageAsync(
+                    $":white_check_mark: Successfully set Leave Channel to `{channel.Name}`!");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
+        }
+
+        public async Task RemoveLeave(CommandContext Context)
+        {
+            try
+            {
+                if (!updateChannelPreferenceDict.ContainsKey(Context.Guild.Id))
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: No Announcement Channel set in this Guild!");
+                }
+                else
+                {
+                    annoucementStruct str = new annoucementStruct();
+                    updateChannelPreferenceDict.TryGetValue(Context.Guild.Id, out str);
+                    str.leaveID = 0;
+                    str.leaveMsg = null;
+                    updateChannelPreferenceDict.TryUpdate(Context.Guild.Id, str);
+                    await Context.Channel.SendMessageAsync(":white_check_mark: Leave Channel for this Guild was removed. No Announcements will be done anymore!");
+                    SaveDatabase();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
+
+        }
+
+
+        private string ReplaceInfo(SocketGuildUser user, string message)
+        {
+            var edited = message.Replace("{user}", $"{user.Mention}");
+            edited = edited.Replace("{user#}", $"{user.Username}#{user.Discriminator}");
+            edited = edited.Replace("{server}", $"{user.Guild.Name}");
+            edited = edited.Replace("{count}", $"{user.Guild.MemberCount}");
+            return edited;
+        }
+
+        
+
+        public struct annoucementStruct
+        {
+            public ulong channelID;
+            public ulong leaveID;
+            public string message;
+            public string leaveMsg;
         }
 
         private void SaveDatabase()
@@ -113,8 +359,10 @@ namespace Sora_Bot_1.SoraBot.Services
                     {
                         using (JsonReader reader = new JsonTextReader(sr))
                         {
-                            updateChannelPreferenceDict =
-                                jSerializer.Deserialize<ConcurrentDictionary<ulong, ulong>>(reader);
+                            var temp = jSerializer.Deserialize<ConcurrentDictionary<ulong, annoucementStruct>>(reader);
+                            if (temp == null)
+                                return;
+                            updateChannelPreferenceDict = temp;
                         }
                     }
                 }

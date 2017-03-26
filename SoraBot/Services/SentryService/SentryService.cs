@@ -12,14 +12,17 @@ namespace Sora_Bot_1.SoraBot.Services
     public static class SentryService
     {
         public static DiscordSocketClient client;
-        private static IUser serenity;
+        private static SocketUser serenity;
 
 
-        public static void Install()
+        public async static void Install()
         {
             try
             {
-                serenity = client.GetUser(192750776005689344);
+                var guild = client.GetGuild(180818466847064065);
+                await guild.DownloadUsersAsync();
+                serenity = guild.GetUser(192750776005689344);
+                Console.WriteLine($"Got user {serenity.Username}");
             }
             catch (Exception e)
             {
@@ -33,18 +36,39 @@ namespace Sora_Bot_1.SoraBot.Services
         {
             try
             {
-                var eb = new EmbedBuilder()
+                var err = e.ToString();
+                if (err.Length <2000)
                 {
-                    Color = new Color(4, 97, 247)
-                };
+                    var eb = new EmbedBuilder()
+                    {
+                        Color = new Color(4, 97, 247),
+                        Title = "Exception Occured",
+                        Description = err
+                    };
+                    await (await serenity.CreateDMChannelAsync()).SendMessageAsync("", false, eb);
+                }
+                else
+                {
+                    string errE = err.Substring(2000);
+                    string errS = err.Remove(2000);
+                    var eb = new EmbedBuilder()
+                    {
+                        Color = new Color(4, 97, 247),
+                        Title = "Exception Occured 1",
+                        Description = errS
+                    };
 
-                eb.AddField((efb) =>
-                {
-                    efb.Name = "Exception Occured";
-                    efb.IsInline = true;
-                    efb.Value = e.ToString();
-                });
-                await (await serenity.CreateDMChannelAsync()).SendMessageAsync("", false, eb);
+                    await (await serenity.CreateDMChannelAsync()).SendMessageAsync("", false, eb);
+
+                    var eb2 = new EmbedBuilder()
+                    {
+                        Color = new Color(4, 97, 247),
+                        Title = "Exception Occured 2",
+                        Description = errE
+                    };
+                    await (await serenity.CreateDMChannelAsync()).SendMessageAsync("", false, eb2);
+                }
+                
             }
             catch (Exception exception)
             {
@@ -56,6 +80,8 @@ namespace Sora_Bot_1.SoraBot.Services
         {
             try
             {
+                if (serenity == null)
+                    return;
                 await (await serenity.CreateDMChannelAsync()).SendMessageAsync(message);
             }
             catch (Exception e)
@@ -68,28 +94,48 @@ namespace Sora_Bot_1.SoraBot.Services
         {
             try
             {
-                var eb = new EmbedBuilder()
+                var err = e.ToString();
+                if(err.Length < 1700)
                 {
-                    Color = new Color(4, 97, 247)
-                };
-
-                eb.AddField((efb) =>
-                {
-                    efb.Name = "Info About Command";
-                    efb.IsInline = true;
-                    efb.Value = $"**Guild Name:**\t{Context.Guild.Name}\n" +
+                    var eb = new EmbedBuilder()
+                    {
+                        Color = new Color(4, 97, 247),
+                        Title = "Exception Occured",
+                        Description = $"**INFO ABOUT COMMAND**\n"+
+                                $"**Guild Name:**\t{Context.Guild.Name}\n" +
                                 $"**Guild ID:**\t{Context.Guild.Id}\n" +
                                 $"**User:**\t{Context.User.Username}#{Context.User.Discriminator}\n" +
                                 $"**Message that Caused the Exception**\n" +
-                                $"{Context.Message.Content}";
-                });
-                eb.AddField((efb) =>
+                                $"{Context.Message.Content}\n\n{err}"
+                    };
+                    await (await serenity.CreateDMChannelAsync()).SendMessageAsync("", false, eb);
+                }
+                else
                 {
-                    efb.Name = "Exception Occured";
-                    efb.IsInline = true;
-                    efb.Value = e.ToString();
-                });
-                await (await serenity.CreateDMChannelAsync()).SendMessageAsync("", false, eb);
+                    string errE = err.Substring(1700);
+                    string errS = err.Remove(1700);
+                    var eb = new EmbedBuilder()
+                    {
+                        Color = new Color(4, 97, 247),
+                        Title = "Exception Occured 1",
+                        Description = $"**INFO ABOUT COMMAND**\n" +
+                                $"**Guild Name:**\t{Context.Guild.Name}\n" +
+                                $"**Guild ID:**\t{Context.Guild.Id}\n" +
+                                $"**User:**\t{Context.User.Username}#{Context.User.Discriminator}\n" +
+                                $"**Message that Caused the Exception**\n" +
+                                $"{Context.Message.Content}\n\n{errS}"
+                    };
+
+                    await (await serenity.CreateDMChannelAsync()).SendMessageAsync("", false, eb);
+
+                    var eb2 = new EmbedBuilder()
+                    {
+                        Color = new Color(4, 97, 247),
+                        Title = "Exception Occured 2",
+                        Description = errE
+                    };
+                    await (await serenity.CreateDMChannelAsync()).SendMessageAsync("", false, eb2);
+                }
             }
             catch (Exception exception)
             {

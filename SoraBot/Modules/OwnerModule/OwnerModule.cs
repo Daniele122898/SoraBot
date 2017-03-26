@@ -60,12 +60,13 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
 
         //ANNOUNCEMENTS
 
+            /*
         [Command("here"), Summary("Sets the Channel in which the message was written as Channel to announce")]
         [RequireOwner]
         public async Task SetAnnounceChannel()
         {
             await updateService.SetChannel(Context);
-        }
+        }*/
 
         [Command("loadChange")]
         [RequireOwner]
@@ -83,12 +84,13 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
             await ReplyAsync(":white_check_mark: Redone the Changelog");
         }
 
+        /*
         [Command("remove"), Summary("Removes current Announcement channel to stop the bot from announcing")]
         [RequireOwner]
         public async Task RemoveAnnounceChannel()
         {
             await updateService.RemoveChannel(Context);
-        }
+        }*/
 
         //END ANNOUNCEMENTS
 
@@ -105,6 +107,13 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
         public async Task RemoveStarBoardChannel()
         {
             await starBoardService.RemoveChannel(Context);
+        }
+
+        [Command("msgme")]
+        [RequireOwner]
+        public async Task SendSentryMessage([Remainder] string message)
+        {
+            await SentryService.SendMessage(message);
         }
 
         //END STARBOARD
@@ -176,7 +185,7 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
             await Context.Channel.SendMessageAsync("I wanted to leave anyway :information_desk_person:");
             //await Context.Client.DisconnectAsync();
             //await ((DiscordSocketClient) Context.Client).LogoutAsync();
-            ((DiscordSocketClient)Context.Client).DisconnectAsync();
+            await ((DiscordSocketClient) Context.Client).StopAsync();
         }
 
         [Command("ban")]

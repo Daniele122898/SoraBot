@@ -28,8 +28,6 @@ namespace Sora_Bot_1.SoraBot.Services.PatService
             {
                 if (patDict.ContainsKey(user.Id))
                 {
-                    if(context.User.Id == user.Id)
-                        return;
                     int counter = 0;
                     patDict.TryGetValue(user.Id, out counter);
                     counter++;

@@ -18,7 +18,9 @@ namespace Sora_Bot_1.SoraBot.Modules.EPModule
             epService = ep;
         }
 
-        [Command("top10", RunMode = RunMode.Async), Summary("Posts the top 10 list of users sorted by EP => The EP is globaly aquired on all Guilds that Sora is on!")]
+        [Command("top10", RunMode = RunMode.Async),
+         Summary(
+             "Posts the top 10 list of users sorted by EP => The EP is globaly aquired on all Guilds that Sora is on!")]
         [Alias("top", "leaderboard")]
         public async Task Top10List()
         {
@@ -26,7 +28,8 @@ namespace Sora_Bot_1.SoraBot.Modules.EPModule
         }
 
         [Command(""), Summary("Displays short profile image of User, if not specified it will show yours")]
-        public async Task SendProfile([Summary("User to show the picture of, if none given will show your own!")]IUser user = null)
+        public async Task SendProfile(
+            [Summary("User to show the picture of, if none given will show your own!")] IUser user = null)
         {
             var typing = Context.Channel.EnterTypingState(null);
             var userInfo = user ?? Context.User;
@@ -39,6 +42,26 @@ namespace Sora_Bot_1.SoraBot.Modules.EPModule
         public async Task ToggleEP()
         {
             await epService.ToggleEPSubscribe(Context);
+        }
+
+        [Command("setCord")]
+        [RequireOwner]
+        public async Task setCords([Remainder] string cords)
+        {
+            await epService.changeProfileCord(cords, Context);
+        }
+
+        [Command("setSize")]
+        [RequireOwner]
+        public async Task setSize(string size)
+        {
+            await epService.size(size, Context);
+        }
+
+        [Command("setbg"), Summary("Set's your profile BG with the provided URL. If no URL is specified it will return to the default Profile Crad. **this feature requires lvl 20!**")]
+        public async Task setBG(string url = null)
+        {
+            await epService.SetBG(url, Context);
         }
     }
 }

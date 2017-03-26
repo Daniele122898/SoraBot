@@ -35,15 +35,16 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
             LoadDatabase();
         }
 
-        public async Task StarAdded(ulong msgID, Optional<SocketUserMessage> msg, SocketReaction reaction)
-        {   
+        public async Task StarAddedNew(Cacheable<IUserMessage, ulong> msgCacheable, ISocketMessageChannel msgChannel, SocketReaction reaction)
+        {
             try
             {
+                var msg = await msgCacheable.GetOrDownloadAsync();
                 //MSG BLACKLIST
-                if (msgStarBlackDict.ContainsKey(msgID))
+                if (msgStarBlackDict.ContainsKey(msg.Id))
                 {
                     short count;
-                    msgStarBlackDict.TryGetValue(msgID, out count);
+                    msgStarBlackDict.TryGetValue(msg.Id, out count);
                     if (count >= 2)
                     {
                         return;
@@ -52,26 +53,27 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
 
                 ulong channelID;
                 IUserMessage sentMessage = null;
-                IMessage dmsg = null;
-                bool specified = true;
+                //IMessage dmsg = null;
+                //bool specified = true;
                 ulong guildID = (reaction.Channel as IGuildChannel).GuildId;
 
                 if (starChannelDict.TryGetValue(guildID, out channelID))
                 {
                     if (reaction.Emoji.Name.Equals("⭐") || reaction.Emoji.Name.Equals("🌟"))
                     {
+                        /*
                         if (!msg.IsSpecified) //!String.IsNullOrEmpty(tag)
                         {
                             dmsg = await reaction.Channel.GetMessageAsync(msgID, CacheMode.AllowDownload, null);
                             specified = false;
-                        }
+                        }*/
 
-                        if (reaction.UserId == (specified ? reaction.Message.Value.Author.Id : dmsg.Author.Id))
+                        if (reaction.UserId == msg.Author.Id)
                         {
                             return;
                         }
 
-                        if (client.CurrentUser.Id == (specified ? reaction.Message.Value.Author.Id : dmsg.Author.Id))
+                        if (client.CurrentUser.Id == msg.Author.Id)
                         {
                             return;
                         }
@@ -79,23 +81,23 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                         Random rand = new Random(DateTime.Now.Millisecond);
                         await Task.Delay(rand.Next(50));
 
-                        if (msgIdDictionary.ContainsKey(msgID))
+                        if (msgIdDictionary.ContainsKey(msg.Id))
                         {
                             //USER BLACKLIST
-                            if (await CheckBlacklist(msgID, reaction.UserId))
+                            if (await CheckBlacklist(msg.Id, reaction.UserId))
                             {
                                 return;
                             }
 
                             starMsg msgStruct = new starMsg();
-                            msgIdDictionary.TryGetValue(msgID, out msgStruct);
+                            msgIdDictionary.TryGetValue(msg.Id, out msgStruct);
                             msgStruct.counter += 1;
                             /*var guild = ((reaction.Channel as IGuildChannel)?.Guild as SocketGuild);
                             var channel = guild?.GetChannel(channelID) as IMessageChannel;
                             var msgToEdit =
                                 (IUserMessage)
                                 await channel.GetMessageAsync(msgStruct.starMSGID, CacheMode.AllowDownload, null);*/
-                            msgIdDictionary.TryUpdate(msgID, msgStruct);
+                            msgIdDictionary.TryUpdate(msg.Id, msgStruct);
                             /*await msgToEdit.ModifyAsync(x => { x.Content = $"{msgStruct.counter} {msgToEdit.Content}"; });*/
 
 
@@ -105,13 +107,13 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                         else
                         {
                             //USER BLACKLIST
-                            if (await CheckBlacklist(msgID, reaction.UserId))
+                            if (await CheckBlacklist(msg.Id, reaction.UserId))
                             {
                                 return;
                             }
 
 
-                            if ((specified ? reaction.Message.Value.Attachments.Count : dmsg.Attachments.Count) < 1)
+                            if (msg.Attachments.Count < 1)
                             {
                                 var eb = new EmbedBuilder()
                                 {
@@ -120,18 +122,18 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                                     Author = new EmbedAuthorBuilder()
                                     {
                                         IconUrl =
-                                            (specified ? reaction.Message.Value.Author.GetAvatarUrl() : dmsg.Author.GetAvatarUrl()),
+                                            msg.Author.GetAvatarUrl(),
                                         Name =
-                                            $"{(specified ? reaction.Message.Value.Author.Username : dmsg.Author.Username)}#{(specified ? reaction.Message.Value.Author.Discriminator : dmsg.Author.Discriminator)}"
+                                            $"{msg.Author.Username}#{msg.Author.Discriminator}"
                                     },
-                                    Description =
-                                        (specified ? reaction.Message.Value.Content : dmsg.Content)
+                                    Description = (msg.Content.Contains("http") ? "Link detected. Copied outside to embed link/picture" : msg.Content)
                                 };
                                 sentMessage = await (((reaction.Channel as IGuildChannel).Guild as SocketGuild)
                                     .GetChannel(channelID) as
                                     IMessageChannel).SendMessageAsync(
-                                    $"{reaction.Emoji.Name} in #{((specified ? reaction.Message.GetValueOrDefault().Channel : dmsg.Channel) as IMessageChannel).Name}\n",
-                                    false, eb);
+                                    $"{reaction.Emoji.Name} in #{msg.Channel.Name}{(msg.Content.Contains("http") ? $" by {msg.Author.Username}#{msg.Author.Discriminator}\n{msg.Content}" : "")}",
+                                    false, (msg.Content.Contains("http") ? null : eb));
+
                             }
                             else
                             {
@@ -140,23 +142,21 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                                     Color = new Color(4, 97, 247),
                                     Timestamp = DateTimeOffset.UtcNow,
                                     ImageUrl =
-                                    (specified
-                                        ? reaction.Message.Value.Attachments.FirstOrDefault().Url
-                                        : dmsg.Attachments.FirstOrDefault().Url),
+                                    msg.Attachments.FirstOrDefault().Url,
                                     Author = new EmbedAuthorBuilder()
                                     {
                                         IconUrl =
-                                            (specified ? reaction.Message.Value.Author.GetAvatarUrl() : dmsg.Author.GetAvatarUrl()),
+                                            msg.Author.GetAvatarUrl(),
                                         Name =
-                                            $"{(specified ? reaction.Message.Value.Author.Username : dmsg.Author.Username)}#{(specified ? reaction.Message.Value.Author.Discriminator : dmsg.Author.Discriminator)}"
+                                            $"{msg.Author.Username}#{msg.Author.Discriminator}"
                                     },
                                     Description =
-                                        (specified ? reaction.Message.Value.Content : dmsg.Content)
+                                        msg.Content
                                 };
                                 sentMessage = await (((reaction.Channel as IGuildChannel).Guild as SocketGuild)
                                     .GetChannel(channelID) as
                                     IMessageChannel).SendMessageAsync(
-                                    $"{reaction.Emoji.Name} in #{((specified ? reaction.Message.GetValueOrDefault().Channel : dmsg.Channel) as IMessageChannel).Name}\n",
+                                    $"{reaction.Emoji.Name} in #{msg.Channel.Name}\n",
                                     false, eb);
                             }
                             starMsg msgStruct = new starMsg
@@ -164,7 +164,7 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                                 starMSGID = sentMessage.Id,
                                 counter = 1
                             };
-                            msgIdDictionary.TryAdd(msgID, msgStruct);
+                            msgIdDictionary.TryAdd(msg.Id, msgStruct);
                             SaveDatabase();
                         }
                     }
@@ -174,60 +174,69 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
             {
                 Console.WriteLine(e);
                 await SentryService.SendError(e);
-                throw;
             }
         }
 
-        public async Task StarRemoved(ulong msgID, Optional<SocketUserMessage> msg, SocketReaction reaction)
+
+        public async Task StarRemovedNew(Cacheable<IUserMessage, ulong> msgCacheable, ISocketMessageChannel msgChannel, SocketReaction reaction)
         {
-            ulong channelID;
-            ulong guildID = (reaction.Channel as IGuildChannel).GuildId;
-
-            if (starChannelDict.TryGetValue(guildID, out channelID))
+            try
             {
-                starMsg msgStruct = new starMsg();
-                if (msgIdDictionary.TryGetValue(msgID, out msgStruct))
-                {
-                    msgStruct.counter -= 1;
-                    var guild = ((reaction.Channel as IGuildChannel)?.Guild as SocketGuild);
-                    var channel = guild?.GetChannel(channelID) as IMessageChannel;
-                    var msgToEdit =
-                        (IUserMessage)
-                        await channel.GetMessageAsync(msgStruct.starMSGID, CacheMode.AllowDownload, null);
+                var msg = await msgCacheable.GetOrDownloadAsync();
+                ulong channelID;
+                ulong guildID = (reaction.Channel as IGuildChannel).GuildId;
 
-                    if (msgStruct.counter < 1)
+                if (starChannelDict.TryGetValue(guildID, out channelID))
+                {
+                    starMsg msgStruct = new starMsg();
+                    if (msgIdDictionary.TryGetValue(msg.Id, out msgStruct))
                     {
-                        await msgToEdit.DeleteAsync();
-                        msgIdDictionary.TryRemove(msgID, out msgStruct);
-                        if (msgStarBlackDict.ContainsKey(msgID))
+                        msgStruct.counter -= 1;
+                        var guild = ((reaction.Channel as IGuildChannel)?.Guild as SocketGuild);
+                        var channel = guild?.GetChannel(channelID) as IMessageChannel;
+                        var msgToEdit =
+                            (IUserMessage)
+                            await channel.GetMessageAsync(msgStruct.starMSGID, CacheMode.AllowDownload, null);
+
+                        if (msgStruct.counter < 1)
                         {
-                            short count;
-                            msgStarBlackDict.TryGetValue(msgID, out count);
-                            count++;
-                            msgStarBlackDict.TryUpdate(msgID, count);
+                            await msgToEdit.DeleteAsync();
+                            msgIdDictionary.TryRemove(msg.Id, out msgStruct);
+                            if (msgStarBlackDict.ContainsKey(msg.Id))
+                            {
+                                short count;
+                                msgStarBlackDict.TryGetValue(msg.Id, out count);
+                                count++;
+                                msgStarBlackDict.TryUpdate(msg.Id, count);
+                            }
+                            else
+                            {
+                                msgStarBlackDict.TryAdd(msg.Id, 1);
+                            }
                         }
                         else
                         {
-                            msgStarBlackDict.TryAdd(msgID, 1);
+                            /*
+                            if (msgToEdit.Content.Contains("⭐"))
+                            {
+                                string subString = msgToEdit.Content.Substring(msgToEdit.Content.IndexOf("⭐"));
+                                await msgToEdit.ModifyAsync(x => { x.Content = $"{msgStruct.counter} {subString}"; });
+                            }
+                            else if(msgToEdit.Content.Contains("🌟"))
+                            {
+                                string subString = msgToEdit.Content.Substring(msgToEdit.Content.IndexOf("🌟"));
+                                await msgToEdit.ModifyAsync(x => { x.Content = $"{msgStruct.counter} {subString}"; });
+                            }*/
+                            msgIdDictionary.TryUpdate(msg.Id, msgStruct);
                         }
+                        SaveDatabase();
                     }
-                    else
-                    {
-                        /*
-                        if (msgToEdit.Content.Contains("⭐"))
-                        {
-                            string subString = msgToEdit.Content.Substring(msgToEdit.Content.IndexOf("⭐"));
-                            await msgToEdit.ModifyAsync(x => { x.Content = $"{msgStruct.counter} {subString}"; });
-                        }
-                        else if(msgToEdit.Content.Contains("🌟"))
-                        {
-                            string subString = msgToEdit.Content.Substring(msgToEdit.Content.IndexOf("🌟"));
-                            await msgToEdit.ModifyAsync(x => { x.Content = $"{msgStruct.counter} {subString}"; });
-                        }*/
-                        msgIdDictionary.TryUpdate(msgID, msgStruct);
-                    }
-                    SaveDatabase();
                 }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e);
             }
         }
 

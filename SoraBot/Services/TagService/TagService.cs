@@ -227,7 +227,7 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
                         {
                             x.Value += $"**{t.tag}**\n";
                         }
-                        if (x.Value.Length < 1)
+                        if (x.Value.ToString().Length < 1)
                         {
                             x.Value = "None";
                         }

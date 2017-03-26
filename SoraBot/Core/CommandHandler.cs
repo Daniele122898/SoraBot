@@ -30,8 +30,13 @@ namespace Sora_Bot_1.SoraBot.Core
         private UserGuildUpdateService updateService;
         private StarBoardService starBoardService;
         private ReminderService remService;
+        private AfkSertvice _afkService;
         private PatService patService;
+        private ImdbService _imdbService;
+        private SelfRoleService _selfRoleService;
+        private AnimeService _animeService;
         private TagService tagService;
+        private UbService _ubService;
         private RatelimitService ratelimitService;
         private EPService epService;
         private PlayingWith playingWith;
@@ -47,6 +52,11 @@ namespace Sora_Bot_1.SoraBot.Core
             starBoardService = new StarBoardService(client);
             musicService = new MusicService();
             ratelimitService = new RatelimitService();
+            _afkService = new AfkSertvice();
+            _selfRoleService = new SelfRoleService();
+            _ubService = new UbService();
+            _imdbService = new ImdbService();
+            _animeService = new AnimeService();
             //remService = new ReminderService();
 
             tagService = new TagService();
@@ -54,7 +64,7 @@ namespace Sora_Bot_1.SoraBot.Core
             epService = new EPService(client);
             playingWith = new PlayingWith(client);
             SentryService.client = client;
-            SentryService.Install();
+            //SentryService.Install();
 
             commands = new CommandService();
             map = new DependencyMap();
@@ -62,9 +72,14 @@ namespace Sora_Bot_1.SoraBot.Core
 
             map.Add(musicService);
             map.Add(handler);
-            map.Add(commands);
+            map.Add(_afkService);
+            map.Add(_selfRoleService);
+            //map.Add(commands);
             map.Add(updateService);
+            map.Add(_imdbService);
+            map.Add(_animeService);
             map.Add(patService);
+            map.Add(_ubService);
             map.Add(tagService);
             map.Add(starBoardService);
             map.Add(epService);
@@ -76,14 +91,26 @@ namespace Sora_Bot_1.SoraBot.Core
 
             ChangelogService.LoadChangelog();
             client.MessageReceived += epService.IncreaseEP;
+            client.MessageReceived += _afkService.Client_MessageReceived;
             client.MessageReceived += HandleCommand;
             client.UserJoined += updateService.UserJoined;
             client.UserLeft += updateService.UserLeft;
-            client.ReactionAdded += starBoardService.StarAdded;
-            client.ReactionRemoved += starBoardService.StarRemoved;
+            client.ReactionAdded += starBoardService.StarAddedNew;
+            client.ReactionRemoved += starBoardService.StarRemovedNew;
             client.UserVoiceStateUpdated += musicService.CheckIfAlone;
             client.JoinedGuild += Client_JoinedGuild;
             client.LeftGuild += Client_LeftGuild;
+            client.GuildAvailable += Client_GuildAvailable;
+        }
+
+        
+
+        private async Task Client_GuildAvailable(SocketGuild guild)
+        {
+            if(guild.Id == 180818466847064065)
+            {
+                SentryService.Install();
+            }
         }
 
         private async Task Client_LeftGuild(SocketGuild arg)
