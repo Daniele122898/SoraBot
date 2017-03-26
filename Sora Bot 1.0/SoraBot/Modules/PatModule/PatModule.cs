@@ -18,6 +18,26 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
             patService = _patService;
         }
 
+        private string[] _pats = new string[]
+        {
+            "https://media.giphy.com/media/3ohzdLjvu2Q8rQLspq/source.gif",
+            "http://i.imgur.com/bDMMk0L.gif",
+            "http://pa1.narvii.com/5673/aa76b9a3ebc376626c6dc748a5983dffcf364277_hq.gif",
+            "http://i.imgur.com/gQ5r1li.gif",
+            "http://funnypictures1.fjcdn.com/funny_gifs/Head_e12a8e_6102763.gif",
+            "http://i.imgur.com/M5kqhq9.gif",
+            "https://s-media-cache-ak0.pinimg.com/originals/c0/3f/58/c03f5817acde4b1c168d31ffe02c522e.gif",
+            "https://68.media.tumblr.com/2d61aa2fd9286f5670fbb17b6e56475f/tumblr_o4ufimpBNt1tydz8to1_500.gif",
+            "https://68.media.tumblr.com/cf71997201ee0463db3be5445eaa8743/tumblr_oij2qrsdIO1vwt3qvo1_500.gif",
+            "http://pa1.narvii.com/5983/85777dd28aa87072ee5a9ed759ab0170b3c60992_hq.gif",
+            "https://m.popkey.co/a5cfaf/1x6lW.gif",
+            "http://funnypictures1.fjcdn.com/funny_gifs/Head_389b42_6102763.gif",
+            "https://media.giphy.com/media/ye7OTQgwmVuVy/giphy.gif",
+            "https://33.media.tumblr.com/cb4da84b16d8e189c5b7a61632a54953/tumblr_nrcwmt2SNG1r4vymlo1_400.gif",
+            "https://media.giphy.com/media/KZQlfylo73AMU/giphy.gif",
+            "http://i0.kym-cdn.com/photos/images/original/000/915/038/7e9.gif"
+        };
+
         private string[] _hugs = new string[]
         {
             "https://media.giphy.com/media/od5H3PmEG5EVq/giphy.gif",
@@ -53,8 +73,9 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
                 await ReplyAsync($"{Context.User.Mention} Why are you patting yourself.. Are you okay? ｡ﾟ･（>﹏<）･ﾟ｡ \n https://media.giphy.com/media/wUArrd4mE3pyU/giphy.gif");
                 return;
             }
+            var r = new Random();
             await patService.AddPat(user, Context);
-            await ReplyAsync($"{Context.User.Mention} pats {user.Mention} ｡◕ ‿ ◕｡ \n http://i.imgur.com/bDMMk0L.gif");
+            await ReplyAsync($"{Context.User.Mention} pats {user.Mention} ｡◕ ‿ ◕｡ \n {_pats[r.Next(0,_pats.Length-1)]}");
         }
 
         [Command("patcount"), Summary("How many pats did this User Receive (Global Number)")]
