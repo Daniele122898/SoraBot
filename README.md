@@ -1,19 +1,16 @@
 ## Major Changelogs (check frequent one with ´$changelog´)
 
 **Version**
-0.0.9.9.4
+0.1.0.0.0
 
 **Date**
-19.3.2017 20:00 UTC +1
+25.3.2017 22:30 UTC +1
 
 **Changes**
-  - Better Image processing
-  => weird characters used to break
-	 the whole profile card.
-  - Added Self-Assignable Roles!
-  - A starboard entry that includes 
-    any form of link will be posted 
-    without the embed!
+  - Added IMDb search queries
+  - Added Anime + Manga search queries
+  - Added Urban Dictionary search queries
+  - Fixed some bugs
 	  
 	  
 # Help => Can be found in Wiki as well (updated more frequently)
