@@ -72,18 +72,33 @@ Command | Parameter | Example | Output
 `stop` | *none* | `$stop` | Stops the audio playback
 
 ## AFK / Away
-**GENERAL** Keep in mind that your AFK status is GLOBAL. So if you want to say `i suck dick` in one guild but rather not in another then.. Do it at your own risk ;) I might add local / guild bound AFK in the future.
+**GENERAL** Keep in mind that your AFK status is GLOBAL. So if you want to say `i suck dick` in one guild but rather not in another then.. Do it at your own risk ;) I might add local / guild bound AFK in the future. The AFK message will only trigger every 30 seconds to prevent spam.
 
 | Command | Parameter                                  | Example               | Output                                                                                                                                                                                              |
 |---------|--------------------------------------------|-----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `afk`   | [Optional message for when you get tagged] | `$afk not fapping...` | If you were set AFK before, the afk status gets removed. Otherwise will set you GLOBALY AFK on all guilds that Sora is on. Whenever you get @mentioned Sora will respond with your creative message |
 
-## Announcements
+## Custom Member Join / Leave Announcements
 
-Command | Parameter | Permission | Output 
---- | --- | --- | ---
-`here` | *none* | Requires Mange Channel Permissions | Sets the channel in which the message was written as channel to announce joining or leaving members
-`remove` | *none* | Requires Mange Channel Permissions | Removes the channel to announce joining or leaving members
+**ATTENTION** This system has changed and the Database has been wiped on 26.03.2017. 
+
+**GENERAL** With this you can set custom leave and welcoming messages. These can be projected to different channels or independently turned off!
+
+**IMPORTANT** In the messages themselfs you can use `{user}` to @Mention the user, ``{user#} for Name#Discriminator (mostly used in leave messages since the member can't be @Mentioned anymore), `{server}` for the server name, `{count}` for member count!
+Example: `$a welcome Welcome {user} to {server} you are our {count}th member!`
+
+**PREFIX** This command uses a module prefix. This means infront of all commands must be the prefix `a` or `announcement` !
+
+| Command        | Parameter | Example                                                                  | Permission      | Output                                                                                                                 |
+|----------------|-----------|--------------------------------------------------------------------------|-----------------|------------------------------------------------------------------------------------------------------------------------|
+| `a welcome`    | [message] | `$a welcome Welcome {user} to {server} you are our {count}th member!`    | Manage Channels | Sets the Welcome channel to the current one and adds the Welcome message! => If left blank it will use the default one |
+| `a welcomemsg` | [message] | `$a welcomemsg Welcome {user} to {server} you are our {count}th member!` | Manage Channels | Sets the custom Welcome message => If left blank it will use the default one                                           |
+| `a welcomecha` | #channel  | `$a welcomecha #general`                                                 | Manage Channels | Sets the Welcome channel                                                                                               |
+| `a rmwelcome`  | *none*    | `$a rmwelcome`                                                           | Manage Channels | Removes the whole Welcome announcement resetting the message aswell                                                    |
+| `a leave`      | [message] | `$a leave {user} has sadly left us. RIP`                                 | Manage Channels | Sets the Leave channel to the current one and adds the Leave message! => If left blank it will use the default one     |
+| `a leavemsg`   | [message] | `$a leavemsg {user} has sadly left us. RIP`                              | Manage Channels | Sets the custom Leave message => If left blank it will use the default one                                             |
+| `a leavecha`   | #channel  | `$a welcomecha #general`                                                 | Manage Channels | Sets the Leave Channel                                                                                                 |
+| `a rmleave`    | *none*    | `$a rmleave`                                                             | Manage Channels | Removes the whole Leave announcement resetting the message aswell                                                      |
 
 ## Tags
 
@@ -157,12 +172,14 @@ You cannot star your own message. It will not be added to the starboard. Only di
 | `ping`     | *none*          | `$ping`                | Shows the current ping of Sora                                                    |
 | `invite`   | *none*          | `$invite`              | Posts a link to invite Sora to your guild :> plz ♥                                |
 
-## Pats
+## Pats, Hugs and Pokes
 
-| Command    | Parameter               | Example                                  | Output                                                                                                                  |
-|------------|-------------------------|------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
-| `pat`      | @mention of user to pat | `$pat @Serenity#0783`                    | Will pat the specified user and add it to his global patcount. Spread love ♥ or pats :>                                 |
-| `patcount` | [@mention]              | `$patcount` / `$patcount @Serenity#0783` | If no user is given as parameter you yourself will be displayed. Posts the global amount of pats the user has received. |
+| Command    | Parameter                | Example                                  | Output                                                                                                                  |
+|------------|--------------------------|------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| `pat`      | @mention of user to pat  | `$pat @Serenity#0783`                    | Will pat the specified user and add it to his global patcount. Spread love ♥ or pats :>                                 |
+| `patcount` | [@mention]               | `$patcount` / `$patcount @Serenity#0783` | If no user is given as parameter you yourself will be displayed. Posts the global amount of pats the user has received. |
+| `hug`      | @mention of user to hug  | `$hug @Serenity#0783`                    | Hugs the specified user with a randomly chosen hug gif                                                                  |
+| `poke`     | @mention of user to poke | `$poke @Serenity#0783`                   | Pokes the specified user with a randomly chosen poke gif                                                                |
 
 
 ## Changelog

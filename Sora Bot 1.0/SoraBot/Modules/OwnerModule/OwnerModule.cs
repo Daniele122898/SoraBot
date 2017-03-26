@@ -60,12 +60,13 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
 
         //ANNOUNCEMENTS
 
+            /*
         [Command("here"), Summary("Sets the Channel in which the message was written as Channel to announce")]
         [RequireOwner]
         public async Task SetAnnounceChannel()
         {
             await updateService.SetChannel(Context);
-        }
+        }*/
 
         [Command("loadChange")]
         [RequireOwner]
@@ -83,12 +84,13 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
             await ReplyAsync(":white_check_mark: Redone the Changelog");
         }
 
+        /*
         [Command("remove"), Summary("Removes current Announcement channel to stop the bot from announcing")]
         [RequireOwner]
         public async Task RemoveAnnounceChannel()
         {
             await updateService.RemoveChannel(Context);
-        }
+        }*/
 
         //END ANNOUNCEMENTS
 

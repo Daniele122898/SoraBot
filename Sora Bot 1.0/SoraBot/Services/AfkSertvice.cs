@@ -15,8 +15,9 @@ namespace Sora_Bot_1.SoraBot.Services
     public class AfkSertvice
     {
 
-        private ConcurrentDictionary<ulong, string> _afkDict = new ConcurrentDictionary<ulong, string>();
+        private ConcurrentDictionary<ulong, _afkStruct> _afkDict = new ConcurrentDictionary<ulong, _afkStruct>();
         private JsonSerializer _jSerializer = new JsonSerializer();
+        private int _timeAdd = 30000;
 
         public AfkSertvice()
         {
@@ -33,13 +34,18 @@ namespace Sora_Bot_1.SoraBot.Services
                     //add
                     if (awayMsg == null)
                         awayMsg = "";
-                    _afkDict.TryAdd(Context.User.Id, awayMsg);
+                    _afkStruct str = new _afkStruct
+                    {
+                        message = awayMsg,
+                        timeToTriggerAgain = DateTime.UtcNow
+                    };
+                    _afkDict.TryAdd(Context.User.Id, str);
                     await Context.Channel.SendMessageAsync(":white_check_mark: You are now set AFK");
                 }
                 else
                 {
                     //remove
-                    string ignore;
+                    _afkStruct ignore;
                     _afkDict.TryRemove(Context.User.Id, out ignore);
                     await Context.Channel.SendMessageAsync(":white_check_mark: AFK has been removed");
                 }
@@ -65,8 +71,14 @@ namespace Sora_Bot_1.SoraBot.Services
                 {
                     if (_afkDict.ContainsKey(u.Id))
                     {
-                        string message = "";
-                        _afkDict.TryGetValue(u.Id, out message);
+                        _afkStruct str = new _afkStruct();
+                        _afkDict.TryGetValue(u.Id, out str);
+                        //await msg.Channel.SendMessageAsync($"{str.timeToTriggerAgain.CompareTo(DateTime.UtcNow)}");
+                        if(str.timeToTriggerAgain.CompareTo(DateTime.UtcNow) >0)
+                        {
+                            return;
+                        }
+                        str.timeToTriggerAgain = DateTime.UtcNow.AddSeconds(30);
                         var eb = new EmbedBuilder()
                         {
                             Color = new Color(4, 97, 247),
@@ -75,8 +87,9 @@ namespace Sora_Bot_1.SoraBot.Services
                                 IconUrl = u.GetAvatarUrl(),
                                 Name = $"{u.Username} is currently AFK"
                             },
-                            Description = message
+                            Description = str.message
                         };
+                        _afkDict.TryUpdate(u.Id, str);
                         await msg.Channel.SendMessageAsync("", false, eb);
                     }
                 }
@@ -114,7 +127,7 @@ namespace Sora_Bot_1.SoraBot.Services
                 {
                     using (JsonReader reader = new JsonTextReader(sr))
                     {
-                        var temp = _jSerializer.Deserialize<ConcurrentDictionary<ulong, string>>(reader);
+                        var temp = _jSerializer.Deserialize<ConcurrentDictionary<ulong, _afkStruct>>(reader);
                         if (temp == null)
                             return;
                         _afkDict = temp;
@@ -131,8 +144,8 @@ namespace Sora_Bot_1.SoraBot.Services
 
         public struct _afkStruct
         {
-            public ulong guildId;
-            public ulong awayMsg;
+            public string message;
+            public DateTime timeToTriggerAgain;
         }
 
         /*
