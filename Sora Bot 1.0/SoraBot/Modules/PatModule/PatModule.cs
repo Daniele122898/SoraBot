@@ -76,7 +76,9 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
             "http://i0.kym-cdn.com/photos/images/newsfeed/000/940/326/086.gif",
             "https://s-media-cache-ak0.pinimg.com/originals/4e/9e/a1/4e9ea150354ad3159339b202cbc6cad9.gif",
             "https://cdn.discordapp.com/attachments/286476586952425472/296394039878615040/giphy.gif",
-            "https://cdn.discordapp.com/attachments/286476586952425472/296394610832572426/giphy-3.gif"
+            "https://cdn.discordapp.com/attachments/286476586952425472/296394610832572426/giphy-3.gif",
+            "http://i.imgur.com/3rHE4Ee.gif",
+            "http://i.imgur.com/ihkVAis.gif"
         };
 
         [Command("pat"), Summary("Pats the person specified")]
@@ -123,6 +125,11 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
         public async Task Slap([Summary("Person to slap")]IUser user)
         {
             var r = new Random();
+            if (Context.User.Id == user.Id)
+            {
+                await ReplyAsync($"{Context.User.Mention} why would you slap yourself... Are you okay? 〣( ºΔº )〣\n https://media.giphy.com/media/Okk9cb1dvtMxq/giphy.gif");
+                return;
+            }
             await ReplyAsync($"{Context.User.Mention} slapped {user.Mention} (ᗒᗩᗕ)՞ \n{_slaps[r.Next(0, _slaps.Length - 1)]}");
         }
 
