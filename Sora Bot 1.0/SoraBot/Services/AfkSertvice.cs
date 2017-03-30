@@ -36,7 +36,7 @@ namespace Sora_Bot_1.SoraBot.Services
                         awayMsg = "";
                     _afkStruct str = new _afkStruct
                     {
-                        message = awayMsg,
+                        message = awayMsg.Length < 80 ? awayMsg : awayMsg.Substring(0,80)+"..." ,
                         timeToTriggerAgain = DateTime.UtcNow
                     };
                     _afkDict.TryAdd(Context.User.Id, str);

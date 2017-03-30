@@ -35,7 +35,8 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
             "https://media.giphy.com/media/ye7OTQgwmVuVy/giphy.gif",
             "https://33.media.tumblr.com/cb4da84b16d8e189c5b7a61632a54953/tumblr_nrcwmt2SNG1r4vymlo1_400.gif",
             "https://media.giphy.com/media/KZQlfylo73AMU/giphy.gif",
-            "http://i0.kym-cdn.com/photos/images/original/000/915/038/7e9.gif"
+            "http://i0.kym-cdn.com/photos/images/original/000/915/038/7e9.gif",
+            "https://68.media.tumblr.com/f746c0d35113e5d5bc855521d44ebca9/tumblr_nqzi8y6VkB1uo77uno1_540.gif"
         };
 
         private string[] _hugs = new string[]
