@@ -66,6 +66,19 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
             "https://31.media.tumblr.com/7c8457fd628f55b768ac2c6232a893cf/tumblr_mnycv2sm2f1r43mgoo1_500.gif"
         };
 
+        private string[] _slaps = new string[]
+        {
+            "https://i.imgur.com/oY3UC4g.gif",
+            "https://49.media.tumblr.com/bff05c1c0d1cb19a35495823b6257cda/tumblr_nhdyy5EhyG1u1toifo5_400.gif",
+            "http://i1280.photobucket.com/albums/a489/Lilyfied/Anime%20Gif/slapgif_zps5164a18e.gif",
+            "https://media.giphy.com/media/jLeyZWgtwgr2U/giphy.gif",
+            "https://s-media-cache-ak0.pinimg.com/originals/65/57/f6/6557f684d6ffcd3cd4558f695c6d8956.gif",
+            "http://i0.kym-cdn.com/photos/images/newsfeed/000/940/326/086.gif",
+            "https://s-media-cache-ak0.pinimg.com/originals/4e/9e/a1/4e9ea150354ad3159339b202cbc6cad9.gif",
+            "https://cdn.discordapp.com/attachments/286476586952425472/296394039878615040/giphy.gif",
+            "https://cdn.discordapp.com/attachments/286476586952425472/296394610832572426/giphy-3.gif"
+        };
+
         [Command("pat"), Summary("Pats the person specified")]
         public async Task Pat([Summary("Person to pat")] IUser user)
         {
@@ -104,6 +117,13 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
         {
             var r = new Random();
             await ReplyAsync($"{Context.User.Mention} poked {user.Mention} ( ≧Д≦)\n{_pokes[r.Next(0, _pokes.Length - 1)]}");
+        }
+
+        [Command("slap"), Summary("Slaps the specified person <.<")]
+        public async Task Slap([Summary("Person to slap")]IUser user)
+        {
+            var r = new Random();
+            await ReplyAsync($"{Context.User.Mention} slapped {user.Mention} (ᗒᗩᗕ)՞ \n{_slaps[r.Next(0, _slaps.Length - 1)]}");
         }
 
 
