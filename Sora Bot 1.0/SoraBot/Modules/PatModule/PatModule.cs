@@ -81,6 +81,22 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
             "http://i.imgur.com/ihkVAis.gif"
         };
 
+        private string[] _kisses = new string[]
+        {
+            "https://media.giphy.com/media/ZRSGWtBJG4Tza/giphy.gif",
+            "https://68.media.tumblr.com/d07fcdd5deb9d2cf1c8c44ffad04e274/tumblr_ok1kd5VJju1vlvf9to1_500.gif",
+            "https://media.giphy.com/media/vUrwEOLtBUnJe/giphy.gif",
+            "http://s8.favim.com/orig/151119/akagami-no-shirayukihime-anime-boy-couple-Favim.com-3598058.gif",
+            "https://s-media-cache-ak0.pinimg.com/originals/e3/4e/31/e34e31123f8f35d5c771a2d6a70bef52.gif",
+            "http://31.media.tumblr.com/cff863fa92395a5b348b000045f36df8/tumblr_mucrmkCyL41s8qxfko1_500.gif",
+            "http://pa1.narvii.com/5791/785432c42f9112561f92dd9250cb2ade78875f20_hq.gif",
+            "https://media.giphy.com/media/12VXIxKaIEarL2/giphy.gif",
+            "http://data.whicdn.com/images/44882599/original.gif",
+            "http://pa1.narvii.com/5791/4d6416af5826b62b9f0aee152ee8ee11a6137857_hq.gif",
+            "http://i.myniceprofile.com/1512/151229.gif",
+            "https://31.media.tumblr.com/40e8d551473cab28d04dc5fdfc0a98ec/tumblr_n473d8T0WX1t0q458o1_500.gif"
+        };
+
         [Command("pat"), Summary("Pats the person specified")]
         public async Task Pat([Summary("Person to pat")] IUser user)
         {
@@ -125,6 +141,19 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
                 await patService.ChangeAffinity(affinityType.poke, user, Context);
             }
             await ReplyAsync($"{Context.User.Mention} poked {user.Mention} ( ≧Д≦)\n{_pokes[r.Next(0, _pokes.Length - 1)]}");
+        }
+
+        [Command("kiss"), Summary("Kiss the specified person")]
+        public async Task Kiss([Summary("Person to kiss")]IUser user)
+        {
+            var r = new Random();
+            if (Context.User.Id == user.Id)
+            {
+                await ReplyAsync($"{Context.User.Mention} you may pat yourself or hug a pillow but kissing yourself is too much (๑•﹏•)");
+                return;
+            }
+            await patService.ChangeAffinity(affinityType.kiss, user, Context);
+            await ReplyAsync($"{Context.User.Mention} kissed {user.Mention} (✿ ♥‿♥)♥\n{_kisses[r.Next(0, _kisses.Length - 1)]}");
         }
 
         [Command("affinity"), Alias("aff", "stats"), Summary("Shows the Affinity of the specified user or if none is specified your own.")]

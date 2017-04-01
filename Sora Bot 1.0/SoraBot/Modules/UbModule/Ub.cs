@@ -15,7 +15,7 @@ namespace Sora_Bot_1.SoraBot.Modules.UbModule
             _ubService = ser;
         }
 
-        [Command("urbandictionary"), Alias("ub", "ud", "urban")]
+        [Command("urbandictionary", RunMode = RunMode.Async), Alias("ub", "ud", "urban")]
         [Summary("Pulls a Urban Dictionary Definition")]
         public async Task GetUbDef([Summary("Definition to search"),Remainder] string urban)
         {

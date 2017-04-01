@@ -18,7 +18,7 @@ namespace Sora_Bot_1.SoraBot.Modules.ImdbModule
             _imdbService = ser;
         }
 
-        [Command("movie"), Alias("imdb"), Summary("Gets Movies/Series from IMDB")]
+        [Command("movie", RunMode = RunMode.Async), Alias("imdb"), Summary("Gets Movies/Series from IMDB")]
         public async Task GetImdb([Summary("Movie/Series to search"), Remainder] string target)
         {
             await _imdbService.GetImdb(Context, target);

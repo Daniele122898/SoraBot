@@ -154,7 +154,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
 
                 Configuration.Default.AddImageFormat(new PngFormat());
 
-                using (var input = File.OpenRead($"{Context.User.Id}BG.jpg"))
+                using (var input = ImageSharp.Image.Load($"{Context.User.Id}BG.jpg"))
                 {
                     using (var output = File.OpenWrite($"{Context.User.Id}BGF.jpg"))
                     {
@@ -171,7 +171,6 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                         //image.Quality = quality;
                         image.Save(output);
                         image.Dispose();
-                        await input.FlushAsync();
                         input.Dispose();
                         await output.FlushAsync();
                         output.Dispose();
@@ -503,7 +502,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
 
                 Configuration.Default.AddImageFormat(new PngFormat());
 
-                using (var input = File.OpenRead($"{userInfo.Id}Avatar.png"))
+                using (var input = ImageSharp.Image.Load($"{userInfo.Id}Avatar.png"))
                 {
                     using (var output = File.OpenWrite($"{userInfo.Id}AvatarF.png"))
                     {
@@ -519,7 +518,6 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                         image.Dispose();
                         await output.FlushAsync();
                         output.Dispose();
-                        await input.FlushAsync();
                         input.Dispose();
                     }
                 }
@@ -691,7 +689,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
 
                 Configuration.Default.AddImageFormat(new PngFormat());
 
-                using (var input = File.OpenRead($"{userInfo.Id}Avatar.png"))
+                using (var input = ImageSharp.Image.Load($"{userInfo.Id}Avatar.png"))
                 {
                     using (var output = File.OpenWrite($"{userInfo.Id}AvatarF.png"))
                     {
@@ -707,7 +705,6 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                         image.Dispose();
                         await output.FlushAsync();
                         output.Dispose();
-                        await input.FlushAsync();
                         input.Dispose();
                     }
                 }
