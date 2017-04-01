@@ -49,9 +49,9 @@ namespace Sora_Bot_1.SoraBot.Core
             LoadDatabase();
             client = c;
             updateService = new UserGuildUpdateService();
-            starBoardService = new StarBoardService(client);
             musicService = new MusicService();
             ratelimitService = new RatelimitService();
+            starBoardService = new StarBoardService(client, ratelimitService);
             _afkService = new AfkSertvice();
             _selfRoleService = new SelfRoleService();
             _ubService = new UbService();
@@ -285,7 +285,7 @@ namespace Sora_Bot_1.SoraBot.Core
                 return;
 
             //Send to Ratelimiter Service
-            if(await ratelimitService.onlyCheck(context))
+            if(await ratelimitService.onlyCheck(context.User, context.Guild, context))
                 return;
 
             //Execute the command. (result does no indicate a return value
@@ -306,7 +306,7 @@ namespace Sora_Bot_1.SoraBot.Core
             var result = await commands.ExecuteAsync(context, argPos, map);
 
             if (result.IsSuccess)
-                await ratelimitService.checkRatelimit(context);
+                await ratelimitService.checkRatelimit(context.User);
 
             //if (!result.IsSuccess)
             //  await context.Channel.SendMessageAsync(result.ErrorReason);
