@@ -91,6 +91,7 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
             }
             var r = new Random();
             await patService.AddPat(user, Context);
+            await patService.ChangeAffinity(affinityType.pat, user, Context);
             await ReplyAsync($"{Context.User.Mention} pats {user.Mention} ｡◕ ‿ ◕｡ \n {_pats[r.Next(0,_pats.Length-1)]}");
         }
 
@@ -110,6 +111,7 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
                 await ReplyAsync($"{Context.User.Mention} don't hug yourself ;-; At least take this pillow (̂ ˃̥̥̥ ˑ̫ ˂̥̥̥ )̂ \n http://i.imgur.com/CM0of.gif");
                 return;
             }
+            await patService.ChangeAffinity(affinityType.hug, user, Context);
             var r = new Random();
             await ReplyAsync($"{Context.User.Mention} hugged {user.Mention} °˖✧◝(⁰▿⁰)◜✧˖°\n{_hugs[r.Next(0,_hugs.Length-1)]}");
         }
@@ -118,7 +120,18 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
         public async Task Poke([Summary("Person to poke")]IUser user)
         {
             var r = new Random();
+            if (Context.User.Id != user.Id)
+            {
+                await patService.ChangeAffinity(affinityType.poke, user, Context);
+            }
             await ReplyAsync($"{Context.User.Mention} poked {user.Mention} ( ≧Д≦)\n{_pokes[r.Next(0, _pokes.Length - 1)]}");
+        }
+
+        [Command("affinity"), Alias("aff", "stats"), Summary("Shows the Affinity of the specified user or if none is specified your own.")]
+        public async Task GetAffinity([Summary("Person to check")]IUser userT = null)
+        {
+            var user = userT ?? Context.User;
+            await patService.GetAffinity(user, Context);
         }
 
         [Command("slap"), Summary("Slaps the specified person <.<")]
@@ -130,6 +143,7 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
                 await ReplyAsync($"{Context.User.Mention} why would you slap yourself... Are you okay? 〣( ºΔº )〣\n https://media.giphy.com/media/Okk9cb1dvtMxq/giphy.gif");
                 return;
             }
+            await patService.ChangeAffinity(affinityType.slap, user, Context);
             await ReplyAsync($"{Context.User.Mention} slapped {user.Mention} (ᗒᗩᗕ)՞ \n{_slaps[r.Next(0, _slaps.Length - 1)]}");
         }
 
