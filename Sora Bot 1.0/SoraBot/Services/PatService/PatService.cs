@@ -114,6 +114,26 @@ namespace Sora_Bot_1.SoraBot.Services.PatService
             }
         }
 
+        public async Task ResetAffinity(CommandContext Context)
+        {
+            try
+            {
+                if (!affinityDict.ContainsKey(Context.User.Id))
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: User did not receive any pats,hugs,kisses,pokes or slaps yet! Can't reset something that was never there :eyes:");
+                    return;
+                }
+                AffinityStats temp;
+                affinityDict.TryRemove(Context.User.Id, out temp);
+                await Context.Channel.SendMessageAsync(":white_check_mark: Your stats have been successfully reset.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
+        }
+
         public struct AffinityStruct
         {
             public int pats;

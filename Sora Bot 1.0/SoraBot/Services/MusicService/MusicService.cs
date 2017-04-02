@@ -431,7 +431,7 @@ namespace Sora_Bot_1.SoraBot.Services
                         {
                             efb.Name = "Now playing";
                             efb.IsInline = true;
-                            efb.Value = $"{titleT} \n  - {queue[0].user}";
+                            efb.Value = $"{titleT} \n      \t- {queue[0].user}";
                         });
 
                         eb.AddField((efb) =>
@@ -453,9 +453,9 @@ namespace Sora_Bot_1.SoraBot.Services
                                 var info = JObject.Parse(infoJson);
 
                                 var title = info["fulltitle"].ToString();
-                                if (((efb.Value == null ? 0 : efb.Value.ToString().Length) + ($"**{i}.** {title} \n  - {queue[0].user}\n").Length) > 1000)
+                                if (((efb.Value == null ? 0 : efb.Value.ToString().Length) + ($"**{i}.** {title} \n      \t- {queue[i].user}\n").Length) > 1000)
                                     break;
-                                efb.Value += $"**{i}.** {title} \n  - {queue[0].user}\n";
+                                efb.Value += $"**{i}.** {title} \n      \t- {queue[i].user}\n";
                             }
                             if (queue.Count == 1)
                             {
