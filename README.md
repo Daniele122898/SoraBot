@@ -1,15 +1,20 @@
-## Major Changelogs (check frequent one with ´$changelog´)
+## Major Changelogs (check frequent one with �$changelog�)
 
 **Version**
-0.1.0.0.0
+0.1.0.1.0
 
 **Date**
-25.3.2017 22:30 UTC +1
+02.4.2017 20:00 UTC +1
 
 **Changes**
-  - Added IMDb search queries
-  - Added Anime + Manga search queries
-  - Added Urban Dictionary search queries
+  - Added kisses, hugs, pokes, slaps
+    => With them came Affinity
+  - Songs will show who requested it.
+  - The bot is not YT only anymore.
+    It can play basically anything
+    SoundCloud, Youtube, Vimeo and whatever
+  - Removed the patcount due to affinity
+  - AFK chars are now limited
   - Fixed some bugs
 	  
 	  
@@ -53,7 +58,7 @@ Sora can always be invoked with mentioning him. But using that function is proba
 
 ## Music
 
-**GENERAL** Sora can currently only play YT-Videos and no playlists. This will be added soon™ 
+**GENERAL** Sora can **FINALLY** play all sorts of sources. YT, Soundcloud, vimeo ~~and even youporn~~ :eyes:  Have fun :) (The previous music library was completely cleaned -> deleted over 4.5k songs and 29 GB)
 Newly added: Bot will leave the channel if no one is in it anymore
 
 Command | Parameter | Example | Output 
@@ -107,7 +112,7 @@ Example: `$a welcome Welcome {user} to {server} you are our {count}th member!`
 
 | Command      	| Parameter                	| Example                                  	| Output                                                                                                                                                                                          	|
 |--------------	|--------------------------	|------------------------------------------	|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|
-| `t create`   	| [tagname] │ [tagvalue]   	| `$t create test │ this will be displyed` 	| Creates a tag                                                                                                                                                                                   	|
+| `t create`   	| [tagname] � [tagvalue]   	| `$t create test � this will be displyed` 	| Creates a tag                                                                                                                                                                                   	|
 | `t remove`   	| tagname                  	| `$t remove test`                         	| Removes the specified tag => You either need to be the creator or the specified permission group to do that. (If not specified it's manage hannels)                                             	|
 | `t taglist`  	| *none*                   	| `$t taglist`                             	| This will list all tags in the Guild                                                                                                                                                            	|
 | `t`          	| tagname                  	| `$t test`                                	| This will post the value of the specified tag                                                                                                                                                   	|
@@ -162,21 +167,22 @@ You cannot star your own message. It will not be added to the starboard. Only di
 | `git`      | *none*          | `$git`                 | Will post a link to my gitlab page                                                |
 | `feedback` | *none*          | `$feedback / $bug`       | Posts a link to my discord in where you can report bugs or issue Feature requests |
 | `door`     | @mention        | `$door @Serenity#0783` | Shows the specified user the door. Mostly used after bad jokes                    |
-| `lenny`    | *none*          | `$lenny`               | Posts a nice lenny face ( ͡° ͜ʖ ͡°)                                                  |
+| `lenny`    | *none*          | `$lenny`               | Posts a nice lenny face ( ?� ?? ?�)                                                  |
 | `google`   | What to google  | `$google what is c#?`  | Googles something for you. Mostly used to google for others...                    |
 | `swag`     | *none*          | `$swag`                | Swags the chat                                                                    |
 | `about`    | *none*          | `$about`               | Gives infos about Sora and where he came from :)                                  |
 | `ping`     | *none*          | `$ping`                | Shows the current ping of Sora                                                    |
-| `invite`   | *none*          | `$invite`              | Posts a link to invite Sora to your guild :> plz ♥                                |
+| `invite`   | *none*          | `$invite`              | Posts a link to invite Sora to your guild :> plz ?                                |
 
 ## Pats, Hugs and Pokes
-
-| Command    | Parameter                | Example                                  | Output                                                                                                                  |
-|------------|--------------------------|------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
-| `pat`      | @mention of user to pat  | `$pat @Serenity#0783`                    | Will pat the specified user and add it to his global patcount. Spread love ♥ or pats :>                                 |
-| `patcount` | [@mention]               | `$patcount` / `$patcount @Serenity#0783` | If no user is given as parameter you yourself will be displayed. Posts the global amount of pats the user has received. |
-| `hug`      | @mention of user to hug  | `$hug @Serenity#0783`                    | Hugs the specified user with a randomly chosen hug gif                                                                  |
-| `poke`     | @mention of user to poke | `$poke @Serenity#0783`                   | Pokes the specified user with a randomly chosen poke gif                                                                |
+| Command    | Parameter                | Example                                  | Output                                                                                                                                                                                                                                                                              |
+|------------|--------------------------|------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `pat`      | @mention of user to pat  | `$pat @Serenity#0783`                    | Will pat the specified user and add it to his global patcount. Spread love ? or pats :>                                                                                                                                                                                             |
+| `hug`      | @mention of user to hug  | `$hug @Serenity#0783`                    | Hugs the specified user with a randomly chosen hug gif                                                                                                                                                                                                                              |
+| `poke`     | @mention of user to poke | `$poke @Serenity#0783`                   | Pokes the specified user with a randomly chosen poke gif                                                                                                                                                                                                                            |
+| `kiss`     | @mention of user to kiss | `$kiss @Serenity#0783`                   | Kisses the specified user with a randomly chosen kiss gif                                                                                                                                                                                                                           |
+| `slap`     | @mention of user to slap | `$slap @Serenity#0783`                   | Slaps the specified user with a randomly chosen slap gif                                                                                                                                                                                                                            |
+| `affinity` | [@mention]               | `$affinity` / `$affinity @Serenity#0783` | Checks the stats and affinity of the specified person (if none is mentioned it will show yours). Pats, hugs and kisses give positive affinity, but not the same amount. Kiss gives more then pat and so on. Pokes are neutral and slaps give negative affinity. spread some love :3 |
 
 
 ## Changelog

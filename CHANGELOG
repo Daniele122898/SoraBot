@@ -1,11 +1,16 @@
 **Version**
-0.1.0.0.0
+0.1.0.1.0
 
 **Date**
-25.3.2017 22:30 UTC +1
+02.4.2017 20:00 UTC +1
 
 **Changes**
-  - Added IMDb search queries
-  - Added Anime + Manga search queries
-  - Added Urban Dictionary search queries
+  - Added kisses, hugs, pokes, slaps
+    => With them came Affinity
+  - Songs will show who requested it.
+  - The bot is not YT only anymore.
+    It can play basically anything
+    SoundCloud, Youtube, Vimeo and whatever
+  - Removed the patcount due to affinity
+  - AFK chars are now limited
   - Fixed some bugs

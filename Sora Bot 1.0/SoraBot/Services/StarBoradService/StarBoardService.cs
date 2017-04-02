@@ -55,7 +55,7 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
 
                 if (starChannelDict.TryGetValue(guildID, out channelID))
                 {
-                    if (reaction.Emoji.Name.Equals("â­") || reaction.Emoji.Name.Equals("ðŸŒŸ"))
+                    if (reaction.Emoji.Name.Equals("⭐") || reaction.Emoji.Name.Equals("🌟"))
                     {
                         /*
                         if (!msg.IsSpecified) //!String.IsNullOrEmpty(tag)

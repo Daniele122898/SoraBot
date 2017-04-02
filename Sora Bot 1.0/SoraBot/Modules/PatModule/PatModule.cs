@@ -106,17 +106,8 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
                 return;
             }
             var r = new Random();
-            await patService.AddPat(user, Context);
             await patService.ChangeAffinity(affinityType.pat, user, Context);
             await ReplyAsync($"{Context.User.Mention} pats {user.Mention} ｡◕ ‿ ◕｡ \n {_pats[r.Next(0,_pats.Length-1)]}");
-        }
-
-        [Command("patcount"), Summary("How many pats did this User Receive (Global Number)")]
-        public async Task PatCount(
-            [Summary("Person to get Patcount. If not specified it will give your own")] IUser user = null)
-        {
-            var userInfo = user ?? Context.User; // ?? if not null return left. if null return right
-            await patService.CheckPats(userInfo, Context);
         }
 
         [Command("hug"), Summary("Hugs the specified person")]

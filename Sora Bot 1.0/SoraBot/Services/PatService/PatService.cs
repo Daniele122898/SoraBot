@@ -19,7 +19,6 @@ namespace Sora_Bot_1.SoraBot.Services.PatService
 
     public class PatService
     {
-        private ConcurrentDictionary<ulong, int> patDict = new ConcurrentDictionary<ulong, int>();
         private ConcurrentDictionary<ulong, AffinityStats> affinityDict = new ConcurrentDictionary<ulong, AffinityStats>();
         private JsonSerializer jSerializer = new JsonSerializer();
 
@@ -27,31 +26,6 @@ namespace Sora_Bot_1.SoraBot.Services.PatService
         {
             InitializeLoader();
             LoadDatabase();
-        }
-
-        public async Task AddPat(IUser user, CommandContext context)
-        {
-            try
-            {
-                if (patDict.ContainsKey(user.Id))
-                {
-                    int counter = 0;
-                    patDict.TryGetValue(user.Id, out counter);
-                    counter++;
-                    patDict.TryUpdate(user.Id, counter);
-                }
-                else
-                {
-                    patDict.TryAdd(user.Id, 1);
-                }
-                SaveDatabase();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                await SentryService.SendError(e);
-            }
-              
         }
 
         public async Task ChangeAffinity(affinityType type, IUser user, CommandContext Context)
@@ -121,12 +95,13 @@ namespace Sora_Bot_1.SoraBot.Services.PatService
                     },
                     Title = $"Affinity stats of {user.Username}#{user.Discriminator}",
                     ThumbnailUrl = user.GetAvatarUrl(),
-                    Description = $"Pats:\t{stats.pats}\n" +
-                    $"Hugs:\t{stats.hugs}\n" +
-                    $"Kisses:\t{stats.kisses}\n" +
-                    $"Pokes:\t{stats.pokes}\n" +
-                    $"Slaps:\t{stats.slaps}\n" +
-                    $"Affinity:\t{stats.GetAffinity()}/100"
+                    Description = $"" +
+                    $"Pats:     {stats.pats}\n" +
+                    $"Hugs:     {stats.hugs}\n" +
+                    $"Kisses:   {stats.kisses}\n" +
+                    $"Pokes:    {stats.pokes}\n" +
+                    $"Slaps:    {stats.slaps}\n" +
+                    $"Affinity: {stats.GetAffinity()}/100"
                 };
 
                 await Context.Channel.SendMessageAsync("",false,eb);
@@ -137,29 +112,6 @@ namespace Sora_Bot_1.SoraBot.Services.PatService
                 Console.WriteLine(e);
                 await SentryService.SendError(e, Context);
             }
-        }
-
-        public async Task CheckPats(IUser user, CommandContext Context)
-        {
-            try
-            {
-                if (patDict.ContainsKey(user.Id))
-                {
-                    int counter = 0;
-                    patDict.TryGetValue(user.Id, out counter);
-                    await Context.Channel.SendMessageAsync($"{user.Mention} has received a total of {counter} pats (◕‿◕✿)");
-                }
-                else
-                {
-                    await Context.Channel.SendMessageAsync($"{user.Mention} has not received any pats yet (⌯˃̶᷄ ﹏ ˂̶᷄⌯)ﾟ be the first!");
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                await SentryService.SendError(e, Context);
-            }
-            
         }
 
         public struct AffinityStruct
