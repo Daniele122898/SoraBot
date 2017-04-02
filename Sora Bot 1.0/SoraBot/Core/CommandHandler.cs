@@ -51,7 +51,7 @@ namespace Sora_Bot_1.SoraBot.Core
             updateService = new UserGuildUpdateService();
             musicService = new MusicService();
             ratelimitService = new RatelimitService();
-            starBoardService = new StarBoardService(client, ratelimitService);
+            starBoardService = new StarBoardService(client);
             _afkService = new AfkSertvice();
             _selfRoleService = new SelfRoleService();
             _ubService = new UbService();

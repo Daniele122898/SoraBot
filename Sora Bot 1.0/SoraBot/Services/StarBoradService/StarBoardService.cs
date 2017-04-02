@@ -24,12 +24,9 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
 
         private DiscordSocketClient client;
 
-        private RatelimitService _ratelimitService;
-
-        public StarBoardService(DiscordSocketClient c, RatelimitService ser)
+        public StarBoardService(DiscordSocketClient c)
         {
             client = c;
-            _ratelimitService = ser;
             InitializeLoader();
             LoadDatabase();
         }
@@ -38,10 +35,6 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
         {
             try
             {
-                var guildT = (reaction.Channel as IGuildChannel).Guild;
-                var user = await guildT.GetUserAsync(reaction.UserId) as IUser;
-                if (await _ratelimitService.onlyCheck(user, guildT, null, $"STAR ADDED TO MSG"))
-                    return;
                 var msg = await msgCacheable.GetOrDownloadAsync();
                 //MSG BLACKLIST
                 if (msgStarBlackDict.ContainsKey(msg.Id))
@@ -62,7 +55,7 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
 
                 if (starChannelDict.TryGetValue(guildID, out channelID))
                 {
-                    if (reaction.Emoji.Name.Equals("⭐") || reaction.Emoji.Name.Equals("🌟"))
+                    if (reaction.Emoji.Name.Equals("â­") || reaction.Emoji.Name.Equals("ðŸŒŸ"))
                     {
                         /*
                         if (!msg.IsSpecified) //!String.IsNullOrEmpty(tag)
@@ -95,15 +88,15 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                             starMsg msgStruct = new starMsg();
                             msgIdDictionary.TryGetValue(msg.Id, out msgStruct);
                             msgStruct.counter += 1;
-                            var guild = (guildT as SocketGuild);
+                            /*var guild = ((reaction.Channel as IGuildChannel)?.Guild as SocketGuild);
                             var channel = guild?.GetChannel(channelID) as IMessageChannel;
                             var msgToEdit =
                                 (IUserMessage)
-                                await channel.GetMessageAsync(msgStruct.starMSGID, CacheMode.AllowDownload, null);
+                                await channel.GetMessageAsync(msgStruct.starMSGID, CacheMode.AllowDownload, null);*/
                             msgIdDictionary.TryUpdate(msg.Id, msgStruct);
-                            await msgToEdit.ModifyAsync(x => { x.Content = $"{msgStruct.counter} {msgStruct.originalContent}"; });
+                            /*await msgToEdit.ModifyAsync(x => { x.Content = $"{msgStruct.counter} {msgToEdit.Content}"; });*/
 
-                            await _ratelimitService.checkRatelimit(user);
+
                             SaveDatabase();
                             return;
                         }
@@ -165,11 +158,9 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                             starMsg msgStruct = new starMsg
                             {
                                 starMSGID = sentMessage.Id,
-                                counter = 1,
-                                originalContent = sentMessage.Content
+                                counter = 1
                             };
                             msgIdDictionary.TryAdd(msg.Id, msgStruct);
-                            await _ratelimitService.checkRatelimit(user);
                             SaveDatabase();
                         }
                     }
@@ -187,10 +178,6 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
         {
             try
             {
-                var guildT = (reaction.Channel as IGuildChannel).Guild;
-                var user = await guildT.GetUserAsync(reaction.UserId) as IUser;
-                if (await _ratelimitService.onlyCheck(user, guildT, null, $"STAR REMOVED FROM MSG"))
-                    return;
                 var msg = await msgCacheable.GetOrDownloadAsync();
                 ulong channelID;
                 ulong guildID = (reaction.Channel as IGuildChannel).GuildId;
@@ -201,7 +188,7 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                     if (msgIdDictionary.TryGetValue(msg.Id, out msgStruct))
                     {
                         msgStruct.counter -= 1;
-                        var guild = (guildT as SocketGuild);
+                        var guild = ((reaction.Channel as IGuildChannel)?.Guild as SocketGuild);
                         var channel = guild?.GetChannel(channelID) as IMessageChannel;
                         var msgToEdit =
                             (IUserMessage)
@@ -226,20 +213,18 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                         else
                         {
                             /*
-                            if (msgToEdit.Content.Contains("⭐"))
+                            if (msgToEdit.Content.Contains("â­"))
                             {
-                                string subString = msgToEdit.Content.Substring(msgToEdit.Content.IndexOf("⭐"));
+                                string subString = msgToEdit.Content.Substring(msgToEdit.Content.IndexOf("â­"));
                                 await msgToEdit.ModifyAsync(x => { x.Content = $"{msgStruct.counter} {subString}"; });
                             }
-                            else if(msgToEdit.Content.Contains("🌟"))
+                            else if(msgToEdit.Content.Contains("ðŸŒŸ"))
                             {
-                                string subString = msgToEdit.Content.Substring(msgToEdit.Content.IndexOf("🌟"));
+                                string subString = msgToEdit.Content.Substring(msgToEdit.Content.IndexOf("ðŸŒŸ"));
                                 await msgToEdit.ModifyAsync(x => { x.Content = $"{msgStruct.counter} {subString}"; });
                             }*/
-                            await msgToEdit.ModifyAsync(x => { x.Content = $"{msgStruct.counter} {msgStruct.originalContent}"; });
                             msgIdDictionary.TryUpdate(msg.Id, msgStruct);
                         }
-                        await _ratelimitService.checkRatelimit(user);
                         SaveDatabase();
                     }
                 }
@@ -331,7 +316,6 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
         {
             public ulong starMSGID;
             public int counter;
-            public string originalContent;
         }
 
         private void SaveDatabase()
@@ -377,38 +361,6 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
             {
                 Console.WriteLine(e);
                 SentryService.SendError(e);
-            }
-        }
-
-        public void SaveDatabaseMsg()
-        {
-            using (StreamWriter sw = File.CreateText(@"starMSG.json"))
-            {
-                using (JsonWriter writer = new JsonTextWriter(sw))
-                {
-                    jSerializer.Serialize(writer, msgIdDictionary);
-                }
-            }
-        }
-
-        private void LoadDatabaseMsg()
-        {
-            if (File.Exists("starMSG.json"))
-            {
-                using (StreamReader sr = File.OpenText(@"starMSG.json"))
-                {
-                    using (JsonReader reader = new JsonTextReader(sr))
-                    {
-                        var temp = jSerializer.Deserialize<ConcurrentDictionary<ulong, starMsg>>(reader);
-                        if (temp == null)
-                            return;
-                        msgIdDictionary = temp;
-                    }
-                }
-            }
-            else
-            {
-                File.Create("starMSG.json").Dispose();
             }
         }
 
