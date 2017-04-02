@@ -107,7 +107,7 @@ namespace Sora_Bot_1.SoraBot.Services
                 }
                 SaveDatabase();
                 await Context.Channel.SendMessageAsync(
-                    $":white_check_mark: Successfully set Welcome Channel to `{Context.Channel.Name}` with message:\n{str.message} (if this is empty the default message is chosen)");
+                    $":white_check_mark: Successfully set Welcome Channel to `{Context.Channel.Name}` with {(String.IsNullOrWhiteSpace(str.message) ? "the default leave message" : $"message:\n{str.message}")}");
             }
             catch (Exception e)
             {
@@ -219,7 +219,7 @@ namespace Sora_Bot_1.SoraBot.Services
                 }
                 SaveDatabase();
                 await Context.Channel.SendMessageAsync(
-                    $":white_check_mark: Successfully set Leave Channel to `{Context.Channel.Name}` with message:\n{str.message} (if this is empty the default message is chosen)");
+                    $":white_check_mark: Successfully set Leave Channel to `{Context.Channel.Name}` with {(String.IsNullOrWhiteSpace(str.leaveMsg) ? "the default leave message" : $"message:\n{str.leaveMsg}" )}");
             }
             catch (Exception e)
             {

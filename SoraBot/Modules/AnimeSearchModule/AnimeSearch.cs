@@ -18,13 +18,13 @@ namespace Sora_Bot_1.SoraBot.Modules.AnimeSearchModule
             _animeService = ser;
         }
 
-        [Command("anime"), Summary("Gets the stats of your desired Anime")]
+        [Command("anime", RunMode = RunMode.Async), Summary("Gets the stats of your desired Anime")]
         public async Task GetAnime([Summary("Anime to search"), Remainder]string anime)
         {
             await _animeService.GetAnime(Context, anime);
         }
 
-        [Command("manga"), Summary("Gets the stats of your desired Manga")]
+        [Command("manga", RunMode = RunMode.Async), Summary("Gets the stats of your desired Manga")]
         public async Task GetManga([Summary("Manga to search"), Remainder]string manga)
         {
             await _animeService.GetManga(Context, manga);

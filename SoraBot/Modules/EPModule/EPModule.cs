@@ -27,7 +27,7 @@ namespace Sora_Bot_1.SoraBot.Modules.EPModule
             await epService.shotTop10(Context);
         }
 
-        [Command(""), Summary("Displays short profile image of User, if not specified it will show yours")]
+        [Command("", RunMode = RunMode.Async), Summary("Displays short profile image of User, if not specified it will show yours")]
         public async Task SendProfile(
             [Summary("User to show the picture of, if none given will show your own!")] IUser user = null)
         {
@@ -58,7 +58,7 @@ namespace Sora_Bot_1.SoraBot.Modules.EPModule
             await epService.size(size, Context);
         }
 
-        [Command("setbg"), Summary("Set's your profile BG with the provided URL. If no URL is specified it will return to the default Profile Crad. **this feature requires lvl 20!**")]
+        [Command("setbg", RunMode = RunMode.Async), Summary("Set's your profile BG with the provided URL. If no URL is specified it will return to the default Profile Crad. **this feature requires lvl 20!**")]
         public async Task setBG(string url = null)
         {
             await epService.SetBG(url, Context);

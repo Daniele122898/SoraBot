@@ -86,6 +86,7 @@ namespace Sora_Bot_1.SoraBot.Services
             catch(Exception e)
             {
                 Console.WriteLine(e);
+                await Context.Channel.SendMessageAsync($":no_entry_sign: Failed to add role. I'm probably missing the perms!");
                 await SentryService.SendError(e, Context);
             }
             
@@ -123,42 +124,52 @@ namespace Sora_Bot_1.SoraBot.Services
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                await Context.Channel.SendMessageAsync($":no_entry_sign: Failed to add role. I'm probably missing the perms!");
                 await SentryService.SendError(e, Context);
             }
         }
 
         public async Task RemoveRoleFromList(CommandContext Context, string roleName)
         {
-            if (!_availableRoles.ContainsKey(Context.Guild.Id))
+            try
             {
-                await Context.Channel.SendMessageAsync(":no_entry_sign: There are no self-assignable roles in this guild!");
-                return;
-            }
-
-            List<ulong> roleIDs = new List<ulong>();
-            _availableRoles.TryGetValue(Context.Guild.Id, out roleIDs);
-
-            foreach (var rId in roleIDs)
-            {
-                var role = Context.Guild.GetRole(rId);
-                if(role.Name == roleName)
+                if (!_availableRoles.ContainsKey(Context.Guild.Id))
                 {
-                    roleIDs.Remove(rId);
-                    if(roleIDs.Count < 1)
-                    {
-                        List<ulong> ignore = new List<ulong>();
-                        _availableRoles.TryRemove(Context.Guild.Id, out ignore);
-                    }
-                    else
-                    {
-                        _availableRoles.TryUpdate(Context.Guild.Id, roleIDs);
-                    }
-                    SaveDatabase();
-                    await Context.Channel.SendMessageAsync($":white_check_mark: Successfully removed Role `{role.Name}`");
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: There are no self-assignable roles in this guild!");
                     return;
                 }
+
+                List<ulong> roleIDs = new List<ulong>();
+                _availableRoles.TryGetValue(Context.Guild.Id, out roleIDs);
+
+                foreach (var rId in roleIDs)
+                {
+                    var role = Context.Guild.GetRole(rId);
+                    if (role.Name == roleName)
+                    {
+                        roleIDs.Remove(rId);
+                        if (roleIDs.Count < 1)
+                        {
+                            List<ulong> ignore = new List<ulong>();
+                            _availableRoles.TryRemove(Context.Guild.Id, out ignore);
+                        }
+                        else
+                        {
+                            _availableRoles.TryUpdate(Context.Guild.Id, roleIDs);
+                        }
+                        SaveDatabase();
+                        await Context.Channel.SendMessageAsync($":white_check_mark: Successfully removed Role `{role.Name}`");
+                        return;
+                    }
+                }
+                await Context.Channel.SendMessageAsync(":no_entry_sign: Specified role could not be found! Use `<prefix>getRoles` to get a list of all self-assignable roles!");
             }
-            await Context.Channel.SendMessageAsync(":no_entry_sign: Specified role could not be found! Use `<prefix>getRoles` to get a list of all self-assignable roles!");
+            catch (Exception e)
+            {
+                await Context.Channel.SendMessageAsync($":no_entry_sign: Failed to add role. I'm probably missing the perms!");
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
         }
        
         public async Task IAmNotRole(CommandContext Context, string roleName)
@@ -224,6 +235,7 @@ namespace Sora_Bot_1.SoraBot.Services
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                await Context.Channel.SendMessageAsync($":no_entry_sign: Failed to add role. I'm probably missing the perms!");
                 await SentryService.SendError(e, Context);
             }
         }
@@ -286,6 +298,7 @@ namespace Sora_Bot_1.SoraBot.Services
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                await Context.Channel.SendMessageAsync($":no_entry_sign: Failed to add role. I'm probably missing the perms!");
                 await SentryService.SendError(e, Context);
             }
         }

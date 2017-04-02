@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
-using Discord.Net;
 using Discord.WebSocket;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -217,14 +213,14 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                         else
                         {
                             /*
-                            if (msgToEdit.Content.Contains("⭐"))
+                            if (msgToEdit.Content.Contains("â­"))
                             {
-                                string subString = msgToEdit.Content.Substring(msgToEdit.Content.IndexOf("⭐"));
+                                string subString = msgToEdit.Content.Substring(msgToEdit.Content.IndexOf("â­"));
                                 await msgToEdit.ModifyAsync(x => { x.Content = $"{msgStruct.counter} {subString}"; });
                             }
-                            else if(msgToEdit.Content.Contains("🌟"))
+                            else if(msgToEdit.Content.Contains("ðŸŒŸ"))
                             {
-                                string subString = msgToEdit.Content.Substring(msgToEdit.Content.IndexOf("🌟"));
+                                string subString = msgToEdit.Content.Substring(msgToEdit.Content.IndexOf("ðŸŒŸ"));
                                 await msgToEdit.ModifyAsync(x => { x.Content = $"{msgStruct.counter} {subString}"; });
                             }*/
                             msgIdDictionary.TryUpdate(msg.Id, msgStruct);
