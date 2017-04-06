@@ -18,7 +18,8 @@ namespace Sora_Bot_1.SoraBot.Services
             try
             {
                 var vc = new HttpClient();
-                string req = await vc.GetStringAsync("http://api.urbandictionary.com/v0/define?term=" + urban);
+                var search = System.Net.WebUtility.UrlEncode(urban);
+                string req = await vc.GetStringAsync("http://api.urbandictionary.com/v0/define?term=" + search);
                 var ub = JsonConvert.DeserializeObject<UbContainer>(req);
 
                 var eb = ub.GetEmbed();
@@ -48,12 +49,14 @@ namespace Sora_Bot_1.SoraBot.Services
             new EmbedBuilder()
             .WithColor(new Color(4, 97, 247))
             .WithAuthor(x => { x.Name = "Urban Dictionary"; x.IconUrl = "https://lh5.ggpht.com/oJ67p2f1o35dzQQ9fVMdGRtA7jKQdxUFSQ7vYstyqTp-Xh-H5BAN4T5_abmev3kz55GH=w300"; })
-            .AddField(x => x.WithName($"Definition of {list[0].word}").WithValue(list[0].definition).WithIsInline(false))
+            .WithTitle($"Definition of {list[0].word}")
+            .WithDescription(list[0].definition)
+            .WithUrl(list[0].permalink)
             .AddField(x => x.WithName("Examples").WithValue(list[0].example).WithIsInline(false))
             .AddField(x => x.WithName("Author").WithValue(list[0].author).WithIsInline(true))
             .AddField(x => x.WithName("Stats").WithValue($"{list[0].thumbs_up} :thumbsup:\t{list[0].thumbs_down} :thumbsdown:").WithIsInline(true))
             .AddField(x => x.WithName("Tags").WithValue(GetTags()).WithIsInline(false));
-            //.Build();
+        //.Build(); .AddField(x => x.WithName($"Definition of {list[0].word}").WithValue(list[0].definition).WithIsInline(false)).WithUrl(list[0].permalink)
 
         public string GetTags()
         {
@@ -74,5 +77,6 @@ namespace Sora_Bot_1.SoraBot.Services
         public string author { get; set; }
         public string thumbs_up { get; set; }
         public string thumbs_down { get; set; }
+        public string permalink { get; set; }
     }
 }

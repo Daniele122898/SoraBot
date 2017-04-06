@@ -72,7 +72,6 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
         {
             "https://i.imgur.com/oY3UC4g.gif",
             "https://49.media.tumblr.com/bff05c1c0d1cb19a35495823b6257cda/tumblr_nhdyy5EhyG1u1toifo5_400.gif",
-            "http://i1280.photobucket.com/albums/a489/Lilyfied/Anime%20Gif/slapgif_zps5164a18e.gif",
             "https://media.giphy.com/media/jLeyZWgtwgr2U/giphy.gif",
             "https://s-media-cache-ak0.pinimg.com/originals/65/57/f6/6557f684d6ffcd3cd4558f695c6d8956.gif",
             "http://i0.kym-cdn.com/photos/images/newsfeed/000/940/326/086.gif",

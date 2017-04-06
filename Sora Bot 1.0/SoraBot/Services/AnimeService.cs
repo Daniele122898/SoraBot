@@ -8,6 +8,8 @@ using Discord.WebSocket;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using System.IO;
+using Discord.Addons.InteractiveCommands;
 
 namespace Sora_Bot_1.SoraBot.Services
 {
@@ -23,7 +25,7 @@ namespace Sora_Bot_1.SoraBot.Services
             RequestAuth();
         }
 
-        private async Task RequestAuth()
+        public async Task RequestAuth()
         {
             try
             {
@@ -56,7 +58,7 @@ namespace Sora_Bot_1.SoraBot.Services
            
         }
 
-        public async Task GetManga(CommandContext Context, string manga)
+        public async Task GetManga(CommandContext Context, string manga, InteractiveService interactive)
         {
             try
             {
@@ -64,14 +66,41 @@ namespace Sora_Bot_1.SoraBot.Services
                 {
                     await RequestAuth();
                 }
-
-                var link = "http://anilist.co/api/manga/search/" + Uri.EscapeUriString(manga);
+                var search = System.Net.WebUtility.UrlEncode(manga);
+                var link = "http://anilist.co/api/manga/search/" + Uri.EscapeUriString(search);
                 using (var http = new HttpClient())
                 {
                     var res = await http.GetStringAsync(link + $"?access_token={anilistToken}").ConfigureAwait(false);
-                    var smallObj = JArray.Parse(res)[0];
+                    var results = JArray.Parse(res);
+                    string choose = "";
+                    var ebC = new EmbedBuilder()
+                    {
+                        Color = new Color(4, 97, 247),
+                        Title = "Enter the Index of the Manga you want more info about.",
+                    };
+                    int count = 1;
+                    foreach (var r in results)
+                    {
+                        choose += $"**{count}.** {r["title_english"]}\n";
+                        count++;
+                    }
+                    ebC.Description = choose;
+                    await Context.Channel.SendMessageAsync("", embed: ebC);
+                    var response = await interactive.WaitForMessage(Context.User, Context.Channel);
+                    int index;
+                    if (!Int32.TryParse(response.Content, out index))
+                    {
+                        await Context.Channel.SendMessageAsync(":no_entry_sign: Only add the Index");
+                        return;
+                    }
+                    if (index > (results.Count) || index < 1)
+                    {
+                        await Context.Channel.SendMessageAsync(":no_entry_sign: Invalid Number");
+                        return;
+                    }
+                    var smallObj = JArray.Parse(res)[index-1];
                     var manData = await http.GetStringAsync("http://anilist.co/api/manga/" + smallObj["id"] + $"?access_token={anilistToken}").ConfigureAwait(false);
-                    //await Context.Channel.SendMessageAsync(aniData);
+                    //await Context.Channel.SendMessageAsync(manData);
                     //return await Task.Run(() => { try { return JsonConvert.DeserializeObject<AnimeResult>(aniData); } catch { return null; } }).ConfigureAwait(false);
                     var mangaDa = JsonConvert.DeserializeObject<MangaResult>(manData);
 
@@ -93,7 +122,7 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
-        public async Task GetAnime(CommandContext Context, string anime)
+        public async Task GetAnime(CommandContext Context, string anime, InteractiveService interactive)
         {
             try
             {
@@ -101,11 +130,39 @@ namespace Sora_Bot_1.SoraBot.Services
                 {
                     await RequestAuth();
                 }
-                var link = "http://anilist.co/api/anime/search/" + Uri.EscapeUriString(anime);
+                var search = System.Net.WebUtility.UrlEncode(anime);
+                var link = "http://anilist.co/api/anime/search/" + Uri.EscapeUriString(search);
                 using (var http = new HttpClient())
                 {
                     var res = await http.GetStringAsync(link + $"?access_token={anilistToken}").ConfigureAwait(false);
-                    var smallObj = JArray.Parse(res)[0];
+                    var results = JArray.Parse(res);
+                    string choose = "";
+                    var ebC = new EmbedBuilder()
+                    {
+                        Color = new Color(4, 97, 247),
+                        Title = "Enter the Index of the Anime you want more info about.",
+                    };
+                    int count = 1;
+                    foreach (var r in results)
+                    {
+                        choose += $"**{count}.** {r["title_english"]}\n";
+                        count++;
+                    }
+                    ebC.Description = choose;
+                    await Context.Channel.SendMessageAsync("", embed: ebC);
+                    var response = await interactive.WaitForMessage(Context.User, Context.Channel);
+                    int index;
+                    if (!Int32.TryParse(response.Content, out index))
+                    {
+                        await Context.Channel.SendMessageAsync(":no_entry_sign: Only add the Index");
+                        return;
+                    }
+                    if(index > (results.Count) || index < 1)
+                    {
+                        await Context.Channel.SendMessageAsync(":no_entry_sign: Invalid Number");
+                        return;
+                    }
+                    var smallObj = JArray.Parse(res)[index-1];
                     var aniData = await http.GetStringAsync("http://anilist.co/api/anime/" + smallObj["id"] + $"?access_token={anilistToken}").ConfigureAwait(false);
                     //await Context.Channel.SendMessageAsync(aniData);
                     //return await Task.Run(() => { try { return JsonConvert.DeserializeObject<AnimeResult>(aniData); } catch { return null; } }).ConfigureAwait(false);
@@ -124,7 +181,7 @@ namespace Sora_Bot_1.SoraBot.Services
             }
             catch (Exception e)
             {
-                await Context.Channel.SendMessageAsync(":no_entry_sign: Couldn't Anime. Try later or try another one.");
+                await Context.Channel.SendMessageAsync(":no_entry_sign: Couldn't find Anime. Try later or try another one.");
             }   
         }
 
@@ -139,6 +196,8 @@ namespace Sora_Bot_1.SoraBot.Services
         public int total_chapters;
         public int total_volumes;
         public string description;
+        public string start_date;
+        public string end_date;
         public string[] Genres;
         public string average_score;
         public string Link => "http://anilist.co/manga/" + id;
@@ -154,7 +213,8 @@ namespace Sora_Bot_1.SoraBot.Services
             .AddField(efb => efb.WithName("Chapters").WithValue(total_chapters.ToString()).WithIsInline(true))
             .AddField(efb => efb.WithName("Status").WithValue(publishing_status.ToString()).WithIsInline(true))
             .AddField(efb => efb.WithName("Genres").WithValue(String.Join(", ", Genres)).WithIsInline(true))
-            .AddField(efb => efb.WithName("Score").WithValue(average_score + " / 100").WithIsInline(true));
+            .AddField(efb => efb.WithName("Score").WithValue(average_score + " / 100").WithIsInline(true))
+            .AddField(efb => efb.WithName("Published").WithValue($"Start: {start_date.Remove(10)}\n{(String.IsNullOrWhiteSpace(end_date) ? "Ongoing" : $"End:   {end_date.Remove(10)}")}").WithIsInline(true));
     }
 
     public class AnimeResult
@@ -166,6 +226,8 @@ namespace Sora_Bot_1.SoraBot.Services
         public int total_episodes;
         public string description;
         public string image_url_lge;
+        public string start_date;
+        public string end_date;
         public string[] Genres;
         public string average_score;
 
@@ -182,7 +244,8 @@ namespace Sora_Bot_1.SoraBot.Services
             .AddField(efb => efb.WithName("Episodes").WithValue(total_episodes.ToString()).WithIsInline(true))
             .AddField(efb => efb.WithName("Status").WithValue(AiringStatus.ToString()).WithIsInline(true))
             .AddField(efb => efb.WithName("Genres").WithValue(String.Join(",", Genres)).WithIsInline(true))
-            .AddField(efb => efb.WithName("Score").WithValue(average_score + " / 100").WithIsInline(true));
+            .AddField(efb => efb.WithName("Score").WithValue(average_score + " / 100").WithIsInline(true))
+            .AddField(efb => efb.WithName("Aired").WithValue($"Start: {start_date.Remove(10)}\n{(String.IsNullOrWhiteSpace(end_date) ? "Ongoing": $"End:   {end_date.Remove(10)}")}").WithIsInline(true));
             //.WithThumbnailUrl(image_url_lge);
     }
 }

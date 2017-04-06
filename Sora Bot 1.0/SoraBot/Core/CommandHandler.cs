@@ -17,6 +17,7 @@ using Sora_Bot_1.SoraBot.Services.EPService;
 using Sora_Bot_1.SoraBot.Services.PatService;
 using Sora_Bot_1.SoraBot.Services.StarBoradService;
 using Sora_Bot_1.SoraBot.Services.TagService;
+using Discord.Addons.InteractiveCommands;
 
 namespace Sora_Bot_1.SoraBot.Core
 {
@@ -69,7 +70,7 @@ namespace Sora_Bot_1.SoraBot.Core
             commands = new CommandService();
             map = new DependencyMap();
 
-
+            map.Add(new InteractiveService(client));
             map.Add(musicService);
             map.Add(handler);
             map.Add(_afkService);

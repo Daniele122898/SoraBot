@@ -429,9 +429,14 @@ namespace Sora_Bot_1.SoraBot.Services
 
                         eb.AddField((efb) =>
                         {
+                            int duration = 0;
+                            var con = Int32.TryParse(infoT["duration"].ToString(), out duration);
+                            string dur = "00:00";
+                            if (con)
+                                dur = Convert(duration);
                             efb.Name = "Now playing";
                             efb.IsInline = true;
-                            efb.Value = $"{titleT} \n      \t- {queue[0].user}";
+                            efb.Value = $"[{dur}] - **{titleT}** \n      \t*by {queue[0].user}*";
                         });
 
                         eb.AddField((efb) =>
@@ -452,10 +457,16 @@ namespace Sora_Bot_1.SoraBot.Services
                                 var infoJson = File.ReadAllText($"{queue[i].name}.info.json");
                                 var info = JObject.Parse(infoJson);
 
+                                int duration = 0;
+                                var con = Int32.TryParse(info["duration"].ToString(), out duration);
+                                string dur = "00:00";
+                                if (con)
+                                    dur = Convert(duration);
+
                                 var title = info["fulltitle"].ToString();
                                 if (((efb.Value == null ? 0 : efb.Value.ToString().Length) + ($"**{i}.** {title} \n      \t- {queue[i].user}\n").Length) > 1000)
                                     break;
-                                efb.Value += $"**{i}.** {title} \n      \t- {queue[i].user}\n";
+                                efb.Value += $"**{i}.** [{dur}] - **{title}** \n      \t*by {queue[i].user}*\n";
                             }
                             if (queue.Count == 1)
                             {
@@ -509,9 +520,14 @@ namespace Sora_Bot_1.SoraBot.Services
 
                         eb.AddField((efb) =>
                         {
+                            int duration = 0;
+                            var con = Int32.TryParse(info["duration"].ToString(), out duration);
+                            string dur = "00:00";
+                            if (con)
+                                dur = Convert(duration);
                             efb.Name = "Now playing";
                             efb.IsInline = false;
-                            efb.Value = title.ToString();
+                            efb.Value = $"[{dur}] - {title}";
                         });
 
                         eb.AddField((x) =>
@@ -708,6 +724,13 @@ namespace Sora_Bot_1.SoraBot.Services
                 return "f";
             }
         }
+
+        public string Convert(int value)
+        {
+            TimeSpan ts = TimeSpan.FromSeconds(value);
+            return String.Format("{0}:{1:D2}", ts.Minutes, ts.Seconds);
+        }
+
 
         public struct audioStream_Token
         {
