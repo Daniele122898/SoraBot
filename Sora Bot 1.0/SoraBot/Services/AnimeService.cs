@@ -72,31 +72,43 @@ namespace Sora_Bot_1.SoraBot.Services
                 {
                     var res = await http.GetStringAsync(link + $"?access_token={anilistToken}").ConfigureAwait(false);
                     var results = JArray.Parse(res);
-                    string choose = "";
-                    var ebC = new EmbedBuilder()
-                    {
-                        Color = new Color(4, 97, 247),
-                        Title = "Enter the Index of the Manga you want more info about.",
-                    };
-                    int count = 1;
-                    foreach (var r in results)
-                    {
-                        choose += $"**{count}.** {r["title_english"]}\n";
-                        count++;
-                    }
-                    ebC.Description = choose;
-                    await Context.Channel.SendMessageAsync("", embed: ebC);
-                    var response = await interactive.WaitForMessage(Context.User, Context.Channel);
                     int index;
-                    if (!Int32.TryParse(response.Content, out index))
+                    if (results.Count > 1)
                     {
-                        await Context.Channel.SendMessageAsync(":no_entry_sign: Only add the Index");
-                        return;
+                        string choose = "";
+                        var ebC = new EmbedBuilder()
+                        {
+                            Color = new Color(4, 97, 247),
+                            Title = "Enter the Index of the Manga you want more info about.",
+                        };
+                        int count = 1;
+                        foreach (var r in results)
+                        {
+                            choose += $"**{count}.** {r["title_english"]}\n";
+                            count++;
+                        }
+                        ebC.Description = choose;
+                        await Context.Channel.SendMessageAsync("", embed: ebC);
+                        var response = await interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(20));
+                        if (response == null)
+                        {
+                            await Context.Channel.SendMessageAsync($":no_entry_sign: Answer timed out {Context.User.Mention} (≧д≦ヾ)");
+                            return;
+                        }
+                        if (!Int32.TryParse(response.Content, out index))
+                        {
+                            await Context.Channel.SendMessageAsync(":no_entry_sign: Only add the Index");
+                            return;
+                        }
+                        if (index > (results.Count) || index < 1)
+                        {
+                            await Context.Channel.SendMessageAsync(":no_entry_sign: Invalid Number");
+                            return;
+                        }
                     }
-                    if (index > (results.Count) || index < 1)
+                    else
                     {
-                        await Context.Channel.SendMessageAsync(":no_entry_sign: Invalid Number");
-                        return;
+                        index = 1;
                     }
                     var smallObj = JArray.Parse(res)[index-1];
                     var manData = await http.GetStringAsync("http://anilist.co/api/manga/" + smallObj["id"] + $"?access_token={anilistToken}").ConfigureAwait(false);
@@ -136,31 +148,45 @@ namespace Sora_Bot_1.SoraBot.Services
                 {
                     var res = await http.GetStringAsync(link + $"?access_token={anilistToken}").ConfigureAwait(false);
                     var results = JArray.Parse(res);
-                    string choose = "";
-                    var ebC = new EmbedBuilder()
-                    {
-                        Color = new Color(4, 97, 247),
-                        Title = "Enter the Index of the Anime you want more info about.",
-                    };
-                    int count = 1;
-                    foreach (var r in results)
-                    {
-                        choose += $"**{count}.** {r["title_english"]}\n";
-                        count++;
-                    }
-                    ebC.Description = choose;
-                    await Context.Channel.SendMessageAsync("", embed: ebC);
-                    var response = await interactive.WaitForMessage(Context.User, Context.Channel);
                     int index;
-                    if (!Int32.TryParse(response.Content, out index))
+                    if (results.Count > 1)
                     {
-                        await Context.Channel.SendMessageAsync(":no_entry_sign: Only add the Index");
-                        return;
+
+                        string choose = "";
+                        var ebC = new EmbedBuilder()
+                        {
+                            Color = new Color(4, 97, 247),
+                            Title = "Enter the Index of the Anime you want more info about.",
+                        };
+                        int count = 1;
+                        foreach (var r in results)
+                        {
+                            choose += $"**{count}.** {r["title_english"]}\n";
+                            count++;
+                        }
+                        ebC.Description = choose;
+                        await Context.Channel.SendMessageAsync("", embed: ebC);
+                        var response = await interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(20));
+                        if (response == null)
+                        {
+                            await Context.Channel.SendMessageAsync($":no_entry_sign: Answer timed out {Context.User.Mention} (≧д≦ヾ)");
+                            return;
+                        }
+                        
+                        if (!Int32.TryParse(response.Content, out index))
+                        {
+                            await Context.Channel.SendMessageAsync(":no_entry_sign: Only add the Index");
+                            return;
+                        }
+                        if (index > (results.Count) || index < 1)
+                        {
+                            await Context.Channel.SendMessageAsync(":no_entry_sign: Invalid Number");
+                            return;
+                        }
                     }
-                    if(index > (results.Count) || index < 1)
+                    else
                     {
-                        await Context.Channel.SendMessageAsync(":no_entry_sign: Invalid Number");
-                        return;
+                        index = 1;
                     }
                     var smallObj = JArray.Parse(res)[index-1];
                     var aniData = await http.GetStringAsync("http://anilist.co/api/anime/" + smallObj["id"] + $"?access_token={anilistToken}").ConfigureAwait(false);

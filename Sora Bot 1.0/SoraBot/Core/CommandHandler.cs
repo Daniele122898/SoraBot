@@ -18,6 +18,7 @@ using Sora_Bot_1.SoraBot.Services.PatService;
 using Sora_Bot_1.SoraBot.Services.StarBoradService;
 using Sora_Bot_1.SoraBot.Services.TagService;
 using Discord.Addons.InteractiveCommands;
+using Sora_Bot_1.SoraBot.Services.Mod;
 
 namespace Sora_Bot_1.SoraBot.Core
 {
@@ -30,7 +31,7 @@ namespace Sora_Bot_1.SoraBot.Core
         private MusicService musicService;
         private UserGuildUpdateService updateService;
         private StarBoardService starBoardService;
-        private ReminderService remService;
+        private ModService _modService;
         private AfkSertvice _afkService;
         private PatService patService;
         private ImdbService _imdbService;
@@ -57,6 +58,7 @@ namespace Sora_Bot_1.SoraBot.Core
             _selfRoleService = new SelfRoleService();
             _ubService = new UbService();
             _imdbService = new ImdbService();
+            _modService = new ModService();
             _animeService = new AnimeService();
             //remService = new ReminderService();
 
@@ -72,6 +74,7 @@ namespace Sora_Bot_1.SoraBot.Core
 
             map.Add(new InteractiveService(client));
             map.Add(musicService);
+            map.Add(_modService);
             map.Add(handler);
             map.Add(_afkService);
             map.Add(_selfRoleService);
@@ -102,6 +105,12 @@ namespace Sora_Bot_1.SoraBot.Core
             client.JoinedGuild += Client_JoinedGuild;
             client.LeftGuild += Client_LeftGuild;
             client.GuildAvailable += Client_GuildAvailable;
+
+            //Modlog
+
+            client.MessageDeleted += _modService.Client_MessageDeleted;
+            client.RoleCreated += _modService.Client_RoleCreated;
+            client.RoleDeleted += _modService.Client_RoleDeleted;
         }
 
         
