@@ -66,13 +66,12 @@ namespace Sora_Bot_1.SoraBot.Core
             tagService = new TagService();
             patService = new PatService();
             epService = new EPService(client);
-            playingWith = new PlayingWith(client);
             SentryService.client = client;
             //SentryService.Install();
 
             commands = new CommandService();
             map = new DependencyMap();
-
+            playingWith = new PlayingWith(client);
             map.Add(new InteractiveService(client));
             map.Add(musicService);
             map.Add(_modService);

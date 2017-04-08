@@ -41,18 +41,30 @@ namespace Sora_Bot_1.SoraBot.Services
         public PlayingWith(DiscordSocketClient _c)
         {
             client = _c;
-            ChangePlayingStatus();
+            Task.Factory.StartNew(() => { ChangePlayingStatus(); });
+            
         }
 
         private async Task ChangePlayingStatus()
         {
-            Random rand = new Random();
-            while (true)
+            try
             {
-                await client.SetGameAsync(playing[rand.Next(playing.Length-1)]);
-                await Task.Delay(10000);
-            }
+                Random rand = new Random();
+                while (true)
+                {
+                    if (client.ConnectionState.ToString() == "Connected")
+                    {
+                        await client.SetGameAsync(playing[rand.Next(playing.Length - 1)]);
+                        await Task.Delay(10000);
+                    }
+                }
 
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e);
+            }
         }
     }
 }
