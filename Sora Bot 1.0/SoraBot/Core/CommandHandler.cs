@@ -109,6 +109,7 @@ namespace Sora_Bot_1.SoraBot.Core
             //Bans
 
             client.UserBanned += _modService.Client_UserBanned;
+            client.UserUnbanned += _modService.Client_UserUnbanned;
 
             //Modlog
 

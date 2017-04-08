@@ -24,6 +24,9 @@ guildlist.txt
 *.msm
 *.msp
 *.png
+*.txt
+*.html
+*.asc
 
 # Windows shortcuts
 *.lnk

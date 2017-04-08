@@ -191,6 +191,7 @@ namespace Sora_Bot_1.SoraBot.Services
                     return;
                 }
                 await Context.Channel.SendMessageAsync(":musical_note: Started playing");
+                //await PlayQueueAsync(client, Context);
                 await PlayQueueAsync(client, Context);
             }
             catch (Exception e)
@@ -290,6 +291,20 @@ namespace Sora_Bot_1.SoraBot.Services
                 Console.WriteLine(e);
                 await SentryService.SendError(e, Context);
             }
+        }
+
+        private Process CreateStream(string path)
+        {
+            //-loglevel quiet
+            var ffmpeg = new ProcessStartInfo
+            {
+                FileName = "ffmpeg",
+                Arguments = $"-i {path}.mp3 -ac 2 -loglevel quiet -f s16le -ar 48000 pipe:1",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+            return Process.Start(ffmpeg);
         }
 
         private async Task PlayQueueAsync(IAudioClient client, CommandContext Context)
@@ -392,7 +407,7 @@ namespace Sora_Bot_1.SoraBot.Services
                 }
                 else
                 {
-                    await Context.Channel.SendMessageAsync(":no_entry_sign: I dind't even join a Channel yet!");
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: I didn't even join a Channel yet!");
                 }
             }
             catch (Exception e)
@@ -557,19 +572,7 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
-        private Process CreateStream(string path)
-        {
-            //-loglevel quiet
-            var ffmpeg = new ProcessStartInfo
-            {
-                FileName = "ffmpeg",
-                Arguments = $"-i {path}.mp3 -ac 2 -loglevel quiet -f s16le -ar 48000 pipe:1",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            };
-            return Process.Start(ffmpeg);
-        }
+        
 
         private Process YtDl(string path, string name)
         { //$"-i -x --no-playlist --max-filesize 100m --audio-format mp3 --audio-quality 0 --id {path} --write-info-json" 
@@ -577,7 +580,7 @@ namespace Sora_Bot_1.SoraBot.Services
             {
                 FileName = "youtube-dl",
                 Arguments =
-                    $"-i -x --no-playlist --max-filesize 100m --audio-format mp3 --audio-quality 0 --output \"{name}.%(ext)s\"  {path} --write-info-json"
+                    $"-i -x --no-playlist --max-filesize 100m --audio-format mp3 --audio-quality 0 --output \"{name}.%(ext)s\"  {path} --write-info-json" //--audio-format mp3
             };
             return Process.Start(ytdl);
         }
@@ -680,18 +683,45 @@ namespace Sora_Bot_1.SoraBot.Services
             {
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 stopwatch.Start();
-                while (!File.Exists(name + ".mp3") && stopwatch.ElapsedMilliseconds < 30000)
+                while (!File.Exists(name + ".mp3"))
                 {
                     if (ytdl != null)
                     {
                         if (ytdl.HasExited)
                             break;
                     }
+                    if (stopwatch.ElapsedMilliseconds > 60000)
+                    {
+                        stopwatch.Stop();
+                        try
+                        {
+                            ytdl.Kill();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                            await SentryService.SendError(e, Context);
+                        }
+                        var dir = new DirectoryInfo(".");
+
+                        foreach (var file in dir.EnumerateFiles("*.part"))
+                        {
+                            file.Delete();
+                        }
+                        File.Delete($"{name}.info.json");
+                        await msg.ModifyAsync(x =>
+                        {
+                            x.Content =
+                                ":no_entry_sign: The Server that hosts the Video you tried to download is way to slow. Try another, faster service!";
+                        });
+                        return "f";
+                    }
                 }
                 if (File.Exists(name + ".mp3"))
                 {
                     try
                     {
+                        
                         await msg.ModifyAsync(
                             x => { x.Content = ":musical_note: Successfully Downloaded."; });
                         stream = true;
@@ -710,6 +740,31 @@ namespace Sora_Bot_1.SoraBot.Services
                             ":no_entry_sign: Failed to Download. Possible reasons: Video is blocked in Bot's country, Video was too long, NO PLAYLISTS AND NO LIVE STREAMS!";
                     });
                 }
+                /*
+                if (stream)
+                {
+                    //Opus Encoding
+                    
+                    var OpusEncoder = OpusEncoding(name);
+                    OpusEncoder.WaitForExit();
+                    if (OpusEncoder.ExitCode != 0)
+                    {
+                        await msg.ModifyAsync(x =>
+                        {
+                            x.Content =
+                                ":no_entry_sign: Failed to convert video to opus :/";
+                        });
+                        return "f";
+                    }
+
+                    if (File.Exists($"{name}.opus"))
+                    {
+                        File.Delete($"{name}.wav");
+                        await msg.ModifyAsync(
+                            x => { x.Content = ":musical_note: Successfully Downloaded and Encoded!"; });
+                        return name;
+                    }
+                }*/
             }
             else
             {
@@ -723,6 +778,19 @@ namespace Sora_Bot_1.SoraBot.Services
             {
                 return "f";
             }
+        }
+
+        private Process OpusEncoding(string name)
+        {
+            var opus = new ProcessStartInfo //bash -c
+            {
+                FileName = "cmd.exe",
+                Arguments =
+                    $"/c \"opusenc {name}.wav {name}.opus\"", ///c \"ffmpeg -i {name}.mp3 -f s16le pipe:0 | opusenc - > --bitrate 268 {name}.opus\"
+                RedirectStandardOutput = true,
+                UseShellExecute = false
+            };
+            return Process.Start(opus);
         }
 
         public string Convert(int value)

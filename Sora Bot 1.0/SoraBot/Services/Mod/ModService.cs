@@ -313,7 +313,80 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
 
         public async Task Client_UserBanned(SocketUser user, SocketGuild guild)
         {
-            await LogAction(Action.Ban, (user as IUser), null, null, null, guild);
+            try
+            {
+                if (!_punishLogs.ContainsKey(guild.Id))
+                    return;
+                punishStruct str = new punishStruct();
+                _punishLogs.TryGetValue(guild.Id, out str);
+                if (str.punishes == null)
+                    str.punishes = new List<punishCase>();
+
+                await Task.Run(async() =>
+                {
+                    await Task.Delay(1000);
+                    if (!str.punishes.Any(x => x.userID == user.Id))
+                        await LogAction(Action.Ban, (user as IUser), null, null, null, guild);
+                });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e);
+            }
+        }
+
+        public async Task Client_UserUnbanned(SocketUser user, SocketGuild guildT)
+        {
+            try
+            {
+                var guild = guildT as IGuild;
+                if (!_punishLogs.ContainsKey(guild.Id))
+                    return;
+                punishStruct str = new punishStruct();
+                _punishLogs.TryGetValue(guild.Id, out str);
+                if (str.punishes == null)
+                    return;
+                var channel = await guild.GetChannelAsync(str.channelID) as IMessageChannel;
+                if (channel == null)
+                    return;
+                var found = str.punishes.Where(x => x.userID == user.Id).ToList();
+                if (found == null)
+                    return;
+                foreach (var p in found)
+                {
+                    str.punishes.Remove(p);
+                }
+
+                var eb = new EmbedBuilder()
+                {
+                    Color = new Color(4, 97, 247),
+                    Title = $"User Unbanned :balloon:",
+                    Timestamp = DateTimeOffset.UtcNow
+                };
+                eb.AddField((x) =>
+                {
+                    x.Name = "User";
+                    x.IsInline = false;
+                    x.Value = $"**{user.Username}#{user.Discriminator}** ({user.Id})\nThere currently is a bug in Discord.net so there is no Username sometimes...";
+                });
+                eb.AddField((x) =>
+                {
+                    x.Name = "Reset";
+                    x.IsInline = false;
+                    x.Value = "All cases in which this user was involved as target were removed from the database. He starts fresh again.";
+                });
+
+                await channel.SendMessageAsync("", embed: eb);
+                _punishLogs.TryUpdate(guild.Id, str);
+                ModServiceDB.SavePunishLogs(_punishLogs);
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e);
+            }
         }
 
         private async Task LogAction(Action type, IUser user, IUser mod, string reason, CommandContext Context = null, SocketGuild guildP = null)
@@ -332,7 +405,17 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                     return;
                 if (str.punishes == null)
                     str.punishes = new List<punishCase>();
-                var casenr = str.punishes.Count + 1;
+
+                /*var modHighestRole = mod.Roles.OrderByDescending(r => r.Position).First();*/
+
+                int casenr = 1;
+                if (str.punishes.Count > 0)
+                {
+                    var highest = str.punishes.OrderByDescending(x => x.caseNr).First();
+                    casenr = highest.caseNr + 1;
+                }
+
+
                 punishCase pnsh = new punishCase
                 {
                     caseNr = casenr,

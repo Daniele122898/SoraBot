@@ -16,11 +16,10 @@ namespace Sora_Bot_1.SoraBot.Services
             "with Karen",
             "with Emily",
             "with Nep",
-            "with 0xFADED",
+            "with 0xFADED <3",
             "with Serraniel",
             "with Serenity",
             "with Shiro <3",
-            "with Katsu <3",
 
             //Games
             "CS:GO",
@@ -55,8 +54,8 @@ namespace Sora_Bot_1.SoraBot.Services
                     if (client.ConnectionState.ToString() == "Connected")
                     {
                         await client.SetGameAsync(playing[rand.Next(playing.Length - 1)]);
-                        await Task.Delay(10000);
                     }
+                    await Task.Delay(10000);
                 }
 
             }
