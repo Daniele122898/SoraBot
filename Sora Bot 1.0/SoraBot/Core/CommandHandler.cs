@@ -42,6 +42,7 @@ namespace Sora_Bot_1.SoraBot.Core
         private RatelimitService ratelimitService;
         private EPService epService;
         private PlayingWith playingWith;
+        private int _commandsRan = 0;
         public static Dictionary<ulong, string> prefixDict = new Dictionary<ulong, string>();
         private JsonSerializer jSerializer = new JsonSerializer();
 
@@ -105,6 +106,10 @@ namespace Sora_Bot_1.SoraBot.Core
             client.JoinedGuild += Client_JoinedGuild;
             client.LeftGuild += Client_LeftGuild;
             client.GuildAvailable += Client_GuildAvailable;
+
+            //Bans
+
+            client.UserBanned += _modService.Client_UserBanned;
 
             //Modlog
 
@@ -271,6 +276,11 @@ namespace Sora_Bot_1.SoraBot.Core
             }
         }
 
+        public int CommandsRunSinceRestart()
+        {
+            return _commandsRan;
+        }
+
 
         public async Task HandleCommand(SocketMessage messageParam)
         {
@@ -321,7 +331,10 @@ namespace Sora_Bot_1.SoraBot.Core
             var result = await commands.ExecuteAsync(context, argPos, map);
 
             if (result.IsSuccess)
+            {
                 await ratelimitService.checkRatelimit(context.User);
+                _commandsRan++;
+            }
 
             //if (!result.IsSuccess)
             //  await context.Channel.SendMessageAsync(result.ErrorReason);

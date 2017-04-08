@@ -63,10 +63,12 @@ namespace Sora_Bot_1.SoraBot.Services
         {
             try
             {
-                if (msg.MentionedUsers.Count < 1)
-                {
+                if (msg.Author.Id == 270931284489011202 || msg.Author.Id == 276304865934704642)
                     return;
-                }
+
+                if (msg.MentionedUsers.Count < 1)
+                    return;
+
                 foreach (var u in msg.MentionedUsers)
                 {
                     if (_afkDict.ContainsKey(u.Id))

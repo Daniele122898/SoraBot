@@ -82,7 +82,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                     await Context.Channel.SendMessageAsync(":no_entry_sign: Couldn't find Punishlog!");
                     return;
                 }
-                if(found.modID != mod.Id)
+                if(found.modID != mod.Id && found.modID != 0)
                 {
                     await Context.Channel.SendMessageAsync(":no_entry_sign: Only the person that banned the User can edit the reason!");
                     return;
@@ -311,15 +311,23 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
             }
         }
 
-        private async Task LogAction(Action type, IUser user, IUser mod, string reason, CommandContext Context)
+        public async Task Client_UserBanned(SocketUser user, SocketGuild guild)
+        {
+            await LogAction(Action.Ban, (user as IUser), null, null, null, guild);
+        }
+
+        private async Task LogAction(Action type, IUser user, IUser mod, string reason, CommandContext Context = null, SocketGuild guildP = null)
         {
             try
             {
-                if (!_punishLogs.ContainsKey(Context.Guild.Id))
+                var guild = Context?.Guild ?? (guildP as IGuild);
+                if (guild == null)
+                    return;
+                if (!_punishLogs.ContainsKey(guild.Id))
                     return;
                 punishStruct str = new punishStruct();
-                _punishLogs.TryGetValue(Context.Guild.Id, out str);
-                var channel = await Context.Guild.GetChannelAsync(str.channelID) as IMessageChannel;
+                _punishLogs.TryGetValue(guild.Id, out str);
+                var channel = await guild.GetChannelAsync(str.channelID) as IMessageChannel;
                 if (channel == null)
                     return;
                 if (str.punishes == null)
@@ -329,8 +337,8 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                 {
                     caseNr = casenr,
                     type = type,
-                    mod = $"{mod.Username}#{mod.Discriminator}",
-                    modID = mod.Id,
+                    mod = $"{(mod != null ? $"{mod.Username}#{mod.Discriminator}" : "Unknown")}",
+                    modID = (mod !=null ? mod.Id : 0),
                     user = $"{user.Username}#{user.Discriminator}",
                     userID = user.Id,
                     reason = reason
@@ -366,13 +374,20 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                 var msg = await channel.SendMessageAsync("", embed: eb);
                 pnsh.punishMsgID = msg.Id;
                 str.punishes.Add(pnsh);
-                _punishLogs.TryUpdate(Context.Guild.Id, str);
+                _punishLogs.TryUpdate(guild.Id, str);
                 ModServiceDB.SavePunishLogs(_punishLogs);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                await SentryService.SendError(e, Context);
+                if (Context != null)
+                {
+                    await SentryService.SendError(e, Context);
+                }
+                else
+                {
+                    await SentryService.SendError(e);
+                }
             }
         }
 
@@ -449,7 +464,9 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
             {
                 if (!msg.HasValue)
                     return;
-                var guild = (channel as IGuildChannel).Guild;
+                var guild = (channel as IGuildChannel)?.Guild;
+                if (guild == null)
+                    return;
                 if (!_modlogsDict.ContainsKey(guild.Id))
                     return;
                 modLogs logs = new modLogs();
@@ -619,7 +636,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                     Color = new Color(4, 97, 247),
                     Title = $"{DateTime.UtcNow.TimeOfDay.ToString().Remove(8)} - Role Updated",
                     ThumbnailUrl = "http://i.imgur.com/Qo4kSxq.png",
-                    Description = $"**{oldRole.Name}** ({oldRole.Id}) has been updated to **{newRole.Name}** ({newRole.Id})"
+                    Description = $"{(oldRole.Name != newRole.Name ? $"**{oldRole.Name}** ({oldRole.Id}) has been updated to **{newRole.Name}** ({newRole.Id})" : $"**{newRole.Name}**")}"
                 };
                 eb.AddField((x) =>
                 {
@@ -648,7 +665,14 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                     }
                     x.Name = "Permissions";
                     x.IsInline = true;
-                    x.Value = $"{(String.IsNullOrWhiteSpace(msg1) ? "No Permissions" : msg1)} \n\n{(String.IsNullOrWhiteSpace(msg2) ? "No Permissions" : msg2)}";
+                    if (msg1 != msg2)
+                    {
+                        x.Value = $"{(String.IsNullOrWhiteSpace(msg1) ? "No Permissions" : msg1)} \n\n{(String.IsNullOrWhiteSpace(msg2) ? "No Permissions" : msg2)}";
+                    }
+                    else
+                    {
+                        x.Value = "Permissions weren't altered";
+                    }
                 });
 
                 await logChannel.SendMessageAsync("", embed: eb);
@@ -678,7 +702,9 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
         {
             try
             {
-                var guild = (channel as IGuildChannel).Guild;
+                var guild = (channel as IGuildChannel)?.Guild;
+                if (guild == null)
+                    return;
                 if (!_modlogsDict.ContainsKey(guild.Id))
                     return;
                 modLogs logs = new modLogs();
@@ -712,7 +738,9 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                 var socketNew = newChannel as SocketGuildChannel;
                 if (socketOld.Position != socketNew.Position)
                     return;
-                var guild = (oldChannel as IGuildChannel).Guild;
+                var guild = (oldChannel as IGuildChannel)?.Guild;
+                if (guild == null)
+                    return;
                 if (!_modlogsDict.ContainsKey(guild.Id))
                     return;
                 modLogs logs = new modLogs();
@@ -733,8 +761,18 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                     Color = new Color(4, 97, 247),
                     Title = $"{DateTime.UtcNow.TimeOfDay.ToString().Remove(8)} - Channel was Updated",
                     ThumbnailUrl = "https://cdn0.iconfinder.com/data/icons/kirrkle-social-networks-part-1/60/05_-_Text_messaging-512.png",
-                    Description = $"**#{socketOld.Name}** ({socketOld.Id}) \nhas been changed to \n**#{socketNew.Name}** ({socketNew.Id})!"
+                    Description = $"{(socketOld.Name != socketNew.Name ? $"**#{socketOld.Name}** ({socketOld.Id}) \nhas been changed to \n<#{socketNew.Id}> ({socketNew.Id})" : $"<#{socketNew.Id}>")}"
                 };
+
+                if(socketOld.Name == socketNew.Name)
+                {
+                    eb.AddField((x) =>
+                    {
+                        x.Name = "Channel settings updated!";
+                        x.IsInline = true;
+                        x.Value = "Either the permission overwrites or Webhooks have been altered!";
+                    });
+                }
                 
 
                 await logChannel.SendMessageAsync("", embed: eb);
@@ -750,7 +788,9 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
         {
             try
             {
-                var guild = (channel as IGuildChannel).Guild;
+                var guild = (channel as IGuildChannel)?.Guild;
+                if (guild == null)
+                    return;
                 if (!_modlogsDict.ContainsKey(guild.Id))
                     return;
                 modLogs logs = new modLogs();
