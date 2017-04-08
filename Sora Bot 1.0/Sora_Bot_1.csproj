@@ -13,11 +13,11 @@
   <ItemGroup>
     <PackageReference Include="CoreCompat.System.Drawing" Version="1.0.0-beta006" />
     <PackageReference Include="Discord.Addons.InteractiveCommands" Version="1.2.2" />
-    <PackageReference Include="Discord.Net.Commands" Version="1.0.0-rc2-00679" />
-    <PackageReference Include="Discord.Net.Core" Version="1.0.0-rc2-00679" />
-    <PackageReference Include="Discord.Net.WebSocket" Version="1.0.0-rc2-00679" />
-    <PackageReference Include="ImageSharp" Version="1.0.0-alpha5-00053" />
-    <PackageReference Include="ImageSharp.Drawing" Version="1.0.0-alpha5-00047" />
+    <PackageReference Include="Discord.Net.Commands" Version="1.0.0-rc2-00687" />
+    <PackageReference Include="Discord.Net.Core" Version="1.0.0-rc2-00687" />
+    <PackageReference Include="Discord.Net.WebSocket" Version="1.0.0-rc2-00687" />
+    <PackageReference Include="ImageSharp" Version="1.0.0-alpha5-00054" />
+    <PackageReference Include="ImageSharp.Drawing" Version="1.0.0-alpha5-00048" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="1.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="1.0.1" />
     <PackageReference Include="Microsoft.NETCore.App" Version="1.0.1" />

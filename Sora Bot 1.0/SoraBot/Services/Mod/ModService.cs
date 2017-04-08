@@ -385,7 +385,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                 var user = Context.User as SocketGuildUser;
                 if (!user.GuildPermissions.Has(GuildPermission.Administrator))
                 {
-                    await Context.Channel.SendMessageAsync(":no_entry_sign: You need `Administrator` permissions to change the PunishLogs Channel!");
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: You need `Administrator` permissions to change the ModLogs Channel!");
                     return;
                 }
                 modLogs modLogs = new modLogs();
@@ -416,7 +416,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                 var user = Context.User as SocketGuildUser;
                 if (!user.GuildPermissions.Has(GuildPermission.Administrator))
                 {
-                    await Context.Channel.SendMessageAsync(":no_entry_sign: You need `Administrator` permissions to change the PunishLogs Channel!");
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: You need `Administrator` permissions to change the ModLogs Channel!");
                     return;
                 }
                 if (!_modlogsDict.ContainsKey(Context.Guild.Id))
@@ -447,6 +447,8 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
         {
             try
             {
+                if (!msg.HasValue)
+                    return;
                 var guild = (channel as IGuildChannel).Guild;
                 if (!_modlogsDict.ContainsKey(guild.Id))
                     return;
@@ -478,7 +480,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                 {
                     x.Name = "Channel";
                     x.IsInline = true;
-                    x.Value = $"#{channel.Name}";
+                    x.Value = $"<#{channel.Id}>";
                 });
 
                 eb.AddField((x) =>

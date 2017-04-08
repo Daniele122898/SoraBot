@@ -99,7 +99,7 @@ namespace Sora_Bot_1.SoraBot.Core
             var _client = new DiscordSocketClient(new DiscordSocketConfig()
             {
                 LogLevel = LogSeverity.Info,
-                MessageCacheSize = 50
+                MessageCacheSize = 75
             });
 
             _client.Log += (message) =>
