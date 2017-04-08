@@ -111,9 +111,14 @@ namespace Sora_Bot_1.SoraBot.Core
             client.MessageDeleted += _modService.Client_MessageDeleted;
             client.RoleCreated += _modService.Client_RoleCreated;
             client.RoleDeleted += _modService.Client_RoleDeleted;
-        }
+            client.RoleUpdated += _modService.Client_RoleUpdated;
 
-        
+            client.ChannelCreated += _modService.Client_ChannelCreated;
+            client.ChannelDestroyed += _modService.Client_ChannelDestroyed;
+            client.ChannelUpdated += _modService.Client_ChannelUpdated;
+
+            client.GuildUpdated += _modService.Client_GuildUpdated;
+        }
 
         private async Task Client_GuildAvailable(SocketGuild guild)
         {

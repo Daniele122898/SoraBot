@@ -19,13 +19,24 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
             Ban, Kick
         }
 
+        public ModService()
+        {
+            ModServiceDB.InitializeLoader();
+            var modlogsTemp = ModServiceDB.LoadModLogs();
+            if (modlogsTemp != null)
+                _modlogsDict = modlogsTemp;
+            var punishLogsTemp = ModServiceDB.LoadPunishLogs();
+            if (punishLogsTemp != null)
+                _punishLogs = punishLogsTemp;
+        }
+
         public async Task AddReason(CommandContext Context, string reason)
         {
             try
             {
                 if (!_punishLogs.ContainsKey(Context.Guild.Id))
                 {
-                    await Context.Channel.SendMessageAsync(":no_entry_sign: No _punishLogs Channel set!");
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: No PunishLogs Channel set!");
                     return;
                 }
                 var mod = Context.User as SocketGuildUser;
@@ -114,7 +125,15 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                 found.reason = res[1];
                 str.punishes.Add(found);
                 _punishLogs.TryUpdate(Context.Guild.Id, str);
-                await Context.Channel.SendMessageAsync(":white_check_mark: Successfully updated reason!");
+                var msg = await Context.Channel.SendMessageAsync(":white_check_mark: Successfully updated reason!");
+                await Task.Delay(3000);
+                var bot = await Context.Guild.GetUserAsync(270931284489011202, Discord.CacheMode.AllowDownload) as IGuildUser;
+                if (bot.GuildPermissions.Has(GuildPermission.ManageMessages))
+                {
+                    await Context.Message.DeleteAsync();
+                }
+                await msg.DeleteAsync();
+                ModServiceDB.SavePunishLogs(_punishLogs);
             }
             catch (Exception e)
             {
@@ -226,174 +245,287 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
             }
         }
 
-        public async Task set_punishLogsChannel(CommandContext Context, IMessageChannel channel)
+        public async Task setPunishLogsChannel(CommandContext Context, IMessageChannel channel)
         {
-            var user = Context.User as SocketGuildUser;
-            if (!user.GuildPermissions.Has(GuildPermission.Administrator))
+            try
             {
-                await Context.Channel.SendMessageAsync(":no_entry_sign: You need `Administrator` permissions to change the _punishLogs Channel!");
-                return;
+                var user = Context.User as SocketGuildUser;
+                if (!user.GuildPermissions.Has(GuildPermission.Administrator))
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: You need `Administrator` permissions to change the PunishLogs Channel!");
+                    return;
+                }
+                punishStruct str = new punishStruct();
+                if (!_punishLogs.ContainsKey(Context.Guild.Id))
+                {
+                    str.channelID = channel.Id;
+                }
+                else
+                {
+                    _punishLogs.TryGetValue(Context.Guild.Id, out str);
+                    str.channelID = channel.Id;
+                }
+                _punishLogs.AddOrUpdate(Context.Guild.Id, str, (key, oldValue) => str);
+                await Context.Channel.SendMessageAsync($":white_check_mark: Successfully added #{channel.Name} as Punishlog Channel");
+                ModServiceDB.SavePunishLogs(_punishLogs);
             }
-            punishStruct str = new punishStruct();
-            if (!_punishLogs.ContainsKey(Context.Guild.Id))
+            catch (Exception e)
             {
-                str.channelID = channel.Id;
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
             }
-            else
-            {
-                _punishLogs.TryGetValue(Context.Guild.Id, out str);
-                str.channelID = channel.Id;
-            }
-            _punishLogs.AddOrUpdate(Context.Guild.Id, str, (key, oldValue) => str);
-            await Context.Channel.SendMessageAsync($":white_check_mark: Successfully added #{channel.Name} as Punishlog Channel");
         }
 
-        public async Task del_punishLogsChannel(CommandContext Context)
+        public async Task delPunishLogsChannel(CommandContext Context)
         {
-            var user = Context.User as SocketGuildUser;
-            if (!user.GuildPermissions.Has(GuildPermission.Administrator))
+            try
             {
-                await Context.Channel.SendMessageAsync(":no_entry_sign: You need `Administrator` permissions to change the _punishLogs Channel!");
-                return;
-            }
-            if (!_punishLogs.ContainsKey(Context.Guild.Id))
-            {
-                await Context.Channel.SendMessageAsync(":no_entry_sign: No Channel has been set yet!");
-                return;
-            }
+                var user = Context.User as SocketGuildUser;
+                if (!user.GuildPermissions.Has(GuildPermission.Administrator))
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: You need `Administrator` permissions to change the PunishLogs Channel!");
+                    return;
+                }
+                if (!_punishLogs.ContainsKey(Context.Guild.Id))
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: No Channel has been set yet!");
+                    return;
+                }
 
-            punishStruct str = new punishStruct();
-            _punishLogs.TryGetValue(Context.Guild.Id, out str);
-            if(str.channelID == 0)
-            {
-                await Context.Channel.SendMessageAsync(":no_entry_sign: Channel was already removed!");
-                return;
+                punishStruct str = new punishStruct();
+                _punishLogs.TryGetValue(Context.Guild.Id, out str);
+                if (str.channelID == 0)
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: Channel was already removed!");
+                    return;
+                }
+                str.channelID = 0;
+                _punishLogs.TryUpdate(Context.Guild.Id, str);
+                await Context.Channel.SendMessageAsync(":white_check_mark: Channel has been successfully removed!");
+                ModServiceDB.SavePunishLogs(_punishLogs);
             }
-            str.channelID = 0;
-            _punishLogs.TryUpdate(Context.Guild.Id, str);
-            await Context.Channel.SendMessageAsync(":white_check_mark: Channel has been successfully removed!");
-
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
         }
 
         private async Task LogAction(Action type, IUser user, IUser mod, string reason, CommandContext Context)
         {
-            if (!_punishLogs.ContainsKey(Context.Guild.Id))
-                return;
-            punishStruct str = new punishStruct();
-            _punishLogs.TryGetValue(Context.Guild.Id, out str);
-            var channel = await Context.Guild.GetChannelAsync(str.channelID) as IMessageChannel;
-            if (channel == null)
-                return;
-            if (str.punishes == null)
-                str.punishes = new List<punishCase>();
-            var casenr = str.punishes.Count + 1;
-            punishCase pnsh = new punishCase
+            try
             {
-                caseNr = casenr,
-                type = type,
-                mod = $"{mod.Username}#{mod.Discriminator}",
-                modID = mod.Id,
-                user = $"{user.Username}#{user.Discriminator}",
-                userID = user.Id,
-                reason = reason
-            };
-            
-            var eb = new EmbedBuilder()
-            {
-                Color = new Color(4, 97, 247),
-                Title = $"Case #{pnsh.caseNr} | {(type == Action.Ban ? "Ban :hammer:" : "Kick :boot:")}",
-                Timestamp = DateTimeOffset.UtcNow
-            };
-            eb.AddField((x) =>
-            {
-                x.Name = "User";
-                x.IsInline = true;
-                x.Value = $"**{pnsh.user}** ({pnsh.userID})";
-            });
+                if (!_punishLogs.ContainsKey(Context.Guild.Id))
+                    return;
+                punishStruct str = new punishStruct();
+                _punishLogs.TryGetValue(Context.Guild.Id, out str);
+                var channel = await Context.Guild.GetChannelAsync(str.channelID) as IMessageChannel;
+                if (channel == null)
+                    return;
+                if (str.punishes == null)
+                    str.punishes = new List<punishCase>();
+                var casenr = str.punishes.Count + 1;
+                punishCase pnsh = new punishCase
+                {
+                    caseNr = casenr,
+                    type = type,
+                    mod = $"{mod.Username}#{mod.Discriminator}",
+                    modID = mod.Id,
+                    user = $"{user.Username}#{user.Discriminator}",
+                    userID = user.Id,
+                    reason = reason
+                };
 
-            eb.AddField((x) =>
-            {
-                x.Name = "Moderator";
-                x.IsInline = true;
-                x.Value = $"**{pnsh.mod}** ({pnsh.modID})";
-            });
+                var eb = new EmbedBuilder()
+                {
+                    Color = new Color(4, 97, 247),
+                    Title = $"Case #{pnsh.caseNr} | {(type == Action.Ban ? "Ban :hammer:" : "Kick :boot:")}",
+                    Timestamp = DateTimeOffset.UtcNow
+                };
+                eb.AddField((x) =>
+                {
+                    x.Name = "User";
+                    x.IsInline = true;
+                    x.Value = $"**{pnsh.user}** ({pnsh.userID})";
+                });
 
-            eb.AddField((x) =>
-            {
-                x.Name = "Reason";
-                x.IsInline = true;
-                x.Value = $"{(String.IsNullOrWhiteSpace(pnsh.reason) ? $"Type [p]reason {pnsh.caseNr} <reason> to add it" : pnsh.reason)}";
-            });
+                eb.AddField((x) =>
+                {
+                    x.Name = "Moderator";
+                    x.IsInline = true;
+                    x.Value = $"**{pnsh.mod}** ({pnsh.modID})";
+                });
 
-            var msg = await channel.SendMessageAsync("", embed: eb);
-            pnsh.punishMsgID = msg.Id;
-            str.punishes.Add(pnsh);
-            _punishLogs.TryUpdate(Context.Guild.Id, str);
+                eb.AddField((x) =>
+                {
+                    x.Name = "Reason";
+                    x.IsInline = true;
+                    x.Value = $"{(String.IsNullOrWhiteSpace(pnsh.reason) ? $"Type [p]reason {pnsh.caseNr} <reason> to add it" : pnsh.reason)}";
+                });
+
+                var msg = await channel.SendMessageAsync("", embed: eb);
+                pnsh.punishMsgID = msg.Id;
+                str.punishes.Add(pnsh);
+                _punishLogs.TryUpdate(Context.Guild.Id, str);
+                ModServiceDB.SavePunishLogs(_punishLogs);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
         }
 
         //ModLogs
 
+        public async Task setModLgosChannel(CommandContext Context, IMessageChannel channel)
+        {
+            try
+            {
+                var user = Context.User as SocketGuildUser;
+                if (!user.GuildPermissions.Has(GuildPermission.Administrator))
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: You need `Administrator` permissions to change the PunishLogs Channel!");
+                    return;
+                }
+                modLogs modLogs = new modLogs();
+                if (!_modlogsDict.ContainsKey(Context.Guild.Id))
+                {
+                    modLogs.channelID = channel.Id;
+                }
+                else
+                {
+                    _modlogsDict.TryGetValue(Context.Guild.Id, out modLogs);
+                    modLogs.channelID = channel.Id;
+                }
+                _modlogsDict.AddOrUpdate(Context.Guild.Id, modLogs, (key, oldValue) => modLogs);
+                await Context.Channel.SendMessageAsync(":white_check_mark: Channel has been successfully added!");
+                ModServiceDB.SaveModLogs(_modlogsDict);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
+        }
+
+        public async Task removeModLogsChannel(CommandContext Context)
+        {
+            try
+            {
+                var user = Context.User as SocketGuildUser;
+                if (!user.GuildPermissions.Has(GuildPermission.Administrator))
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: You need `Administrator` permissions to change the PunishLogs Channel!");
+                    return;
+                }
+                if (!_modlogsDict.ContainsKey(Context.Guild.Id))
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: No Channel has been set yet!");
+                    return;
+                }
+                modLogs modLogs = new modLogs();
+                _modlogsDict.TryGetValue(Context.Guild.Id, out modLogs);
+                if (modLogs.channelID == 0)
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: Channel was already removed!");
+                    return;
+                }
+                modLogs.channelID = 0;
+                _modlogsDict.TryUpdate(Context.Guild.Id, modLogs);
+                await Context.Channel.SendMessageAsync(":white_check_mark: Channel has been successfully removed!");
+                ModServiceDB.SaveModLogs(_modlogsDict);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
+        }
+
         public async Task Client_MessageDeleted(Cacheable<IMessage, ulong> msg, ISocketMessageChannel channel)
         {
-            var guild = (channel as IGuildChannel).Guild;
-            if (!_modlogsDict.ContainsKey(guild.Id))
-                return;
-            modLogs logs = new modLogs();
-            _modlogsDict.TryGetValue(guild.Id, out logs);
-
-            var logChannel = await guild.GetChannelAsync(logs.channelID) as IMessageChannel;
-            if (logChannel == null)
-                return;
-            if (!logs.msgDelete)
-                return;
-
-            var eb = new EmbedBuilder() //https://img.clipartfest.com/664ce829afe3443ac3aae2f074b4bd69_recycle-bin-icon-recycle-bin-icon-clipart_2400-2400.png
+            try
             {
-                Color = new Color(4, 97, 247),
-                Title = $"{DateTime.UtcNow.TimeOfDay} - Message Deleted",
-                ThumbnailUrl = "https://img.clipartfest.com/664ce829afe3443ac3aae2f074b4bd69_recycle-bin-icon-recycle-bin-icon-clipart_2400-2400.png",
-                Description = msg.Value.Content,
-                Footer = new EmbedFooterBuilder()
+                var guild = (channel as IGuildChannel).Guild;
+                if (!_modlogsDict.ContainsKey(guild.Id))
+                    return;
+                modLogs logs = new modLogs();
+                _modlogsDict.TryGetValue(guild.Id, out logs);
+
+                var logChannel = await guild.GetChannelAsync(logs.channelID) as IMessageChannel;
+                if (logChannel == null)
+                    return;
+                if (!logs.msgDelete)
+                    return;
+                if (logs.msgDeleteInterval.CompareTo(DateTime.UtcNow) > 0)
+                    return;
+                logs.msgDeleteInterval = DateTime.UtcNow.AddSeconds(4);
+
+                var eb = new EmbedBuilder() //https://img.clipartfest.com/664ce829afe3443ac3aae2f074b4bd69_recycle-bin-icon-recycle-bin-icon-clipart_2400-2400.png
                 {
-                    Text = $"Author ID: {msg.Value.Author.Id}"
-                }
-            };
+                    Color = new Color(4, 97, 247),
+                    Title = $"{DateTime.UtcNow.TimeOfDay.ToString().Remove(8)} - Message Deleted",
+                    ThumbnailUrl = "https://img.clipartfest.com/664ce829afe3443ac3aae2f074b4bd69_recycle-bin-icon-recycle-bin-icon-clipart_2400-2400.png",
+                    Description = msg.Value.Content,
+                    Footer = new EmbedFooterBuilder()
+                    {
+                        Text = $"Author ID: {msg.Value.Author.Id}"
+                    }
+                };
 
-            eb.AddField((x) =>
+                eb.AddField((x) =>
+                {
+                    x.Name = "Channel";
+                    x.IsInline = true;
+                    x.Value = $"#{channel.Name}";
+                });
+
+                eb.AddField((x) =>
+                {
+                    x.Name = "Author";
+                    x.IsInline = true;
+                    x.Value = $"{msg.Value.Author.Username}#{msg.Value.Author.Discriminator}";
+                });
+
+                await logChannel.SendMessageAsync("", embed: eb);
+            }
+            catch (Exception e)
             {
-                x.Name = "Channel";
-                x.IsInline = true;
-                x.Value = $"#{channel.Name}";
-            });
-
-            eb.AddField((x) =>
-            {
-                x.Name = "Author";
-                x.IsInline = true;
-                x.Value = $"{msg.Value.Author.Username}#{msg.Value.Author.Discriminator}";
-            });
-
-            await logChannel.SendMessageAsync("", embed: eb);
+                Console.WriteLine(e);
+                await SentryService.SendError(e);
+            }
         }
 
 
         public async Task Client_RoleCreated(SocketRole role)
         {
-            var guild = role.Guild as IGuild;
-            if (!_modlogsDict.ContainsKey(guild.Id))
-                return;
-            modLogs logs = new modLogs();
-            _modlogsDict.TryGetValue(guild.Id, out logs);
+            try
+            {
+                var guild = role.Guild as IGuild;
+                if (!_modlogsDict.ContainsKey(guild.Id))
+                    return;
+                modLogs logs = new modLogs();
+                _modlogsDict.TryGetValue(guild.Id, out logs);
 
-            var logChannel = await guild.GetChannelAsync(logs.channelID) as IMessageChannel;
-            if (logChannel == null)
-                return;
-            if (!logs.roleChange)
-                return;
+                var logChannel = await guild.GetChannelAsync(logs.channelID) as IMessageChannel;
+                if (logChannel == null)
+                    return;
+                if (!logs.roleChange)
+                    return;
+                if (logs.roleChangeInterval.CompareTo(DateTime.UtcNow) > 0)
+                    return;
+                logs.roleChangeInterval = DateTime.UtcNow.AddSeconds(10);
 
-            var eb = createRoleEmbed(role, true);
+                var eb = createRoleEmbed(role, true);
 
-            await logChannel.SendMessageAsync("", embed: eb);
+                await logChannel.SendMessageAsync("", embed: eb);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e);
+            }
         }
 
         private EmbedBuilder createRoleEmbed(SocketRole role, bool isCreate)
@@ -401,7 +533,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
             var eb = new EmbedBuilder()
             {
                 Color = new Color(4, 97, 247),
-                Title = $"{DateTime.UtcNow.TimeOfDay} - Role {(isCreate ? "Created" : "Deleted")}",
+                Title = $"{DateTime.UtcNow.TimeOfDay.ToString().Remove(8)} - Role {(isCreate ? "Created" : "Deleted")}",
                 ThumbnailUrl = "http://i.imgur.com/Qo4kSxq.png",
                 Description = $"**{role.Name}** ({role.Id}) has been {(isCreate ? "created" : "deleted")}!"
             };
@@ -409,7 +541,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
             {
                 x.Name = "Color";
                 x.IsInline = true;
-                x.Value = $"{role.Color.RawValue} : {role.Color}";
+                x.Value = $"{role.Color}";
             });
             eb.AddField((x) =>
             {
@@ -434,20 +566,427 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
 
         public async Task Client_RoleDeleted(SocketRole role)
         {
-            var guild = role.Guild as IGuild;
-            if (!_modlogsDict.ContainsKey(guild.Id))
+            try
+            {
+                var guild = role.Guild as IGuild;
+                if (!_modlogsDict.ContainsKey(guild.Id))
+                    return;
+                modLogs logs = new modLogs();
+                _modlogsDict.TryGetValue(guild.Id, out logs);
+
+                var logChannel = await guild.GetChannelAsync(logs.channelID) as IMessageChannel;
+                if (logChannel == null)
+                    return;
+                if (!logs.roleChange)
+                    return;
+                if (logs.roleChangeInterval.CompareTo(DateTime.UtcNow) > 0)
+                    return;
+                logs.roleChangeInterval = DateTime.UtcNow.AddSeconds(5);
+
+                var eb = createRoleEmbed(role, false);
+                await logChannel.SendMessageAsync("", embed: eb);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e);
+            }
+        }
+
+        public async Task Client_RoleUpdated(SocketRole oldRole, SocketRole newRole)
+        {
+            try
+            {
+                var guild = oldRole.Guild as IGuild;
+                if (!_modlogsDict.ContainsKey(guild.Id))
+                    return;
+                modLogs logs = new modLogs();
+                _modlogsDict.TryGetValue(guild.Id, out logs);
+
+                var logChannel = await guild.GetChannelAsync(logs.channelID) as IMessageChannel;
+                if (logChannel == null)
+                    return;
+                if (!logs.roleChange)
+                    return;
+                if (logs.roleChangeInterval.CompareTo(DateTime.UtcNow) > 0)
+                    return;
+                logs.roleChangeInterval = DateTime.UtcNow.AddSeconds(10);
+
+                var eb = new EmbedBuilder()
+                {
+                    Color = new Color(4, 97, 247),
+                    Title = $"{DateTime.UtcNow.TimeOfDay.ToString().Remove(8)} - Role Updated",
+                    ThumbnailUrl = "http://i.imgur.com/Qo4kSxq.png",
+                    Description = $"**{oldRole.Name}** ({oldRole.Id}) has been updated to **{newRole.Name}** ({newRole.Id})"
+                };
+                eb.AddField((x) =>
+                {
+                    x.Name = "Color";
+                    x.IsInline = true;
+                    x.Value = $"{oldRole.Color} : {newRole.Color}";
+                });
+                eb.AddField((x) =>
+                {
+                    x.Name = "Is Mentionable";
+                    x.IsInline = true;
+                    x.Value = $"{oldRole.IsMentionable} : {newRole.IsMentionable}";
+                });
+                eb.AddField((x) =>
+                {
+                    string msg1 = "";
+                    foreach (var p in oldRole.Permissions.ToList())
+                    {
+                        msg1 += $"{p}, ";
+                    }
+
+                    string msg2 = "";
+                    foreach (var p in newRole.Permissions.ToList())
+                    {
+                        msg2 += $"{p}, ";
+                    }
+                    x.Name = "Permissions";
+                    x.IsInline = true;
+                    x.Value = $"{(String.IsNullOrWhiteSpace(msg1) ? "No Permissions" : msg1)} \n\n{(String.IsNullOrWhiteSpace(msg2) ? "No Permissions" : msg2)}";
+                });
+
+                await logChannel.SendMessageAsync("", embed: eb);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e);
+            }
+        }
+
+        private EmbedBuilder _createChannelEmbed(SocketChannel channel, bool isCreate)
+        {
+            var ichannel = channel as IMessageChannel;
+            var eb = new EmbedBuilder()
+            {
+                Color = new Color(4, 97, 247),
+                Title = $"{DateTime.UtcNow.TimeOfDay.ToString().Remove(8)} - Channel was {(isCreate ? "Created" : "Deleted")}",
+                ThumbnailUrl = "https://cdn0.iconfinder.com/data/icons/kirrkle-social-networks-part-1/60/05_-_Text_messaging-512.png",
+                Description = $"**#{ichannel.Name}** ({ichannel.Id}) has been {(isCreate ? "created" : "deleted")}!"
+            };
+            return eb;
+        }
+
+
+        public async Task Client_ChannelCreated(SocketChannel channel)
+        {
+            try
+            {
+                var guild = (channel as IGuildChannel).Guild;
+                if (!_modlogsDict.ContainsKey(guild.Id))
+                    return;
+                modLogs logs = new modLogs();
+                _modlogsDict.TryGetValue(guild.Id, out logs);
+
+                var logChannel = await guild.GetChannelAsync(logs.channelID) as IMessageChannel;
+                if (logChannel == null)
+                    return;
+                if (!logs.channelChange)
+                    return;
+                if (logs.channelChangeInterval.CompareTo(DateTime.UtcNow) > 0)
+                    return;
+                logs.channelChangeInterval = DateTime.UtcNow.AddSeconds(10);
+
+                var eb = _createChannelEmbed(channel, true);
+
+                await logChannel.SendMessageAsync("", embed: eb);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e);
+            }
+        }
+
+        public async Task Client_ChannelUpdated(SocketChannel oldChannel, SocketChannel newChannel)
+        {
+            try
+            {
+                var socketOld = oldChannel as SocketGuildChannel;
+                var socketNew = newChannel as SocketGuildChannel;
+                if (socketOld.Position != socketNew.Position)
+                    return;
+                var guild = (oldChannel as IGuildChannel).Guild;
+                if (!_modlogsDict.ContainsKey(guild.Id))
+                    return;
+                modLogs logs = new modLogs();
+                _modlogsDict.TryGetValue(guild.Id, out logs);
+
+                var logChannel = await guild.GetChannelAsync(logs.channelID) as IMessageChannel;
+                if (logChannel == null)
+                    return;
+                if (!logs.channelChange)
+                    return;
+                if (logs.channelChangeInterval.CompareTo(DateTime.UtcNow) > 0)
+                    return;
+                logs.channelChangeInterval = DateTime.UtcNow.AddSeconds(10);
+
+
+                var eb = new EmbedBuilder()
+                {
+                    Color = new Color(4, 97, 247),
+                    Title = $"{DateTime.UtcNow.TimeOfDay.ToString().Remove(8)} - Channel was Updated",
+                    ThumbnailUrl = "https://cdn0.iconfinder.com/data/icons/kirrkle-social-networks-part-1/60/05_-_Text_messaging-512.png",
+                    Description = $"**#{socketOld.Name}** ({socketOld.Id}) \nhas been changed to \n**#{socketNew.Name}** ({socketNew.Id})!"
+                };
+                
+
+                await logChannel.SendMessageAsync("", embed: eb);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e);
+            }
+        }
+
+        public async Task Client_ChannelDestroyed(SocketChannel channel)
+        {
+            try
+            {
+                var guild = (channel as IGuildChannel).Guild;
+                if (!_modlogsDict.ContainsKey(guild.Id))
+                    return;
+                modLogs logs = new modLogs();
+                _modlogsDict.TryGetValue(guild.Id, out logs);
+
+                var logChannel = await guild.GetChannelAsync(logs.channelID) as IMessageChannel;
+                if (logChannel == null)
+                    return;
+                if (!logs.channelChange)
+                    return;
+                if (logs.channelChangeInterval.CompareTo(DateTime.UtcNow) > 0)
+                    return;
+                logs.channelChangeInterval = DateTime.UtcNow.AddSeconds(5);
+
+                var eb = _createChannelEmbed(channel, false);
+
+                await logChannel.SendMessageAsync("", embed: eb);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e);
+            }
+        }
+
+        public async Task Client_GuildUpdated(SocketGuild guildOld, SocketGuild guildNew)
+        {
+            if (!_modlogsDict.ContainsKey(guildOld.Id))
                 return;
             modLogs logs = new modLogs();
-            _modlogsDict.TryGetValue(guild.Id, out logs);
+            _modlogsDict.TryGetValue(guildOld.Id, out logs);
 
-            var logChannel = await guild.GetChannelAsync(logs.channelID) as IMessageChannel;
+            var logChannel = await (guildOld as IGuild).GetChannelAsync(logs.channelID) as IMessageChannel;
             if (logChannel == null)
                 return;
-            if (!logs.roleChange)
+            if (!logs.serverChange)
                 return;
+            if (logs.serverChangeInterval.CompareTo(DateTime.UtcNow) > 0)
+                return;
+            logs.serverChangeInterval = DateTime.UtcNow.AddSeconds(5);
 
-            var eb = createRoleEmbed(role, false);
+            var eb = new EmbedBuilder()
+            {
+                Color = new Color(4, 97, 247),
+                Title = $"{DateTime.UtcNow.TimeOfDay.ToString().Remove(8)} - Server was Updated",
+                ThumbnailUrl = "https://cdn1.iconfinder.com/data/icons/round-ui/143/33-512.png",
+                Description = $"{(guildOld.Name != guildNew.Name ? $"**{guildOld.Name}**\nhas been changed to \n**{guildNew.Name}**" : $"**{guildOld}** - Name hasn't changed")}!"
+            };
+
+            if (guildOld.IconUrl != guildNew.IconUrl)
+            {
+                eb.AddField((x) =>
+                {
+                    x.Name = "Guild Avatar Updated";
+                    x.IsInline = true;
+                    x.Value = $"[Old Avatar]({guildOld.IconUrl}) : [New Avatar]({guildNew.IconUrl})";
+                });
+            }
+            if(guildOld.VoiceRegionId != guildNew.VoiceRegionId)
+            {
+                eb.AddField((x) =>
+                {
+                    x.Name = "Voice Region Updated";
+                    x.IsInline = true;
+                    x.Value = $"{guildOld.VoiceRegionId} : {guildNew.VoiceRegionId}";
+                });
+            }
+            if(guildOld.VerificationLevel != guildNew.VerificationLevel)
+            {
+                eb.AddField((x) =>
+                {
+                    x.Name = "Verification Level Updated";
+                    x.IsInline = true;
+                    x.Value = $"{guildOld.VerificationLevel} : {guildNew.VerificationLevel}";
+                });
+            }
+            if(guildOld.OwnerId != guildNew.OwnerId)
+            {
+                eb.AddField((x) =>
+                {
+                    x.Name = "Owner Changed";
+                    x.IsInline = true;
+                    x.Value = $"{guildOld.Owner.Username}#{guildOld.Owner.Discriminator} ({guildOld.OwnerId})\n{guildNew.Owner.Username}#{guildNew.Owner.Discriminator} ({guildNew.OwnerId})";
+                });
+            }
+
             await logChannel.SendMessageAsync("", embed: eb);
+
+        }
+
+        public async Task ShowConfigLog(CommandContext Context)
+        {
+            var user = Context.User as SocketGuildUser;
+            if (!user.GuildPermissions.Has(GuildPermission.Administrator))
+            {
+                await Context.Channel.SendMessageAsync(":no_entry_sign: You need `Administrator` permissions to view the ModLog config!");
+                return;
+            }
+            if (!_modlogsDict.ContainsKey(Context.Guild.Id))
+            {
+                await Context.Channel.SendMessageAsync(":no_entry_sign: You have not set any ModLogs yet! Your config file will be created when you create the Channel for the first time!");
+            }
+
+            modLogs modLogs = new modLogs();
+            _modlogsDict.TryGetValue(Context.Guild.Id, out modLogs);
+
+            var eb = new EmbedBuilder()
+            {
+                Color = new Color(4, 97, 247),
+                Footer = new EmbedFooterBuilder()
+                {
+                    Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
+                    IconUrl = Context.User.GetAvatarUrl()
+                },
+                Title = $"ModLog Config File for {Context.Guild.Name}"
+            };
+
+            eb.AddField((x) =>
+            {
+                x.Name = "Channel";
+                x.IsInline = true;
+                x.Value = $"<#{modLogs.channelID}>";
+            });
+
+            eb.AddField((x) =>
+            {
+                x.Name = "Role Change";
+                x.IsInline = true;
+                x.Value = $"{modLogs.roleChange}";
+            });
+
+            eb.AddField((x) =>
+            {
+                x.Name = "Server Change";
+                x.IsInline = true;
+                x.Value = $"{modLogs.serverChange}";
+            });
+
+            eb.AddField((x) =>
+            {
+                x.Name = "Channel Change";
+                x.IsInline = true;
+                x.Value = $"{modLogs.channelChange}";
+            });
+
+            eb.AddField((x) =>
+            {
+                x.Name = "Msg Delete";
+                x.IsInline = true;
+                x.Value = $"{modLogs.msgDelete}";
+            });
+
+            await Context.Channel.SendMessageAsync("", embed: eb);
+        }
+
+        public async Task ToggleRole(CommandContext Context)
+        {
+            var user = Context.User as SocketGuildUser;
+            if (!user.GuildPermissions.Has(GuildPermission.Administrator))
+            {
+                await Context.Channel.SendMessageAsync(":no_entry_sign: You need `Administrator` permissions to change the ModLog config!");
+                return;
+            }
+            if (!_modlogsDict.ContainsKey(Context.Guild.Id))
+            {
+                await Context.Channel.SendMessageAsync(":no_entry_sign: You have not set any ModLogs yet! Your config file will be created when you create the Channel for the first time!");
+            }
+            modLogs modLogs = new modLogs();
+            _modlogsDict.TryGetValue(Context.Guild.Id, out modLogs);
+
+            modLogs.roleChange = !modLogs.roleChange;
+            _modlogsDict.TryUpdate(Context.Guild.Id, modLogs);
+
+            ModServiceDB.SaveModLogs(_modlogsDict);
+            await Context.Channel.SendMessageAsync($":white_check_mark: Successfully set Role Change log to {modLogs.roleChange}");
+        }
+
+        public async Task ToggleServer(CommandContext Context)
+        {
+            var user = Context.User as SocketGuildUser;
+            if (!user.GuildPermissions.Has(GuildPermission.Administrator))
+            {
+                await Context.Channel.SendMessageAsync(":no_entry_sign: You need `Administrator` permissions to change the ModLog config!");
+                return;
+            }
+            if (!_modlogsDict.ContainsKey(Context.Guild.Id))
+            {
+                await Context.Channel.SendMessageAsync(":no_entry_sign: You have not set any ModLogs yet! Your config file will be created when you create the Channel for the first time!");
+            }
+            modLogs modLogs = new modLogs();
+            _modlogsDict.TryGetValue(Context.Guild.Id, out modLogs);
+
+            modLogs.serverChange = !modLogs.serverChange;
+            _modlogsDict.TryUpdate(Context.Guild.Id, modLogs);
+            ModServiceDB.SaveModLogs(_modlogsDict);
+            await Context.Channel.SendMessageAsync($":white_check_mark: Successfully set Server Change log to {modLogs.serverChange}");
+        }
+
+        public async Task ToggleChannel(CommandContext Context)
+        {
+            var user = Context.User as SocketGuildUser;
+            if (!user.GuildPermissions.Has(GuildPermission.Administrator))
+            {
+                await Context.Channel.SendMessageAsync(":no_entry_sign: You need `Administrator` permissions to change the ModLog config!");
+                return;
+            }
+            if (!_modlogsDict.ContainsKey(Context.Guild.Id))
+            {
+                await Context.Channel.SendMessageAsync(":no_entry_sign: You have not set any ModLogs yet! Your config file will be created when you create the Channel for the first time!");
+            }
+            modLogs modLogs = new modLogs();
+            _modlogsDict.TryGetValue(Context.Guild.Id, out modLogs);
+
+            modLogs.channelChange = !modLogs.channelChange;
+            _modlogsDict.TryUpdate(Context.Guild.Id, modLogs);
+            ModServiceDB.SaveModLogs(_modlogsDict);
+            await Context.Channel.SendMessageAsync($":white_check_mark: Successfully set Channel Change log to {modLogs.channelChange}");
+        }
+
+        public async Task ToggleMessage(CommandContext Context)
+        {
+            var user = Context.User as SocketGuildUser;
+            if (!user.GuildPermissions.Has(GuildPermission.Administrator))
+            {
+                await Context.Channel.SendMessageAsync(":no_entry_sign: You need `Administrator` permissions to change the ModLog config!");
+                return;
+            }
+            if (!_modlogsDict.ContainsKey(Context.Guild.Id))
+            {
+                await Context.Channel.SendMessageAsync(":no_entry_sign: You have not set any ModLogs yet! Your config file will be created when you create the Channel for the first time!");
+            }
+            modLogs modLogs = new modLogs();
+            _modlogsDict.TryGetValue(Context.Guild.Id, out modLogs);
+
+            modLogs.msgDelete = !modLogs.msgDelete;
+            _modlogsDict.TryUpdate(Context.Guild.Id, modLogs);
+            ModServiceDB.SaveModLogs(_modlogsDict);
+            await Context.Channel.SendMessageAsync($":white_check_mark: Successfully set Msg Delete log to {modLogs.msgDelete}");
         }
 
 
@@ -477,6 +1016,10 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
         public bool roleChange { get; set; } = false;
         public bool serverChange { get; set; } = false;
         public bool channelChange { get; set; } = false;
-        public bool msgDelete { get; set; } = false;
-        }
+        public bool msgDelete { get; set; } = false; //COOLDOWN
+        public DateTime channelChangeInterval { get; set; } = DateTime.UtcNow;
+        public DateTime roleChangeInterval { get; set; } = DateTime.UtcNow;
+        public DateTime msgDeleteInterval { get; set; } = DateTime.UtcNow;
+        public DateTime serverChangeInterval { get; set; } = DateTime.UtcNow;
+    }
 }
