@@ -49,6 +49,24 @@ namespace Sora_Bot_1.SoraBot.Modules.Mod
             await _modService.Kick(Context, user, reason);
         }
 
+        [Command("warn", RunMode = RunMode.Async), Summary("Warns the user")]
+        public async Task WarnUser([Summary("User to warn")] IUser user, [Summary("Reason for warn"), Remainder]string reason = null)
+        {
+            await _modService.WarnUser(Context, user, reason);
+        }
+
+        [Command("rmwarn", RunMode = RunMode.Async), Summary("Removes warnings from the user")]
+        public async Task RmWarnUser([Summary("User to warn")] IUser user, [Summary("Reason for warn")]int amount = 999)
+        {
+            await _modService.RemoveWarnings(Context, user, amount);
+        }
+
+        [Command("cases", RunMode = RunMode.Async), Alias("listcase", "listcases"), Summary("Lists all cases of specified user")]
+        public async Task ListCaseUsers([Summary("User to list cases")] IUser user)
+        {
+            await _modService.ListCases(Context, user);
+        }
+
         //MODLOG
         [Command("modlog"), Alias("log"), Summary("Sets Channel for ModLogs")]
         public async Task SetModLogs([Summary("Channel for logs, if left blank it will take the current one")] IMessageChannel channelT = null)

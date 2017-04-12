@@ -16,7 +16,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
 
         public enum Action
         {
-            Ban, Kick
+            Ban, Kick, Warn
         }
 
         public ModService()
@@ -93,7 +93,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                     var ebT = new EmbedBuilder()
                     {
                         Color = new Color(4, 97, 247),
-                        Title = $"Case #{found.caseNr} | {(found.type == Action.Ban ? "Ban :hammer:" : "Kick :boot:")}",
+                        Title = $"Case #{found.caseNr} | {(found.type == Action.Ban ? "Ban :hammer:" : (found.type == Action.Warn ? "Warn :warning:" : "Kick :boot:"))}",
                         Timestamp = DateTimeOffset.UtcNow
                     };
                     ebT.AddField((x) =>
@@ -134,6 +134,86 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                 }
                 await msg.DeleteAsync();
                 ModServiceDB.SavePunishLogs(_punishLogs);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
+        }
+
+        public async Task ListCases(CommandContext Context, IUser userT)
+        {
+            try
+            {
+                var bot = await Context.Guild.GetUserAsync(270931284489011202, Discord.CacheMode.AllowDownload) as IGuildUser;
+                var mod = Context.User as SocketGuildUser;
+                if (!mod.GuildPermissions.Has(GuildPermission.BanMembers) && !mod.GuildPermissions.Has(GuildPermission.KickMembers))
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: You don't have kick / ban permissions :frowning: You need at least one mod permission to list cases");
+                    return;
+                }
+                var modHighestRole = mod.Roles.OrderByDescending(r => r.Position).First();
+                var user = userT as SocketGuildUser;
+                var usersHighestRole = user.Roles.OrderByDescending(r => r.Position).First();
+
+                if (usersHighestRole.Position > modHighestRole.Position)
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: You can't view the cases of someone above you in the role hierarchy!");
+                    return;
+                }
+
+
+                var botHighestRole = bot.RoleIds.Select(x => Context.Guild.GetRole(x))
+                                               .OrderByDescending(x => x.Position)
+                                               .First();
+
+                if (usersHighestRole.Position > botHighestRole.Position)
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: I can't list the cases of someone above me in the role hierarchy!");
+                    return;
+                }
+
+                //Get warnings
+                punishStruct str = new punishStruct();
+                _punishLogs.TryGetValue(Context.Guild.Id, out str);
+                if(str.punishes == null)
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: There are no logs found.");
+                    return;
+                }
+                var cases = str.punishes.Where(x => x.userID == userT.Id).ToList();
+                if(cases == null || cases.Count < 1)
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: User has no cases");
+                    return;
+                }
+
+                var eb = new EmbedBuilder()
+                {
+                    Color = new Color(4, 97, 247),
+                    Title = $"Cases of {userT.Username}#{userT.Discriminator}",
+                    Footer = new EmbedFooterBuilder()
+                    {
+                        Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
+                        IconUrl = Context.User.GetAvatarUrl()
+                    },
+                };
+
+                var warnings = str.punishes.Where(x => x.userID == user.Id && x.type == Action.Warn).ToList();
+
+
+                foreach (var c in cases)
+                {
+                    eb.AddField((x) =>
+                    {
+                        x.Name = $"Case #{c.caseNr} | {(c.type == Action.Ban ? "Ban :hammer:" : (c.type == Action.Warn ? $"Warning :warning:" : "Kick :boot:"))}";
+                        x.IsInline = false;
+                        x.Value = $"{c.reason}\n     *by {c.mod}*";
+                    });
+                }
+
+                await Context.Channel.SendMessageAsync("", embed: eb);
             }
             catch (Exception e)
             {
@@ -192,6 +272,186 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                 await SentryService.SendError(e, Context);
             }
 
+        }
+
+        public async Task WarnUser(CommandContext Context, IUser userT, string reason)
+        {
+            try
+            {
+                var bot = await Context.Guild.GetUserAsync(270931284489011202, Discord.CacheMode.AllowDownload) as IGuildUser;
+                var mod = Context.User as SocketGuildUser;
+                if (!mod.GuildPermissions.Has(GuildPermission.BanMembers) && !mod.GuildPermissions.Has(GuildPermission.KickMembers))
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: You don't have kick / ban permissions :frowning: You need at least one mod permission to issue warnings");
+                    return;
+                }
+                var modHighestRole = mod.Roles.OrderByDescending(r => r.Position).First();
+                var user = userT as SocketGuildUser;
+                var usersHighestRole = user.Roles.OrderByDescending(r => r.Position).First();
+
+                if (usersHighestRole.Position > modHighestRole.Position)
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: You can't warn someone above you in the role hierarchy!");
+                    return;
+                }
+
+
+                var botHighestRole = bot.RoleIds.Select(x => Context.Guild.GetRole(x))
+                                               .OrderByDescending(x => x.Position)
+                                               .First();
+
+                if (usersHighestRole.Position > botHighestRole.Position)
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: I can't warn someone above me in the role hierarchy!");
+                    return;
+                }
+
+                //Get warnings
+                punishStruct str = new punishStruct();
+                _punishLogs.TryGetValue(Context.Guild.Id, out str);
+                if (str.punishes == null)
+                {
+                    str.punishes = new List<punishCase>();
+                }
+                var warnings = str.punishes.Where(x => x.userID == userT.Id && x.type == Action.Warn).ToList();
+                var modT = mod as IUser;
+                var guild = Context.Guild as SocketGuild;
+                if(warnings.Count == 2)
+                    await Context.Channel.SendMessageAsync($":white_check_mark: {userT.Username}#{userT.Discriminator} has been successfully warned. :ok_hand:\nThis is his second warning. The next warning will result in a kick!");
+
+                else if (warnings.Count > 2 && warnings.Count < 5)
+                {
+                    await Context.Channel.SendMessageAsync($":white_check_mark: {userT.Username}#{userT.Discriminator} has been successfully warned. :ok_hand:\nThis is his {warnings.Count} warning. He has been **kicked**!");
+                    await LogAction(Action.Kick, userT, modT, reason, Context);
+                }
+                else if (warnings.Count > 4)
+                {
+                    await Context.Channel.SendMessageAsync($":white_check_mark: {userT.Username}#{userT.Discriminator} has been successfully warned. :ok_hand:\nThis is his {warnings.Count} warning. He has been **banned**!");
+                    await LogAction(Action.Kick, userT, modT, reason, Context);
+                }
+                else
+                    await Context.Channel.SendMessageAsync($":white_check_mark: {userT.Username}#{userT.Discriminator} has been successfully warned :ok_hand:");
+                
+                await LogAction(Action.Warn, userT, modT, reason, Context);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await Context.Channel.SendMessageAsync(":no_entry_sign: Failed to ban the user :frowning:");
+                await SentryService.SendError(e, Context);
+            }
+        }
+
+        public async Task RemoveWarnings(CommandContext Context, IUser userT, int amount)
+        {
+            try
+            {
+                var bot = await Context.Guild.GetUserAsync(270931284489011202, CacheMode.AllowDownload) as IGuildUser;
+                var mod = Context.User as SocketGuildUser;
+                if (!mod.GuildPermissions.Has(GuildPermission.BanMembers) && !mod.GuildPermissions.Has(GuildPermission.KickMembers))
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: You don't have kick / ban permissions :frowning: You need at least one mod permission to remove warnings");
+                    return;
+                }
+                var modHighestRole = mod.Roles.OrderByDescending(r => r.Position).First();
+                var user = userT as SocketGuildUser;
+                var usersHighestRole = user.Roles.OrderByDescending(r => r.Position).First();
+
+                if (usersHighestRole.Position > modHighestRole.Position)
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: You can't remove warnings from someone above you in the role hierarchy!");
+                    return;
+                }
+
+
+                var botHighestRole = bot.RoleIds.Select(x => Context.Guild.GetRole(x))
+                                               .OrderByDescending(x => x.Position)
+                                               .First();
+
+                if (usersHighestRole.Position > botHighestRole.Position)
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: I can't remove warnings of someone above me in the role hierarchy!");
+                    return;
+                }
+
+                //Get warnings
+                punishStruct str = new punishStruct();
+                _punishLogs.TryGetValue(Context.Guild.Id, out str);
+                if (str.punishes == null)
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: There are no logs found.");
+                    return;
+                }
+                var warnings = str.punishes.Where(x => x.userID == userT.Id && x.type == Action.Warn).ToList();
+
+                if (warnings == null || warnings.Count == 0)
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: User has no warnings!");
+                    return;
+                }
+
+                if (amount < 1)
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: Enter a whole number bigger then 0!");
+                    return;
+                }
+                if (amount >= warnings.Count)
+                {
+                    foreach (var w in warnings)
+                    {
+                        str.punishes.Remove(w);
+                    }
+                    amount = warnings.Count;
+                    await Context.Channel.SendMessageAsync($":white_check_mark: All warnings were removed ({warnings.Count})!");
+                }
+                else
+                {
+                    for (int i = 0; i < amount; i++)
+                    {
+                        str.punishes.Remove(warnings[i]);
+                    }
+                    await Context.Channel.SendMessageAsync($":white_check_mark: {amount} out of {warnings.Count} were removed!");
+                }
+                ModServiceDB.SavePunishLogs(_punishLogs);
+                //Log
+                var channel = await Context.Guild.GetChannelAsync(str.channelID) as IMessageChannel;
+                if (channel == null)
+                    return;
+
+                var eb = new EmbedBuilder()
+                {
+                    Color = new Color(4, 97, 247),
+                    Title = $"Warnings Removed :open_file_folder:",
+                    Timestamp = DateTimeOffset.UtcNow
+                };
+                eb.AddField((x) =>
+                {
+                    x.Name = "User";
+                    x.IsInline = true;
+                    x.Value = $"**{userT.Username}#{userT.Discriminator}** ({userT.Id})";
+                });
+
+                eb.AddField((x) =>
+                {
+                    x.Name = "Moderator";
+                    x.IsInline = true;
+                    x.Value = $"**{Context.User.Username}#{Context.User.Discriminator}** ({Context.User.Id})";
+                });
+
+                eb.AddField((x) =>
+                {
+                    x.Name = "Warnings";
+                    x.IsInline = true;
+                    x.Value = $"{amount} out of {warnings.Count} were removed";
+                });
+
+                await channel.SendMessageAsync("", embed: eb);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
         }
 
         public async Task PermBan(CommandContext Context, IUser userT, string reason)
@@ -414,6 +674,15 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                     var highest = str.punishes.OrderByDescending(x => x.caseNr).First();
                     casenr = highest.caseNr + 1;
                 }
+                int warncount = 0;
+                if(type == Action.Warn)
+                {
+                    var warnings = str.punishes.Where(x => x.userID == user.Id && x.type == Action.Warn).ToList();
+                    if(warnings != null || warnings.Count > 0)
+                    {
+                        warncount = warnings.Count;
+                    }
+                }
 
 
                 punishCase pnsh = new punishCase
@@ -430,7 +699,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                 var eb = new EmbedBuilder()
                 {
                     Color = new Color(4, 97, 247),
-                    Title = $"Case #{pnsh.caseNr} | {(type == Action.Ban ? "Ban :hammer:" : "Kick :boot:")}",
+                    Title = $"Case #{pnsh.caseNr} | {(type == Action.Ban ? "Ban :hammer:" : (type == Action.Warn ? $"Warning #{warncount+1} :warning:" : "Kick :boot:"))}",
                     Timestamp = DateTimeOffset.UtcNow
                 };
                 eb.AddField((x) =>
