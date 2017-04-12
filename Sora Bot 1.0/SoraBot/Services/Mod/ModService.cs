@@ -170,7 +170,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
 
 
                 var botHighestRole = bot.RoleIds.Select(x => Context.Guild.GetRole(x))
-                                               .OrderBy(x => x.Position)
+                                               .OrderByDescending(x => x.Position)
                                                .First();
 
                 if (usersHighestRole.Position > botHighestRole.Position)
@@ -222,7 +222,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
 
 
                 var botHighestRole = bot.RoleIds.Select(x => Context.Guild.GetRole(x))
-                                               .OrderBy(x => x.Position)
+                                               .OrderByDescending(x => x.Position)
                                                .First();
 
                 if (usersHighestRole.Position > botHighestRole.Position)

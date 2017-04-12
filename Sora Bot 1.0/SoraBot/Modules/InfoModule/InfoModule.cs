@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Linq;
 using Discord;
 using System.Runtime.InteropServices;
 using Discord.Commands;
@@ -8,6 +9,7 @@ using Discord.WebSocket;
 using Sora_Bot_1.SoraBot.Core;
 using Sora_Bot_1.SoraBot.Services;
 using System.IO;
+using System.Collections;
 
 namespace Sora_Bot_1.SoraBot.Modules.InfoModule
 {
@@ -135,7 +137,7 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
             {
                 x.Name = "Threads running";
                 x.IsInline = true;
-                x.Value = $"{proc.Threads.Count}";
+                x.Value = $"{((IEnumerable)proc.Threads).OfType<ProcessThread>().Where(t=>t.ThreadState == ThreadState.Running).Count()} / {proc.Threads.Count}";
             });
             ebn.AddField((x) =>
             {
