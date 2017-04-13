@@ -25,29 +25,41 @@ namespace Sora_Bot_1.SoraBot.Services
             LoadDatabase();
         }
 
+        private async Task AddAfk(CommandContext Context, string awayMsg, bool updated)
+        {
+            if (awayMsg == null)
+                awayMsg = "";
+            _afkStruct str = new _afkStruct
+            {
+                message = awayMsg.Length < 80 ? awayMsg : awayMsg.Substring(0, 80) + "...",
+                timeToTriggerAgain = DateTime.UtcNow
+            };
+            _afkDict.AddOrUpdate(Context.User.Id, str, ((key, oldValue) => str));
+            await Context.Channel.SendMessageAsync($"{(updated == true ? ":white_check_mark: Your AFK status has been updated" : ":white_check_mark: You are now set AFK")}");
+        }
+
         public async Task ToggleAFK(CommandContext Context, string awayMsg)
         {
             try
-            {
+            { 
                 if (!_afkDict.ContainsKey(Context.User.Id))
                 {
                     //add
-                    if (awayMsg == null)
-                        awayMsg = "";
-                    _afkStruct str = new _afkStruct
-                    {
-                        message = awayMsg.Length < 80 ? awayMsg : awayMsg.Substring(0,80)+"..." ,
-                        timeToTriggerAgain = DateTime.UtcNow
-                    };
-                    _afkDict.TryAdd(Context.User.Id, str);
-                    await Context.Channel.SendMessageAsync(":white_check_mark: You are now set AFK");
+                    await AddAfk(Context, awayMsg, false);
                 }
                 else
                 {
-                    //remove
-                    _afkStruct ignore;
-                    _afkDict.TryRemove(Context.User.Id, out ignore);
-                    await Context.Channel.SendMessageAsync(":white_check_mark: AFK has been removed");
+                    if (String.IsNullOrWhiteSpace(awayMsg))
+                    {
+                        //remove
+                        _afkStruct ignore;
+                        _afkDict.TryRemove(Context.User.Id, out ignore);
+                        await Context.Channel.SendMessageAsync(":white_check_mark: AFK has been removed");
+                    }
+                    else
+                    {
+                        await AddAfk(Context, awayMsg, true);
+                    }
                 }
                 SaveDatabase();
             }
@@ -61,44 +73,37 @@ namespace Sora_Bot_1.SoraBot.Services
 
         public async Task Client_MessageReceived(SocketMessage msg)
         {
-            try
+            if (msg.Author.Id == 270931284489011202 || msg.Author.Id == 276304865934704642)
+                return;
+
+            if (msg.MentionedUsers.Count < 1)
+                return;
+
+            foreach (var u in msg.MentionedUsers)
             {
-                if (msg.MentionedUsers.Count < 1)
+                if (_afkDict.ContainsKey(u.Id))
                 {
-                    return;
-                }
-                foreach (var u in msg.MentionedUsers)
-                {
-                    if (_afkDict.ContainsKey(u.Id))
+                    _afkStruct str = new _afkStruct();
+                    _afkDict.TryGetValue(u.Id, out str);
+                    //await msg.Channel.SendMessageAsync($"{str.timeToTriggerAgain.CompareTo(DateTime.UtcNow)}");
+                    if(str.timeToTriggerAgain.CompareTo(DateTime.UtcNow) >0)
                     {
-                        _afkStruct str = new _afkStruct();
-                        _afkDict.TryGetValue(u.Id, out str);
-                        //await msg.Channel.SendMessageAsync($"{str.timeToTriggerAgain.CompareTo(DateTime.UtcNow)}");
-                        if(str.timeToTriggerAgain.CompareTo(DateTime.UtcNow) >0)
-                        {
-                            return;
-                        }
-                        str.timeToTriggerAgain = DateTime.UtcNow.AddSeconds(30);
-                        var eb = new EmbedBuilder()
-                        {
-                            Color = new Color(4, 97, 247),
-                            Author = new EmbedAuthorBuilder()
-                            {
-                                IconUrl = u.GetAvatarUrl(),
-                                Name = $"{u.Username} is currently AFK"
-                            },
-                            Description = str.message
-                        };
-                        _afkDict.TryUpdate(u.Id, str);
-                        await msg.Channel.SendMessageAsync("", false, eb);
+                        return;
                     }
+                    str.timeToTriggerAgain = DateTime.UtcNow.AddSeconds(30);
+                    var eb = new EmbedBuilder()
+                    {
+                        Color = new Color(4, 97, 247),
+                        Author = new EmbedAuthorBuilder()
+                        {
+                            IconUrl = u.GetAvatarUrl(),
+                            Name = $"{u.Username} is currently AFK"
+                        },
+                        Description = str.message
+                    };
+                    _afkDict.TryUpdate(u.Id, str);
+                    await msg.Channel.SendMessageAsync("", false, eb);
                 }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                await SentryService.SendError(e);
-                //await SentryService.SendMessage($"MSG WITH ERROR: \n{msg}");
             }
         }
 

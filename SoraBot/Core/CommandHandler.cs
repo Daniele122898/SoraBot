@@ -17,6 +17,8 @@ using Sora_Bot_1.SoraBot.Services.EPService;
 using Sora_Bot_1.SoraBot.Services.PatService;
 using Sora_Bot_1.SoraBot.Services.StarBoradService;
 using Sora_Bot_1.SoraBot.Services.TagService;
+using Discord.Addons.InteractiveCommands;
+using Sora_Bot_1.SoraBot.Services.Mod;
 
 namespace Sora_Bot_1.SoraBot.Core
 {
@@ -29,7 +31,7 @@ namespace Sora_Bot_1.SoraBot.Core
         private MusicService musicService;
         private UserGuildUpdateService updateService;
         private StarBoardService starBoardService;
-        private ReminderService remService;
+        private ModService _modService;
         private AfkSertvice _afkService;
         private PatService patService;
         private ImdbService _imdbService;
@@ -40,6 +42,7 @@ namespace Sora_Bot_1.SoraBot.Core
         private RatelimitService ratelimitService;
         private EPService epService;
         private PlayingWith playingWith;
+        private int _commandsRan = 0;
         public static Dictionary<ulong, string> prefixDict = new Dictionary<ulong, string>();
         private JsonSerializer jSerializer = new JsonSerializer();
 
@@ -56,21 +59,22 @@ namespace Sora_Bot_1.SoraBot.Core
             _selfRoleService = new SelfRoleService();
             _ubService = new UbService();
             _imdbService = new ImdbService();
+            _modService = new ModService();
             _animeService = new AnimeService();
             //remService = new ReminderService();
 
             tagService = new TagService();
             patService = new PatService();
             epService = new EPService(client);
-            playingWith = new PlayingWith(client);
             SentryService.client = client;
             //SentryService.Install();
 
             commands = new CommandService();
             map = new DependencyMap();
-
-
+            playingWith = new PlayingWith(client);
+            map.Add(new InteractiveService(client));
             map.Add(musicService);
+            map.Add(_modService);
             map.Add(handler);
             map.Add(_afkService);
             map.Add(_selfRoleService);
@@ -101,9 +105,25 @@ namespace Sora_Bot_1.SoraBot.Core
             client.JoinedGuild += Client_JoinedGuild;
             client.LeftGuild += Client_LeftGuild;
             client.GuildAvailable += Client_GuildAvailable;
-        }
 
-        
+            //Bans
+
+            client.UserBanned += _modService.Client_UserBanned;
+            client.UserUnbanned += _modService.Client_UserUnbanned;
+
+            //Modlog
+
+            client.MessageDeleted += _modService.Client_MessageDeleted;
+            client.RoleCreated += _modService.Client_RoleCreated;
+            client.RoleDeleted += _modService.Client_RoleDeleted;
+            client.RoleUpdated += _modService.Client_RoleUpdated;
+
+            client.ChannelCreated += _modService.Client_ChannelCreated;
+            client.ChannelDestroyed += _modService.Client_ChannelDestroyed;
+            client.ChannelUpdated += _modService.Client_ChannelUpdated;
+
+            client.GuildUpdated += _modService.Client_GuildUpdated;
+        }
 
         private async Task Client_GuildAvailable(SocketGuild guild)
         {
@@ -256,6 +276,11 @@ namespace Sora_Bot_1.SoraBot.Core
             }
         }
 
+        public int CommandsRunSinceRestart()
+        {
+            return _commandsRan;
+        }
+
 
         public async Task HandleCommand(SocketMessage messageParam)
         {
@@ -306,7 +331,10 @@ namespace Sora_Bot_1.SoraBot.Core
             var result = await commands.ExecuteAsync(context, argPos, map);
 
             if (result.IsSuccess)
+            {
                 await ratelimitService.checkRatelimit(context.User);
+                _commandsRan++;
+            }
 
             //if (!result.IsSuccess)
             //  await context.Channel.SendMessageAsync(result.ErrorReason);

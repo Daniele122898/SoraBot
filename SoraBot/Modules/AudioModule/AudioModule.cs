@@ -1,15 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Diagnostics.Tracing;
-using System.IO;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Discord;
-using Discord.Audio;
 using Discord.Commands;
 using Discord.WebSocket;
 using Sora_Bot_1.SoraBot.Services;

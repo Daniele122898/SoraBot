@@ -50,7 +50,8 @@ namespace Sora_Bot_1.SoraBot.Services
         {
             using (var http = new HttpClient())
             {
-                var res = await http.GetStringAsync(String.Format(queryUrl, name.Trim().Replace(' ', '+'))).ConfigureAwait(false);
+                var search = System.Net.WebUtility.UrlEncode(name);
+                var res = await http.GetStringAsync(String.Format(queryUrl, search)).ConfigureAwait(false);
                 var movie = JsonConvert.DeserializeObject<OmdbMovie>(res);
 
                 return movie;

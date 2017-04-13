@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Linq;
 using Discord;
 using System.Runtime.InteropServices;
 using Discord.Commands;
 using Discord.WebSocket;
 using Sora_Bot_1.SoraBot.Core;
 using Sora_Bot_1.SoraBot.Services;
+using System.IO;
+using System.Collections;
 
 namespace Sora_Bot_1.SoraBot.Modules.InfoModule
 {
@@ -25,10 +28,12 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
         */
 
         private MusicService musicService;
+        private CommandHandler _commandHandler;
 
-        public InfoModule(MusicService _service)
+        public InfoModule(MusicService _service, CommandHandler handler)
         {
             musicService = _service;
+            _commandHandler = handler;
         }
 
         private Process ps()
@@ -69,7 +74,118 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
 
                 return units[unitCount];
             };
+            double VSZ = 0;
+            double RSS = 0;
+            try
+            {
+                if (File.Exists($"/proc/{proc.Id}/statm"))
+                {
+                    var ramusageInitial = File.ReadAllText($"/proc/{proc.Id}/statm");
+                    var ramusage = ramusageInitial.Split(' ')[0];
+                    VSZ = double.Parse(ramusage);
+                    VSZ = VSZ * 4096 / 1048576;
+                    ramusage = ramusageInitial.Split(' ')[1];
+                    RSS = double.Parse(ramusage);
+                    RSS = RSS * 4096 / 1048576;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
 
+            var ebn = new EmbedBuilder()
+            {
+                Color = new Color(4, 97, 247),
+                ThumbnailUrl = Context.Client.CurrentUser.GetAvatarUrl(),
+                Footer = new EmbedFooterBuilder()
+                {
+                    Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
+                    IconUrl = Context.User.GetAvatarUrl()
+                },
+                Title = "**Sora Info**",
+                Url = "http://git.argus.moe/serenity/SoraBot"
+            };
+            ebn.AddField((x) =>
+            {
+                x.Name = "Uptime";
+                x.IsInline = true;
+                x.Value = (DateTime.Now - proc.StartTime).ToString(@"d'd 'hh\:mm\:ss");
+            });
+
+            ebn.AddField((x) =>
+            {
+                x.Name = ".NET Framework";
+                x.IsInline = true;
+                x.Value = RuntimeInformation.FrameworkDescription;
+            });
+
+            ebn.AddField((x) =>
+            {
+                x.Name = "Used RAM";
+                x.IsInline = true;
+                x.Value = $"{(proc.PagedMemorySize64 == 0 ? $"{RSS.ToString("f1")} mB / {VSZ.ToString("f1")} mB" : $"{formatRamValue(proc.PagedMemorySize64).ToString("f2")} {formatRamUnit(proc.PagedMemorySize64)} / {formatRamValue(proc.VirtualMemorySize64).ToString("f2")} {formatRamUnit(proc.VirtualMemorySize64)}")}";
+            });
+            ebn.AddField((x) =>
+            {
+                x.Name = "Commands Executed";
+                x.IsInline = true;
+                x.Value = $"{_commandHandler.CommandsRunSinceRestart()} since restart";
+            });
+            ebn.AddField((x) =>
+            {
+                x.Name = "Threads running";
+                x.IsInline = true;
+                x.Value = $"{((IEnumerable)proc.Threads).OfType<ProcessThread>().Where(t=>t.ThreadState == ThreadState.Running).Count()} / {proc.Threads.Count}";
+            });
+            ebn.AddField((x) =>
+            {
+                x.Name = "Connected Guilds";
+                x.IsInline = true;
+                x.Value = $"{_client.Guilds.Count}";
+            });
+            var channelCount = 0;
+            var userCount = 0;
+            foreach (var g in _client.Guilds)
+            {
+                channelCount += g.Channels.Count;
+                userCount += g.MemberCount;
+            }
+            ebn.AddField((x) =>
+            {
+                x.Name = "Watching Channels";
+                x.IsInline = true;
+                x.Value = $"{channelCount}";
+            });
+            ebn.AddField((x) =>
+            {
+                x.Name = "Users with access";
+                x.IsInline = true;
+                x.Value = $"{userCount}";
+            });
+            ebn.AddField((x) =>
+            {
+                x.Name = "Playing music for";
+                x.IsInline = true;
+                x.Value = $"{musicService.PlayingFor()} guilds";
+            });
+            ebn.AddField((x) =>
+            {
+                x.Name = "Ping";
+                x.IsInline = true;
+                x.Value = $"{_client.Latency} ms";
+            });
+            ebn.AddField((x) =>
+            {
+                x.Name = "Sora's Official Guild";
+                x.IsInline = true;
+                x.Value = $"[Feedback and Suggestions here](https://discord.gg/Pah4yj5)";
+            });
+            
+
+            await Context.Channel.SendMessageAsync("", false, ebn);
+            /*
             var eb = new EmbedBuilder()
             {
                 Color = new Color(4, 97, 247),
@@ -93,7 +209,9 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
             {
                 efb.Name = "Sora";
                 efb.IsInline = true;
-                efb.Value = $"**Up time:**\t{(DateTime.Now - proc.StartTime).ToString(@"d'd 'hh\:mm\:ss")}\n**Memory:**\t{formatRamValue(proc.PagedMemorySize64).ToString("f2")} {formatRamUnit(proc.PagedMemorySize64)}\n**Processor time:**\t{proc.TotalProcessorTime.ToString(@"d'd 'hh\:mm\:ss")}\n**Feedback or Suggestions here:**\n[Click to Join](https://discord.gg/Pah4yj5)";
+                efb.Value = $"**Up time:**\t{(DateTime.Now - proc.StartTime).ToString(@"d'd 'hh\:mm\:ss")}\n" +
+                $"{(proc.PagedMemorySize64 == 0 ? $"**Memory:**\t{RSS.ToString("f1")} mB / {VSZ.ToString("f1")} mB" : $"**Memory:**\t{formatRamValue(proc.PagedMemorySize64).ToString("f2")} {formatRamUnit(proc.PagedMemorySize64)}")}" +
+                $"{(Context.User.Id == 192750776005689344 ? $"\n**PROCESS ID**:\t{proc.Id}" : "")}\n**Processor time:**\t{proc.TotalProcessorTime.ToString(@"d'd 'hh\:mm\:ss")}\n**Feedback or Suggestions here:**\n[Click to Join](https://discord.gg/Pah4yj5)";
             });
 
             eb.AddField((efb) =>
@@ -110,9 +228,7 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                 }
 
                 efb.Value = $"**State:**\t{_client.ConnectionState}\n**Guilds:**\t{_client.Guilds.Count}\n**Channels:**\t{channelCount}\n**Users:**\t{userCount}\n**Playing music for:** \t{musicService.PlayingFor()} guilds\n**Ping:**\t{_client.Latency} ms";
-            });
-            
-            await Context.Channel.SendMessageAsync("", false, eb);
+            });*/
         }
 
         // $sample userinfo --> foxbot#0282
@@ -193,7 +309,7 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                                 $"**Avatar:** \t[Link]({userInfo.AvatarUrl})";
                 });*/
 
-                await Context.Channel.SendMessageAsync("", false, eb);
+            await Context.Channel.SendMessageAsync("", false, eb);
             }
             catch (Exception e)
             {

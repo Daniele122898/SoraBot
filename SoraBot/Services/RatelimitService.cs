@@ -27,7 +27,7 @@ namespace Sora_Bot_1.SoraBot.Services
                     if (Environment.TickCount < userStruct.timeBetween)
                     {
                         userStruct.counter += 1;
-                        if (userStruct.counter >= 3)
+                        if (userStruct.counter >= 5)
                         {
                             //ratelimit
                             if (!userStruct.messageSent)
@@ -87,7 +87,7 @@ namespace Sora_Bot_1.SoraBot.Services
                     //CHECK TIME
                     if (Environment.TickCount < userStruct.timeBetween)
                     {
-                        if (userStruct.counter >= 3)
+                        if (userStruct.counter >= 4)
                         {
                             //ratelimit
                             if (!userStruct.messageSent)

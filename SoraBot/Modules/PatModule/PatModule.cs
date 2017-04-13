@@ -36,7 +36,8 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
             "https://33.media.tumblr.com/cb4da84b16d8e189c5b7a61632a54953/tumblr_nrcwmt2SNG1r4vymlo1_400.gif",
             "https://media.giphy.com/media/KZQlfylo73AMU/giphy.gif",
             "http://i0.kym-cdn.com/photos/images/original/000/915/038/7e9.gif",
-            "https://68.media.tumblr.com/f746c0d35113e5d5bc855521d44ebca9/tumblr_nqzi8y6VkB1uo77uno1_540.gif"
+            "https://68.media.tumblr.com/f746c0d35113e5d5bc855521d44ebca9/tumblr_nqzi8y6VkB1uo77uno1_540.gif",
+            "https://media.giphy.com/media/xgTs8CcCMbqb6/giphy.gif"
         };
 
         private string[] _hugs = new string[]
@@ -51,7 +52,8 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
             "https://media.giphy.com/media/du8yT5dStTeMg/giphy.gif",
             "https://media.giphy.com/media/kvKFM3UWg2P04/giphy.gif",
             "https://media.giphy.com/media/wnsgren9NtITS/giphy.gif",
-            "http://media.giphy.com/media/veU1qeC9SJiKY/giphy.gif"
+            "http://media.giphy.com/media/veU1qeC9SJiKY/giphy.gif",
+            "https://cdn.discordapp.com/attachments/287369965252902931/298164710212108288/giphy_7.gif"
         };
 
         private string[] _pokes = new string[]
@@ -70,7 +72,6 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
         {
             "https://i.imgur.com/oY3UC4g.gif",
             "https://49.media.tumblr.com/bff05c1c0d1cb19a35495823b6257cda/tumblr_nhdyy5EhyG1u1toifo5_400.gif",
-            "http://i1280.photobucket.com/albums/a489/Lilyfied/Anime%20Gif/slapgif_zps5164a18e.gif",
             "https://media.giphy.com/media/jLeyZWgtwgr2U/giphy.gif",
             "https://s-media-cache-ak0.pinimg.com/originals/65/57/f6/6557f684d6ffcd3cd4558f695c6d8956.gif",
             "http://i0.kym-cdn.com/photos/images/newsfeed/000/940/326/086.gif",
@@ -94,7 +95,11 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
             "http://data.whicdn.com/images/44882599/original.gif",
             "http://pa1.narvii.com/5791/4d6416af5826b62b9f0aee152ee8ee11a6137857_hq.gif",
             "http://i.myniceprofile.com/1512/151229.gif",
-            "https://31.media.tumblr.com/40e8d551473cab28d04dc5fdfc0a98ec/tumblr_n473d8T0WX1t0q458o1_500.gif"
+            "https://31.media.tumblr.com/40e8d551473cab28d04dc5fdfc0a98ec/tumblr_n473d8T0WX1t0q458o1_500.gif",
+            "https://cdn.discordapp.com/attachments/287369965252902931/298165172479066112/tumblr_static_filename_640_v2.gif",
+            "https://media.giphy.com/media/pZ2dG0wCK5wHu/giphy.gif",
+            "https://cdn.discordapp.com/attachments/287369965252902931/298164386508439563/4_GIF_Joukamachi_no_Dandelion_1.gif",
+            "https://s-media-cache-ak0.pinimg.com/originals/3e/5e/9e/3e5e9e2ffbb9cb4d30ae497986168bd4.gif"
         };
 
         [Command("pat"), Summary("Pats the person specified")]
@@ -121,6 +126,12 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
             await patService.ChangeAffinity(affinityType.hug, user, Context);
             var r = new Random();
             await ReplyAsync($"{Context.User.Mention} hugged {user.Mention} °˖✧◝(⁰▿⁰)◜✧˖°\n{_hugs[r.Next(0,_hugs.Length-1)]}");
+        }
+
+        [Command("reset"), Summary("Resets your own stats")]
+        public async Task Reset()
+        {
+            await patService.ResetAffinity(Context);
         }
 
         [Command("poke"), Summary("Pokes the specified person")]

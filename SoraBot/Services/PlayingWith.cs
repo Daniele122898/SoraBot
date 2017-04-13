@@ -16,11 +16,10 @@ namespace Sora_Bot_1.SoraBot.Services
             "with Karen",
             "with Emily",
             "with Nep",
-            "with 0xFADED",
+            "with 0xFADED <3",
             "with Serraniel",
             "with Serenity",
             "with Shiro <3",
-            "with Katsu <3",
 
             //Games
             "CS:GO",
@@ -41,18 +40,30 @@ namespace Sora_Bot_1.SoraBot.Services
         public PlayingWith(DiscordSocketClient _c)
         {
             client = _c;
-            ChangePlayingStatus();
+            Task.Factory.StartNew(() => { ChangePlayingStatus(); });
+            
         }
 
         private async Task ChangePlayingStatus()
         {
-            Random rand = new Random();
-            while (true)
+            try
             {
-                await client.SetGameAsync(playing[rand.Next(playing.Length-1)]);
-                await Task.Delay(10000);
-            }
+                Random rand = new Random();
+                while (true)
+                {
+                    if (client.ConnectionState.ToString() == "Connected")
+                    {
+                        await client.SetGameAsync(playing[rand.Next(playing.Length - 1)]);
+                    }
+                    await Task.Delay(10000);
+                }
 
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e);
+            }
         }
     }
 }

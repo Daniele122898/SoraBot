@@ -26,15 +26,24 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
         private readonly CommandHandler handler;
         private UserGuildUpdateService updateService;
         private StarBoardService starBoardService;
+        private AnimeService _aniServ;
         private EPService epService;
 
         public OwnerModule(CommandHandler _handler, UserGuildUpdateService service, StarBoardService starboards,
-            EPService _epService)
+            EPService _epService, AnimeService aniSer)
         {
             handler = _handler;
             updateService = service;
             starBoardService = starboards;
             epService = _epService;
+            _aniServ = aniSer;
+        }
+
+        [Command("auth")]
+        [RequireOwner]
+        public async Task AnimeAuth()
+        {
+            await _aniServ.RequestAuth();
         }
 
         [Command("prefix"), Summary("Changes the prefix of the bot")]
