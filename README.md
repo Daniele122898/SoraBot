@@ -105,9 +105,10 @@ Command | Parameter | Example | Output
 ## AFK / Away
 **GENERAL** Keep in mind that your AFK status is GLOBAL. So if you want to say `i suck dick` in one guild but rather not in another then.. Do it at your own risk ;) I might add local / guild bound AFK in the future. The AFK message will only trigger every 30 seconds to prevent spam.
 
-| Command | Parameter                                  | Example               | Output                                                                                                                                                                                              |
-|---------|--------------------------------------------|-----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `afk`   | [Optional message for when you get tagged] | `$afk not fapping...` | If you were set AFK before, the afk status gets removed. Otherwise will set you GLOBALY AFK on all guilds that Sora is on. Whenever you get @mentioned Sora will respond with your creative message |
+| Command | Parameter | Example         | Output                                                                                                                                                                                                                           |
+|---------|-----------|-----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `afk`   | [reason]  | `$afk sleeping` | If you were NOT AFK. You can even add no reason and you will be set AFK. When you are AFK adding no reason will result in it being removed. See down below.  If you are AFK and you add a reason your AFK reason will be updated |
+| `afk`   | *none*    | `$afk`          | When you are AFK this will disable your AFK status. If you are not AFK yet this will also set your AFK without reason.                                                                                                           |
 
 ## Custom Member Join / Leave Announcements
 
