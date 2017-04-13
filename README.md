@@ -30,6 +30,8 @@
 **GENERAL** If the Parameter has [ ] that means that it is optional. Leaving it will result in a different outcome.
 For further questions join my Discord: https://discord.gg/Pah4yj5
 
+**ATTENTION** Every @user Parameter can also be just his username or nick. No need to mention. If there are many users with the same name you need to @mention tho!
+
 ## Dynamic Prefix
 
 **GENERAL** What is a dynamic prefix? This basically means that you can choose the prefix that Sora shall use in your guild. The standart prefix is `$`!
@@ -51,6 +53,27 @@ Sora can always be invoked with mentioning him. But using that function is proba
 | `iamnot`      | Name of Role | `$iamnot test`     | *none*       | Removes the specified role from yourself                                                                                                                                     |
 | `getRoles`    | *none*       | `$getRoles`        | *none*       | Posts a list of all self-assignable roles in the Guild                                                                                                                       |
 | `getAllRoles` | *none*       | `$getAllRoles`     | *none*       | Posts a list of all roles in the Guild ordered by Position in the hirachy                                                                                                    |
+
+## Admin / Mod
+**GENERAL** This whole module needs permissions. Its to moderate and log your entire guild. This feature is currently in Beta and still in development (8.4.2017)
+
+| Command             | Parameter          | Example                                                | Permission                  | Output                                                                                                                                                                                  |
+|---------------------|--------------------|--------------------------------------------------------|-----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `ban`               | @user [reason]     | `$ban @Serenity#0783 test` / `$ban @Serenity#0783`     | Ban Members                 | This will perm ban the user and remove his messages for the past 48h. You are able to add the reason at a later date if you do not do it with the ban!                                  |
+| `punishlogs`        | [#channel]         | `$punish #channel` / `$punish`(punish is an alias)     | Administrator               | If no channel is specified it will take the current one. Sora will post all Kick and Ban cases in there.                                                                                |
+| `rmpunishlogs`      | *none*             | `$rmpunish` (using shorter alias)                      | Administrator               | Removes the current punishlogs channel in the guild. This will completely stop logging of bans and kicks!                                                                               |
+| `reason`            | CasreNumber Reason | `$reason 1 Test`                                       | Kick and/or Ban Permission  | Updated the reason of the specified case. Only the Moderator who did the kick/ban can use this.                                                                                         |
+| `kick`              | @user [reason]     | `$kick @Serenity#0783 test` / `$kick @Serenity#0783`   | Kick Permissions            | This will kick the user. You are able to add the reason at a later date if you do not do it with,the kick!                                                                              |
+| `warn`              | @user [reason]     | `$warn @Serenity#0783 test` / `$warn @Serenity#0783`   | Kick and/or Ban Permissions | Warns the user. Same as with kick or ban, the reason can be added at a later date. If the user has 3 or 4 warnings he will be kicked. At 5 and above he gets banned.                    |
+| `rmwarn`            | @user [amount]     | `$rmwarn @Serenity#0783 2` / `$rmwarn @Serenity#0783`  | Kick and/or Ban Permissions | Removes the specified amount of warnings from the user. If amount is higher then his actual amount all will be removed. If no amount is specified, all warnings will be removed aswell. |
+| `cases`             | @user              | `$cases @Serenity#0783`                                | Kick and/or Ban Permissions | Gives you a list of all cases involving the specified user.                                                                                                                             |
+| `modlog`            | [#channel]         | `$modlog #channel` / `$modlog                          | Administrator               | If no channel is specified it will take the current one. You can make Sora post updates on different things here. You can also specifiy what Sora should log!                           |
+| `rmmodlog`          | *none*             | `$rmmodlog`                                            | Administrator               | Removes the ModLog channel                                                                                                                                                              |
+| `modconfig`         | *none*             | `$modconfig`                                           | Administrator               | Shows the current ModLog Config with your settings.                                                                                                                                     |
+| `modconfig role`    | *none*             | `$modconfig role`                                      | Administrator               | Toggles the ModLog Role Update Log. -> Logs when Roles get created, deleted or edited                                                                                                   |
+| `modconfig channel` | *none*             | `$modconfig channel`                                   | Administrator               | Toggles the ModLog Channel Update Log -> Logs when Channels get created, deleted or edited                                                                                              |
+| `modconfig server`  | *none*             | `$modconfig server`                                    | Administrator               | Toggles the ModLog Server Update Log -> Logs when Server/Guild Settings get edited                                                                                                      |
+| `modconfig msg`     | *none*             | `$modconfig msg`                                       | Administrator               | Toggles the ModLog Role Msg Log -> Logs deleted messages                                                                                                                                |                                                                                             |
 
 ## Searches
 
@@ -190,6 +213,7 @@ You cannot star your own message. It will not be added to the starboard. Only di
 | `kiss`     | @mention of user to kiss | `$kiss @Serenity#0783`                   | Kisses the specified user with a randomly chosen kiss gif                                                                                                                                                                                                                           |
 | `slap`     | @mention of user to slap | `$slap @Serenity#0783`                   | Slaps the specified user with a randomly chosen slap gif                                                                                                                                                                                                                            |
 | `affinity` | [@mention]               | `$affinity` / `$affinity @Serenity#0783` | Checks the stats and affinity of the specified person (if none is mentioned it will show yours). Pats, hugs and kisses give positive affinity, but not the same amount. Kiss gives more then pat and so on. Pokes are neutral and slaps give negative affinity. spread some love :3 |
+| `reset`    | *none*                   | `$reset`                                 | Resets all your affinity stats, all pats, slaps etc. So you can start fresh again.                                                                                                                                                                                                  |
 
 
 ## Changelog
