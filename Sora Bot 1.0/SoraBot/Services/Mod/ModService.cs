@@ -93,7 +93,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                     var ebT = new EmbedBuilder()
                     {
                         Color = new Color(4, 97, 247),
-                        Title = $"Case #{found.caseNr} | {(found.type == Action.Ban ? "Ban :hammer:" : (found.type == Action.Warn ? "Warn :warning:" : "Kick :boot:"))}",
+                        Title = $"Case #{found.caseNr} | {(found.type == Action.Ban ? "Ban :hammer:" : (found.type == Action.Warn ? $"Warning #{found.warnNr} :warning:" : "Kick :boot:"))}",
                         Timestamp = DateTimeOffset.UtcNow
                     };
                     ebT.AddField((x) =>
@@ -690,16 +690,17 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                     caseNr = casenr,
                     type = type,
                     mod = $"{(mod != null ? $"{mod.Username}#{mod.Discriminator}" : "Unknown")}",
-                    modID = (mod !=null ? mod.Id : 0),
+                    modID = (mod != null ? mod.Id : 0),
                     user = $"{user.Username}#{user.Discriminator}",
                     userID = user.Id,
-                    reason = reason
+                    reason = reason,
+                    warnNr = warncount + 1
                 };
 
                 var eb = new EmbedBuilder()
                 {
                     Color = new Color(4, 97, 247),
-                    Title = $"Case #{pnsh.caseNr} | {(type == Action.Ban ? "Ban :hammer:" : (type == Action.Warn ? $"Warning #{warncount+1} :warning:" : "Kick :boot:"))}",
+                    Title = $"Case #{pnsh.caseNr} | {(type == Action.Ban ? "Ban :hammer:" : (type == Action.Warn ? $"Warning #{pnsh.warnNr} :warning:" : "Kick :boot:"))}",
                     Timestamp = DateTimeOffset.UtcNow
                 };
                 eb.AddField((x) =>
@@ -1395,6 +1396,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
     public class punishCase
     {
         public int caseNr { get; set; }
+        public int warnNr { get; set; }
         public ModService.Action type { get; set; }
         public string mod { get; set; }
         public ulong modID { get; set; }

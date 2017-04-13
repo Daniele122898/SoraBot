@@ -204,6 +204,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             {
                 Console.WriteLine(e);
                 await SentryService.SendError(e, Context);
+                await Context.Channel.SendMessageAsync(":no_entry_sign: Failed to Download Image! Take another one, sorry :persevere:");
             }
         }
 

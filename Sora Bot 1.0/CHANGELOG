@@ -1,11 +1,23 @@
 **Version**
-0.1.0.0.0
+0.1.1.1.0
 
 **Date**
-25.3.2017 22:30 UTC +1
+13.4.2017 19:00 UTC +2
 
 **Changes**
-  - Added IMDb search queries
-  - Added Anime + Manga search queries
-  - Added Urban Dictionary search queries
-  - Fixed some bugs
+  - Fixed some minor Mod bugs
+  - Added Warning system
+  - Fixed some other minor issues
+  - Added actual thread count
+  - Info card updated
+  - Abort music Download if
+    the server is too slow
+  - AFK is not Toggle only anymore
+   => When u add a reaosn after
+     $afk then ur status will be
+	 updated
+   => When u do $afk without 
+     a reason ur afk status
+	 will be removed
+  - Changing Playing status
+    is finally back :)
