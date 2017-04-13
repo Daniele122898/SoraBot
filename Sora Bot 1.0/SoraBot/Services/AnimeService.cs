@@ -19,9 +19,20 @@ namespace Sora_Bot_1.SoraBot.Services
         public const string apiUrl = "https://anilist.co/api/";
         private string anilistToken;
         private int timeToUpdate;
+        private string clientId = "";
+        private string clientSecret = "";
 
         public AnimeService()
         {
+            var configDict = ConfigService.ConfigService.getConfig();
+            if (!configDict.TryGetValue("client_id", out clientId))
+            {
+                Console.WriteLine("COULDN'T GET CLIENT ID FROM CONFIG!");
+            }
+            if (!configDict.TryGetValue("client_secret", out clientSecret))
+            {
+                Console.WriteLine("COULDN'T GET CLIENT SECRET FROM CONFIG!");
+            }
             RequestAuth();
         }
 
@@ -32,8 +43,8 @@ namespace Sora_Bot_1.SoraBot.Services
                 var headers = new Dictionary<string, string>
                 {
                     {"grant_type", "client_credentials"},
-                    {"client_id", "daniele122898-mukfp"},
-                    {"client_secret", "heKHHjSRxXxCQNDVTwn85XWWnrjKi"},
+                    {"client_id", clientId},
+                    {"client_secret", clientSecret},
                 };
 
                 using (var http = new HttpClient())
