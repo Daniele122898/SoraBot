@@ -1,21 +1,28 @@
 ## Major Changelogs (check frequent one with ´$changelog´)
 
 **Version**
-0.1.0.1.0
+0.1.1.1.0
 
 **Date**
-02.4.2017 20:00 UTC +1
+13.4.2017 19:00 UTC +2
 
 **Changes**
-  - Added kisses, hugs, pokes, slaps
-    => With them came Affinity
-  - Songs will show who requested it.
-  - The bot is not YT only anymore.
-    It can play basically anything
-    SoundCloud, Youtube, Vimeo and whatever
-  - Removed the patcount due to affinity
-  - AFK chars are now limited
-  - Fixed some bugs
+  - Fixed some minor Mod bugs
+  - Added Warning system
+  - Fixed some other minor issues
+  - Added actual thread count
+  - Info card updated
+  - Abort music Download if
+    the server is too slow
+  - AFK is not Toggle only anymore
+   => When you add a reason after
+     $afk then your status will be
+	 updated
+   => When you do $afk without 
+     a reason your afk status
+	 will be removed
+  - Changing Playing status
+    is finally back :)
 	  
 	  
 # Help => Can be found in Wiki as well (updated more frequently)

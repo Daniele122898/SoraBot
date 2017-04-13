@@ -13,11 +13,12 @@
   - Abort music Download if
     the server is too slow
   - AFK is not Toggle only anymore
-   => When u add a reaosn after
-     $afk then ur status will be
+   => When you add a reason after
+     $afk then your status will be
 	 updated
-   => When u do $afk without 
-     a reason ur afk status
+   => When you do $afk without 
+     a reason your afk status
 	 will be removed
   - Changing Playing status
     is finally back :)
+	  

@@ -1037,7 +1037,10 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 {
                     using (JsonReader reader = new JsonTextReader(sr))
                     {
-                        userEPDict = jSerializer.Deserialize<ConcurrentDictionary<ulong, userStruct>>(reader);
+                        var userEPDictTemp = jSerializer.Deserialize<ConcurrentDictionary<ulong, userStruct>>(reader);
+                        if (userEPDictTemp == null)
+                            return;
+                        userEPDict = userEPDictTemp;
                     }
                 }
             }
