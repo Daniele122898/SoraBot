@@ -1,4 +1,4 @@
-# SoraBot
+# SoraBot - Deprecated (check Gitlab link below for updated Version!)
 
 ## To stay updated please visit http://git.argus.moe/serenity/SoraBot ! commits will only be done there
 
