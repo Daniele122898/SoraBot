@@ -4,6 +4,9 @@
 
 ## For official and updated wiki go to: http://git.argus.moe/serenity/SoraBot/wikis/sora-help
 
+## Invite Sora
+https://discordapp.com/oauth2/authorize?client_id=270931284489011202&scope=bot&permissions=2146958463
+
 ## Major Changelogs (check frequent one with ´$changelog´)
 
 **Version**
