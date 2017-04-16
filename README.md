@@ -1,28 +1,17 @@
 ## Major Changelogs (check frequent one with ´$changelog´)
 
 **Version**
-0.1.1.1.0
+0.1.2.0.0
 
 **Date**
-13.4.2017 19:00 UTC +2
+15.4.2017 14:00 UTC +2
 
 **Changes**
-  - Fixed some minor Mod bugs
-  - Added Warning system
-  - Fixed some other minor issues
-  - Added actual thread count
-  - Info card updated
-  - Abort music Download if
-    the server is too slow
-  - AFK is not Toggle only anymore
-   => When you add a reason after
-     $afk then your status will be
-	 updated
-   => When you do $afk without 
-     a reason your afk status
-	 will be removed
-  - Changing Playing status
-    is finally back :)
+  - Add Songs via YT name
+  - Get Lol User stats
+  - Search Gifs on Giphy
+  - Get Random Chuck norris jokes
+  - Get Weather for your city
 	  
 	  
 # Help => Can be found in Wiki as well (updated more frequently)
@@ -79,29 +68,40 @@ Sora can always be invoked with mentioning him. But using that function is proba
 
 **GENERAL** With these you can make search queries for ub definitions, movies, series, animes and mangas!
 
-| Command | Parameter                              | Example                        | Output                                                                                 |
-|---------|----------------------------------------|--------------------------------|----------------------------------------------------------------------------------------|
-| `imdb`  | Title of Movie / Series                | `$imdb Inception`              | Gives you data about the movie / series from IMDb like plot, rating, genres etc..      |
-| `ub`    | Term to search for in Urban Dictionary | `$ub ohayou`                   | Gives you the definition of the Term with examples and its ub ratings                  |
-| `anime` | Title of Anime Series / Movie          | `$anime Overlord`              | Gives you data about the Series / Movie from Anilist like plot, raiting, genres etc... |
-| `manga` | Title of Manga                         | `$manga Boku no hero academia` | Gives you data about the Manga from Anilist like plot, raiting, genres etc...          |
+| Command       | Parameter                              | Example                        | Output                                                                                 |
+|---------------|----------------------------------------|--------------------------------|----------------------------------------------------------------------------------------|
+| `imdb`        | Title of Movie / Series                | `$imdb Inception`              | Gives you data about the movie / series from IMDb like plot, rating, genres etc..      |
+| `ub`          | Term to search for in Urban Dictionary | `$ub ohayou`                   | Gives you the definition of the Term with examples and its ub ratings                  |
+| `anime`       | Title of Anime Series / Movie          | `$anime Overlord`              | Gives you data about the Series / Movie from Anilist like plot, raiting, genres etc... |
+| `manga`       | Title of Manga                         | `$manga Boku no hero academia` | Gives you data about the Manga from Anilist like plot, raiting, genres etc...          |
+| `gif`         | Name of Gif                            | `$gif funny cat`               | Gives a random Gif from Giphy with specified Title                                     |
+| `chucknorris` | *none*                                 | `$chucknorris`                 | Gives random Chuck Norris Jokes from chucknorris.io API                                |
+| `weather`     | City Name                              | `$weather Zurich`              | Gives the current weather in the location                                              |
+
+## League Of Legends
+
+| Command    | Parameter                    | Example                   | Output                                                                            |
+|------------|------------------------------|---------------------------|-----------------------------------------------------------------------------------|
+| `summoner` | <lol region> <summoner name> | `$summoner na Nightblue3` | Gives very basic information about the summoner and his Summoner Icon             |
+| `lolstats` | <lol region> <summoner name> | `$lolstats na Nightblue3` | Gives Detailed infromation about summoners Ranked 5v5, Aram and Normal game stats |
 
 ## Music
 
-**GENERAL** Sora can **FINALLY** play all sorts of sources. YT, Soundcloud, vimeo ~~and even youporn~~ :eyes:  Have fun :) (The previous music library was completely cleaned -> deleted over 4.5k songs and 29 GB)
-Newly added: Bot will leave the channel if no one is in it anymore
+**GENERAL** Sora can **FINALLY** play all sorts of sources. YT, Soundcloud, vimeo ~~and even youporn~~ :eyes:  Have fun :) 
+**ATTENTION** Sora can now add yt videos by NAME. use `$addyt <name>` for this new feature.
 
-Command | Parameter | Example | Output 
---- | --- | --- | ---
-`join` | *none* | `$join` | Joins the VoiceChannel of the calling user
-`add` | YT video Url | `$add https://www.youtube.com/watch?v=Zt8Im_1fowA` | Only works with YT links. Adds the video to your queue
-`skip` | *none* | `$skip` | Skips the current song and go to the next in the queue
-`clear` | *none* | `$clear` | Clears the whole queue for the Guild. **Requires** Manage Channels permissions
-`list` | *none* | `$list` | Shows the entire current queue
-`np` | *none* | `$np` | Shows the current track that is playing
-`play` | *none* | `$play` | Starts the playback of the current queue
-`leave` | *none* | `$leave` | Leaves the channel of the user
-`stop` | *none* | `$stop` | Stops the audio playback
+| Command                | Parameter                             | Example                                                                  | Output                                                                                                   |
+|------------------------|---------------------------------------|--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
+| `join`                 | *none*                                | `$join`                                                                  | Joins the VoiceChannel of the calling user                                                               |
+| `add`                  | Video / Song URL **OR** YT video name | `$add https://www.youtube.com/watch?v=Zt8Im_1fowA` / `$add Stressed Out` | If supported, it adds the URL to the queue. If no link is added it will search the YT API for yt videos. |
+| `addyt` **deprecated** | YT Video Name                         | `$addyt Axel Boy & Maxx Baer - Try Loving (Ft. MOZA)`                    | Gives you a list of Videos with that name, where you can choose which one to add.                        |
+| `skip`                 | *none*                                | `$skip`                                                                  | Skips the current song and go to the next in the queue                                                   |
+| `clear`                | *none*                                | `$clear`                                                                 | Clears the whole queue for the Guild. **Requires** Manage Channels permissions                           |
+| `list`                 | *none*                                | `$list`                                                                  | Shows the entire current queue                                                                           |
+| `np`                   | *none*                                | `$np`                                                                    | Shows the current track that is playing                                                                  |
+| `play`                 | *none*                                | `$play`                                                                  | Starts the playback of the current queue                                                                 |
+| `leave`                | *none*                                | `$leave`                                                                 | Leaves the channel of the user                                                                           |
+| `stop`                 | *none*                                | `$stop`                                                                  | Stops the audio playback                                                                                 |
 
 ## AFK / Away
 **GENERAL** Keep in mind that your AFK status is GLOBAL. So if you want to say `i suck dick` in one guild but rather not in another then.. Do it at your own risk ;) I might add local / guild bound AFK in the future. The AFK message will only trigger every 30 seconds to prevent spam.
@@ -143,7 +143,7 @@ Example: `$a welcome Welcome {user} to {server} you are our {count}th member!`
 
 | Command      	| Parameter                	| Example                                  	| Output                                                                                                                                                                                          	|
 |--------------	|--------------------------	|------------------------------------------	|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|
-| `t create`   	| [tagname] ¦ [tagvalue]   	| `$t create test ¦ this will be displyed` 	| Creates a tag                                                                                                                                                                                   	|
+| `t create`   	| [tagname] ¦ [tagvalue]   	| `$t create test ¦ this will be displyed` 	| Creates a tag (THE SYMBOL BETWEEN THE NAME AND VALUE IS A PIPE! CANT USE IT IN THIS MARKDOWN TABLE :()                                                                                                                                                                                  	|
 | `t remove`   	| tagname                  	| `$t remove test`                         	| Removes the specified tag => You either need to be the creator or the specified permission group to do that. (If not specified it's manage hannels)                                             	|
 | `t taglist`  	| *none*                   	| `$t taglist`                             	| This will list all tags in the Guild                                                                                                                                                            	|
 | `t`          	| tagname                  	| `$t test`                                	| This will post the value of the specified tag                                                                                                                                                   	|

@@ -19,6 +19,10 @@ using Sora_Bot_1.SoraBot.Services.StarBoradService;
 using Sora_Bot_1.SoraBot.Services.TagService;
 using Discord.Addons.InteractiveCommands;
 using Sora_Bot_1.SoraBot.Services.Mod;
+using Sora_Bot_1.SoraBot.Services.Weather;
+using Sora_Bot_1.SoraBot.Services.LeagueOfLegends;
+using Sora_Bot_1.SoraBot.Services.Giphy;
+using Sora_Bot_1.SoraBot.Services.YT;
 
 namespace Sora_Bot_1.SoraBot.Core
 {
@@ -35,6 +39,10 @@ namespace Sora_Bot_1.SoraBot.Core
         private AfkSertvice _afkService;
         private PatService patService;
         private ImdbService _imdbService;
+        private YTService _ytService;
+        private WeatherService _weatherService;
+        private GifService _gifService;
+        private lolService _lolService;
         private SelfRoleService _selfRoleService;
         private AnimeService _animeService;
         private TagService tagService;
@@ -52,7 +60,6 @@ namespace Sora_Bot_1.SoraBot.Core
             LoadDatabase();
             client = c;
             updateService = new UserGuildUpdateService();
-            musicService = new MusicService();
             ratelimitService = new RatelimitService();
             starBoardService = new StarBoardService(client);
             _afkService = new AfkSertvice();
@@ -60,6 +67,11 @@ namespace Sora_Bot_1.SoraBot.Core
             _ubService = new UbService();
             _imdbService = new ImdbService();
             _modService = new ModService();
+            _weatherService = new WeatherService();
+            _ytService = new YTService();
+            musicService = new MusicService(_ytService);
+            _lolService = new lolService();
+            _gifService = new GifService();
             _animeService = new AnimeService();
             //remService = new ReminderService();
 
@@ -82,9 +94,13 @@ namespace Sora_Bot_1.SoraBot.Core
             map.Add(updateService);
             map.Add(_imdbService);
             map.Add(_animeService);
+            map.Add(_lolService);
             map.Add(patService);
+            map.Add(_gifService);
             map.Add(_ubService);
+            map.Add(_ytService);
             map.Add(tagService);
+            map.Add(_weatherService);
             map.Add(starBoardService);
             map.Add(epService);
             //map.Add(remService);
@@ -290,7 +306,7 @@ namespace Sora_Bot_1.SoraBot.Core
 
 
             //Create a command Context
-            var context = new CommandContext(client, message);
+            var context = new SocketCommandContext(client, message);
             if (context.IsPrivate)
                 return;
             if (context.User.IsBot)

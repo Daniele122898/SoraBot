@@ -8,7 +8,7 @@ using Sora_Bot_1.SoraBot.Services.ChangelogService;
 
 namespace Sora_Bot_1.SoraBot.Modules.ChangelogModule
 {
-    public class ChangelogModule : ModuleBase
+    public class ChangelogModule : ModuleBase<SocketCommandContext>
     {
         [Command("changelog"), Summary("Prints the Changelog")]
         [Alias("updates","change")]

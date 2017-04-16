@@ -24,13 +24,13 @@ namespace Sora_Bot_1.SoraBot.Services
             LoadDatabase();
         }
 
-        public async Task AddRoleToList(CommandContext Context, string roleName)
+        public async Task AddRoleToList(SocketCommandContext Context, string roleName)
         {
             //Sora = 270931284489011202
             //Sora test = 276304865934704642
             try
             {
-                var sora = await Context.Guild.GetUserAsync(270931284489011202, Discord.CacheMode.AllowDownload) as SocketGuildUser;
+                var sora = Context.Guild.GetUser(270931284489011202);
                 var role = Context.Guild.Roles.Where(x => x.Name == roleName).FirstOrDefault();
                 //var soraRole = Context.Guild.Roles.Where(x => x.Name == "Sora").FirstOrDefault();
                 var soraRole = sora.Roles.OrderByDescending(r => r.Position).FirstOrDefault();
@@ -92,7 +92,7 @@ namespace Sora_Bot_1.SoraBot.Services
             
         }
 
-        public async Task GetRolesInGuild(CommandContext Context)
+        public async Task GetRolesInGuild(SocketCommandContext Context)
         {
             try
             {
@@ -129,7 +129,7 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
-        public async Task RemoveRoleFromList(CommandContext Context, string roleName)
+        public async Task RemoveRoleFromList(SocketCommandContext Context, string roleName)
         {
             try
             {
@@ -172,11 +172,11 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
        
-        public async Task IAmNotRole(CommandContext Context, string roleName)
+        public async Task IAmNotRole(SocketCommandContext Context, string roleName)
         {
             try
             {
-                var sora = await Context.Guild.GetUserAsync(270931284489011202, Discord.CacheMode.AllowDownload) as SocketGuildUser;
+                var sora = Context.Guild.GetUser(270931284489011202);
                 if (!sora.GuildPermissions.Has(GuildPermission.ManageRoles))
                 {
                     await Context.Channel.SendMessageAsync(":no_entry_sign: Sora needs Manage Roles permissions to add roles!");
@@ -240,11 +240,11 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
-        public async Task IAmRole(CommandContext Context, string roleName)
+        public async Task IAmRole(SocketCommandContext Context, string roleName)
         {
             try
             {
-                var sora = await Context.Guild.GetUserAsync(270931284489011202, Discord.CacheMode.AllowDownload) as SocketGuildUser;
+                var sora = Context.Guild.GetUser(270931284489011202);
                 if (!sora.GuildPermissions.Has(GuildPermission.ManageRoles))
                 {
                     await Context.Channel.SendMessageAsync(":no_entry_sign: Sora needs Manage Roles permissions to add roles!");

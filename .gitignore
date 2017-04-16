@@ -27,6 +27,7 @@ guildlist.txt
 *.txt
 *.html
 *.asc
+*.webm
 
 # Windows shortcuts
 *.lnk

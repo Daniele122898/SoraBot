@@ -19,7 +19,7 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
 {
     [Group("o")]
     [RequireOwner]
-    public class OwnerModule : ModuleBase
+    public class OwnerModule : ModuleBase<SocketCommandContext>
     {
         //PREFIX
 
@@ -151,9 +151,9 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
         {
             try
             {
-                var RequestedGuild = await Context.Client.GetGuildAsync(id);
+                var RequestedGuild = Context.Client.GetGuild(id);
                 IInviteMetadata GuildDefault =
-                    await (await RequestedGuild.GetChannelAsync(RequestedGuild.DefaultChannelId) as IGuildChannel)
+                    await (RequestedGuild.GetChannel(RequestedGuild.DefaultChannel.Id) as IGuildChannel)
                         .CreateInviteAsync();
                 await Context.Channel.SendMessageAsync("Invite link: " + GuildDefault.Url);
             }

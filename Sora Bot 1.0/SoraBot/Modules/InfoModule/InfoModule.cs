@@ -13,20 +13,10 @@ using System.Collections;
 
 namespace Sora_Bot_1.SoraBot.Modules.InfoModule
 {
-    //create a module with the 'sample' prefix
-    [Group("info")]
-    public class InfoModule : ModuleBase
-    {
-        /*
-        //$sample square 20 -> 400
-        [Command("square"), Summary("Squares a number.")]
-        public async Task Square([Summary("The number to square.")]int num)
-        {
-            //We can also access the channel from the command context
-            await Context.Channel.SendMessageAsync($"{num}^2 = {Math.Pow(num, 2)}");
-        }
-        */
 
+    [Group("info")]
+    public class InfoModule : ModuleBase<SocketCommandContext>
+    {
         private MusicService musicService;
         private CommandHandler _commandHandler;
 
@@ -34,17 +24,6 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
         {
             musicService = _service;
             _commandHandler = handler;
-        }
-
-        private Process ps()
-        {
-            var ps = new ProcessStartInfo
-            {
-                FileName = "ps",
-                Arguments =
-                    $"auwx {Process.GetCurrentProcess().Id}"
-            };
-            return Process.Start(ps);
         }
 
         [Command(""), Summary("Gives infos about the bot")]
@@ -231,6 +210,39 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
             });*/
         }
 
+        [Command("permissions"), Summary("Returns the guild perms of the current user, or the user paramter, if one passed.")]
+        [Alias("perms")]
+        public async Task UserPerms([Summary("The (optional) user to get guild perms for")] IUser user = null)
+        {
+            var userInfo = user ?? Context.User; // ?? if not null return left. if null return right
+            string permissions = "";
+            //GuildPermissions.Has(GuildPermission.BanMembers)
+            var invoker = Context.User as IGuildUser;
+            if(!invoker.GuildPermissions.Has(GuildPermission.BanMembers) && !invoker.GuildPermissions.Has(GuildPermission.KickMembers) && !invoker.GuildPermissions.Has(GuildPermission.Administrator) && !invoker.GuildPermissions.Has(GuildPermission.ManageChannels) && !invoker.GuildPermissions.Has(GuildPermission.ManageGuild))
+            {
+                await ReplyAsync(":no_entry_sign: You need at least some sort of Guild Permission. Admin, Kick, Ban, Manage Channels, Manage Guild. Something...");
+                return;
+            }
+            (userInfo as SocketGuildUser)?.GuildPermissions.ToList().ForEach(x => { permissions += x.ToString() + " , "; });
+
+            var avatarURL = userInfo.GetAvatarUrl() ??
+                                "http://ravegames.net/ow_userfiles/themes/theme_image_22.jpg";
+
+            var eb = new EmbedBuilder()
+            {
+                Color = new Color(4, 97, 247),
+                ThumbnailUrl = avatarURL,
+                Title = $"{userInfo.Username}#{userInfo.Discriminator} Guild Permissions",
+                Description = $"{(String.IsNullOrWhiteSpace(permissions) ? "*none*" : permissions)}",
+                Footer = new EmbedFooterBuilder()
+                {
+                    Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
+                    IconUrl = Context.User.GetAvatarUrl()
+                }
+            };
+            await ReplyAsync("", embed: eb);
+        }
+
         // $sample userinfo --> foxbot#0282
         // $sample userinfo @Khionu --> Khionu#8708
         // $sample userinfo Khionu#8708 --> Khionu#8708
@@ -252,15 +264,15 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                 {
                     Color = new Color(4, 97, 247),
                     ThumbnailUrl = avatarURL,
-                    Title = $"{userInfo.Username}#{userInfo.Discriminator} Info",
-                    Description = $"Joined Discord on: {userInfo.CreatedAt.ToString().Remove(userInfo.CreatedAt.ToString().Length - 6)}",
+                    Title = $"{userInfo.Username}",
+                    Description = $"Joined Discord on {userInfo.CreatedAt.ToString().Remove(userInfo.CreatedAt.ToString().Length - 6)}. That is {(int)(DateTime.Now.Subtract(userInfo.CreatedAt.DateTime).TotalDays)} days ago!", //{(int)(DateTime.Now.Subtract(Context.Guild.CreatedAt.DateTime).TotalDays)}
                     Footer = new EmbedFooterBuilder()
                     {
                         Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator} | {userInfo.Username} ID: {userInfo.Id}",
                         IconUrl = Context.User.GetAvatarUrl()
                     }
                 };
-
+                var socketUser = userInfo as SocketGuildUser;
                 eb.AddField((x) =>
                 {
                     x.Name = "Status";
@@ -272,7 +284,21 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                 {
                     x.Name = "Game";
                     x.IsInline = true;
-                    x.Value = $"{(userInfo.Game.HasValue ? userInfo.Game.Value.Name : "none")}";
+                    x.Value = $"{(userInfo.Game.HasValue ? userInfo.Game.Value.Name : "*none*")}";
+                });
+
+                eb.AddField((x) =>
+                {
+                    x.Name = "Nickname";
+                    x.IsInline = true;
+                    x.Value = $"{(socketUser.Nickname == null ? "*none*": $"{socketUser.Nickname}")}";
+                });
+
+                eb.AddField((x) =>
+                {
+                    x.Name = "Discriminator";
+                    x.IsInline = true;
+                    x.Value = $"#{socketUser.Discriminator}";
                 });
 
                 eb.AddField((x) =>
@@ -281,14 +307,14 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                     x.IsInline = true;
                     x.Value = $"[Click to View]({avatarURL})";
                 });
-
+                
                 eb.AddField((x) =>
                 {
                     x.Name = "Joined Guild";
                     x.IsInline = true;
-                    x.Value = $"{(userInfo as SocketGuildUser)?.JoinedAt.ToString().Remove((userInfo as SocketGuildUser).JoinedAt.ToString().Length - 6)}";
+                    x.Value = $"{socketUser?.JoinedAt.ToString().Remove(socketUser.JoinedAt.ToString().Length - 6)}\n({(int)DateTime.Now.Subtract(((DateTimeOffset)socketUser?.JoinedAt).DateTime).TotalDays} days ago)";
                 });
-
+                /*
                 string permissions = "";
                 (userInfo as SocketGuildUser)?.GuildPermissions.ToList().ForEach(x => { permissions += x.ToString() + " | "; });
                 eb.AddField((x) =>
@@ -296,7 +322,20 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                     x.Name = "Guild Permissions";
                     x.IsInline = true;
                     x.Value = $"{permissions}";
+                });*/
+                eb.AddField((x) =>
+                {
+                    string roles = "";
+                    foreach (var role in socketUser.Roles)
+                    {
+                        if(role.Name != "@everyone")
+                            roles += $"{role.Name}, ";
+                    }
+                    x.Name = "Roles";
+                    x.IsInline = true;
+                    x.Value = $"{(String.IsNullOrWhiteSpace(roles) ? "*none*": $"{roles}")}";
                 });
+
                 /*
                 eb.AddField((efb) =>
                 {
@@ -309,7 +348,7 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                                 $"**Avatar:** \t[Link]({userInfo.AvatarUrl})";
                 });*/
 
-            await Context.Channel.SendMessageAsync("", false, eb);
+                await Context.Channel.SendMessageAsync("", false, eb);
             }
             catch (Exception e)
             {
@@ -332,7 +371,7 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                     Color = new Color(4, 97, 247),
                     ThumbnailUrl = avatarURL,
                     Title = $"{Context.Guild.Name} info",
-                    Description = $"Created on {Context.Guild.CreatedAt.ToString().Remove(Context.Guild.CreatedAt.ToString().Length - 6)}",
+                    Description = $"Created on {Context.Guild.CreatedAt.ToString().Remove(Context.Guild.CreatedAt.ToString().Length - 6)}. That's {(int)(DateTime.Now.Subtract(Context.Guild.CreatedAt.DateTime).TotalDays)} days ago!",
                     Footer = new EmbedFooterBuilder()
                     {
                         Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator} | Guild ID: {Context.Guild.Id}",
@@ -344,7 +383,7 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
 
                 //var onlineCount = users.Count(u => u.Status != UserStatus.Unknown && u.Status != UserStatus.Invisible && u.Status != UserStatus.Offline);
                 
-                var GuildOwner = await Context.Guild.GetUserAsync(Context.Guild.OwnerId);
+                var GuildOwner = Context.Guild.GetUser(Context.Guild.OwnerId);
                 int online = 0;
                 foreach (var u in guild.Users)
                 {
@@ -353,29 +392,6 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                         online++;
                     }
                 }
-                /*
-                 * 
-                 * int online2 = 0;
-                int realMemebers = 0;
-                foreach (var u in guild.Users)
-                {
-                    if (u.Status != UserStatus.Unknown && u.Status != UserStatus.Invisible && u.Status != UserStatus.Offline && !u.IsBot)
-                    {
-                        online2++;
-                    }
-                    if (!u.IsBot)
-                        realMemebers++;
-                }
-                 * 
-                 * 
-                eb.AddField((efb) =>
-                {
-                    efb.Name = "Guild";
-                    efb.IsInline = true;
-                    efb.Value = $"**Name:** \t{Context.Guild.Name} \n" + $"**ID:** \t{Context.Guild.Id}\n" + $"**Owner:** \t{GuildOwner}\n" +
-                                $"**Voice Region ID:** \t{Context.Guild.VoiceRegionId}\n" +
-                                $"**Created At:** \t{Context.Guild.CreatedAt.ToString().Remove(Context.Guild.CreatedAt.ToString().Length - 6)}";
-                });*/
 
                 eb.AddField((x) =>
                 {
@@ -386,9 +402,16 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
 
                 eb.AddField((x) =>
                 {
+                    x.Name = "Members";
+                    x.IsInline = true;
+                    x.Value = $"{online} / {(Context.Guild).MemberCount}";
+                });
+
+                eb.AddField((x) =>
+                {
                     x.Name = "Region";
                     x.IsInline = true;
-                    x.Value = Context.Guild.VoiceRegionId;
+                    x.Value = Context.Guild.VoiceRegionId.ToUpper();
                 });
 
                 eb.AddField((x) =>
@@ -398,8 +421,8 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                     x.Value = "" + Context.Guild.Roles.Count;
                 });
 
-                int voice = Context.Guild.GetVoiceChannelsAsync().Result.Count;
-                int text = Context.Guild.GetChannelsAsync().Result.Count - voice;
+                int voice = Context.Guild.VoiceChannels.Count;
+                int text = Context.Guild.TextChannels.Count;
                 eb.AddField((x) =>
                 {
                     x.Name = "Channels";
@@ -409,9 +432,16 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
 
                 eb.AddField((x) =>
                 {
-                    x.Name = "Total Members";
+                    x.Name = "AFK Channel";
                     x.IsInline = true;
-                    x.Value = $"{online}/{((SocketGuild)Context.Guild).MemberCount}";
+                    x.Value = $"{(Context.Guild.AFKChannel == null ? $"No AFK Channel" : $"{Context.Guild.AFKChannel.Name}\n*in {Context.Guild.AFKTimeout} Min*")}";
+                });
+
+                eb.AddField((x) =>
+                {
+                    x.Name = "Total Emojis";
+                    x.IsInline = true;
+                    x.Value = $"{Context.Guild.Emojis.Count}";
                 });
 
                 eb.AddField((x) =>
@@ -419,6 +449,20 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                     x.Name = "Avatar Url";
                     x.IsInline = true;
                     x.Value = $"[Click to view]({avatarURL})";
+                });
+
+                eb.AddField((x) =>
+                {
+                    x.Name = "Emojis";
+                    x.IsInline = false;
+                    string val = "";
+                    foreach (var e in Context.Guild.Emojis)
+                    {
+                        if (val.Length < 950)
+                            val += $"<:{e.Name}:{e.Id}> ";
+                    }
+                    //x.Value = $"{String.Format(":{0}:",String.Join(": , :", Context.Guild.Emojis))}";//await Context.Channel.SendMessageAsync(String.Format("Videos: \n{0}\n", String.Join("\n", videos)));
+                    x.Value = val;
                 });
 
                 await Context.Channel.SendMessageAsync("", false, eb);

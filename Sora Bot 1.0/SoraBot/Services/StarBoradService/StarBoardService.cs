@@ -236,7 +236,7 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
             }
         }
 
-        public async Task SetChannel(CommandContext Context)
+        public async Task SetChannel(SocketCommandContext Context)
         {
             try
             {
@@ -296,7 +296,7 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
             return false;
         }
 
-        public async Task RemoveChannel(CommandContext Context)
+        public async Task RemoveChannel(SocketCommandContext Context)
         {
             if (!starChannelDict.ContainsKey(Context.Guild.Id))
             {

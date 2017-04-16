@@ -40,7 +40,7 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
             permissionsDict.TryAdd("manageguild", GuildPermission.ManageGuild);
         }
 
-        public async Task CreateTag(string entry, CommandContext Context)
+        public async Task CreateTag(string entry, SocketCommandContext Context)
         {
             try
             {
@@ -146,7 +146,7 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
             }
         }
 
-        public async Task RestrictManageChannels(CommandContext context, string perms)
+        public async Task RestrictManageChannels(SocketCommandContext context, string perms)
         {
             try
             {
@@ -200,7 +200,7 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
             }
         }
 
-        public async Task ListTags(CommandContext Context)
+        public async Task ListTags(SocketCommandContext Context)
         {
             try
             {
@@ -246,7 +246,7 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
             }
         }
 
-        public async Task SearchTagAndSend(string tag, CommandContext Context)
+        public async Task SearchTagAndSend(string tag, SocketCommandContext Context)
         {
             try
             {
@@ -276,7 +276,7 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
             }
         }
 
-        public async Task RemoveTag(string tag, CommandContext Context)
+        public async Task RemoveTag(string tag, SocketCommandContext Context)
         {
             try
             {

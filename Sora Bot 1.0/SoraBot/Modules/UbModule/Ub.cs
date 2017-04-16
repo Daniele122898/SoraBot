@@ -7,7 +7,7 @@ using Sora_Bot_1.SoraBot.Services;
 
 namespace Sora_Bot_1.SoraBot.Modules.UbModule
 {
-    public class Ub : ModuleBase
+    public class Ub : ModuleBase<SocketCommandContext>
     {
         private UbService _ubService;
         public Ub(UbService ser)

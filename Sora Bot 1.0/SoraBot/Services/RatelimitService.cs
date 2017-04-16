@@ -76,7 +76,7 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
-        public async Task<bool> onlyCheck(IUser user, IGuild guild, CommandContext context = null, string otherContext = "No string")
+        public async Task<bool> onlyCheck(IUser user, IGuild guild, SocketCommandContext context = null, string otherContext = "No string")
         {
             try
             {

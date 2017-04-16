@@ -8,7 +8,7 @@ using Sora_Bot_1.SoraBot.Services.PatService;
 
 namespace Sora_Bot_1.SoraBot.Modules.PatModule
 {
-    public class PatModule : ModuleBase
+    public class PatModule : ModuleBase<SocketCommandContext>
     {
         private PatService patService;
 

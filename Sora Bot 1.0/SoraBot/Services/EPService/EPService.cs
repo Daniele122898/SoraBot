@@ -54,7 +54,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             LoadDatabaseBG();
         }
 
-        public async Task SetBG(string url, CommandContext Context)
+        public async Task SetBG(string url, SocketCommandContext Context)
         {
             try
             {
@@ -208,7 +208,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             }
         }
 
-        public async Task changeProfileCord(string cords, CommandContext context)
+        public async Task changeProfileCord(string cords, SocketCommandContext context)
         {
             try
             {
@@ -246,7 +246,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             }
         }
 
-        public async Task size(string sizeS, CommandContext context)
+        public async Task size(string sizeS, SocketCommandContext context)
         {
             try
             {
@@ -268,7 +268,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             }
         }
 
-        public async Task shotTop10(CommandContext Context)
+        public async Task shotTop10(SocketCommandContext Context)
         {
             try
             {
@@ -385,7 +385,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             return -1;
         }
 
-        public async Task ShowProfile(CommandContext Context, IUser user)
+        public async Task ShowProfile(SocketCommandContext Context, IUser user)
         {
             try
             {
@@ -440,7 +440,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             }
         }
 
-        private async Task DrawText(String AvatarUrl, IUser userInfo, CommandContext Context)
+        private async Task DrawText(String AvatarUrl, IUser userInfo, SocketCommandContext Context)
         {
             try
             {
@@ -629,7 +629,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             }
         }
 
-        private async Task DrawText2(String AvatarUrl, IUser userInfo, CommandContext Context)
+        private async Task DrawText2(String AvatarUrl, IUser userInfo, SocketCommandContext Context)
         {
             try
             {
@@ -813,7 +813,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             }
         }
 
-        public async Task ToggleEPSubscribe(CommandContext context)
+        public async Task ToggleEPSubscribe(SocketCommandContext context)
         {
             if (lvlSubsriberList.Contains(context.User.Id))
             {
@@ -880,7 +880,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
 
 
             //Create a command Context
-            var context = new CommandContext(client, message);
+            var context = new SocketCommandContext(client, message);
             if (context.IsPrivate)
                 return;
             if (context.User.IsBot)
@@ -923,7 +923,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             }
         }
 
-        private float CalculateEP(CommandContext context)
+        private float CalculateEP(SocketCommandContext context)
         {
             int lenght = (int) Math.Round(context.Message.Content.Length / 10F);
             return lenght;

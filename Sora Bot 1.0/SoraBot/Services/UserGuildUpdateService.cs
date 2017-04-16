@@ -87,7 +87,7 @@ namespace Sora_Bot_1.SoraBot.Services
 
         //WELCOME
 
-        public async Task SetWelcome(CommandContext Context, string message)
+        public async Task SetWelcome(SocketCommandContext Context, string message)
         {
             try
             {
@@ -116,7 +116,7 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
-        public async Task SetWelcomeMessage (CommandContext Context, string message)
+        public async Task SetWelcomeMessage (SocketCommandContext Context, string message)
         {
             try
             {
@@ -143,7 +143,7 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
-        public async Task SetWelcomeChannel(CommandContext Context, IMessageChannel channel)
+        public async Task SetWelcomeChannel(SocketCommandContext Context, IMessageChannel channel)
         {
             try
             {
@@ -170,7 +170,7 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
-        public async Task RemoveWelcome(CommandContext Context)
+        public async Task RemoveWelcome(SocketCommandContext Context)
         {
             try
             {
@@ -199,7 +199,7 @@ namespace Sora_Bot_1.SoraBot.Services
 
         //LEAVE 
 
-        public async Task SetLeave(CommandContext Context, string message)
+        public async Task SetLeave(SocketCommandContext Context, string message)
         {
             try
             {
@@ -228,7 +228,7 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
-        public async Task SetLeaveMessage(CommandContext Context, string message)
+        public async Task SetLeaveMessage(SocketCommandContext Context, string message)
         {
             try
             {
@@ -255,7 +255,7 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
-        public async Task SetLeaveChannel(CommandContext Context, IMessageChannel channel)
+        public async Task SetLeaveChannel(SocketCommandContext Context, IMessageChannel channel)
         {
             try
             {
@@ -282,7 +282,7 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
-        public async Task RemoveLeave(CommandContext Context)
+        public async Task RemoveLeave(SocketCommandContext Context)
         {
             try
             {

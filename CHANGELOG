@@ -1,24 +1,12 @@
 **Version**
-0.1.1.1.0
+0.1.2.0.0
 
 **Date**
-13.4.2017 19:00 UTC +2
+15.4.2017 14:00 UTC +2
 
 **Changes**
-  - Fixed some minor Mod bugs
-  - Added Warning system
-  - Fixed some other minor issues
-  - Added actual thread count
-  - Info card updated
-  - Abort music Download if
-    the server is too slow
-  - AFK is not Toggle only anymore
-   => When you add a reason after
-     $afk then your status will be
-	 updated
-   => When you do $afk without 
-     a reason your afk status
-	 will be removed
-  - Changing Playing status
-    is finally back :)
-	  
+  - Add Songs via YT name
+  - Get Lol User stats
+  - Search Gifs on Giphy
+  - Get Random Chuck norris jokes
+  - Get Weather for your city

@@ -13,7 +13,7 @@ namespace Sora_Bot_1.SoraBot.Services
 {
     public class UbService
     {
-        public async Task GetUbDef(CommandContext Context, string urban)
+        public async Task GetUbDef(SocketCommandContext Context, string urban)
         {
             try
             {

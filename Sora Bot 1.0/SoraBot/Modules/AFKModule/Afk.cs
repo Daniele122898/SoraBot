@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Sora_Bot_1.SoraBot.Modules.AFKModule
 {
-    public class Afk : ModuleBase
+    public class Afk : ModuleBase<SocketCommandContext>
     {
         private AfkSertvice _afkService;
         public Afk(AfkSertvice afkService)

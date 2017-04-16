@@ -25,7 +25,7 @@ namespace Sora_Bot_1.SoraBot.Services
             LoadDatabase();
         }
 
-        private async Task AddAfk(CommandContext Context, string awayMsg, bool updated)
+        private async Task AddAfk(SocketCommandContext Context, string awayMsg, bool updated)
         {
             if (awayMsg == null)
                 awayMsg = "";
@@ -38,7 +38,7 @@ namespace Sora_Bot_1.SoraBot.Services
             await Context.Channel.SendMessageAsync($"{(updated == true ? ":white_check_mark: Your AFK status has been updated" : ":white_check_mark: You are now set AFK")}");
         }
 
-        public async Task ToggleAFK(CommandContext Context, string awayMsg)
+        public async Task ToggleAFK(SocketCommandContext Context, string awayMsg)
         {
             try
             { 

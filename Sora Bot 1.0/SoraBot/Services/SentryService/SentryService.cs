@@ -90,7 +90,7 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
-        public static async Task SendError(Exception e, CommandContext Context)
+        public static async Task SendError(Exception e, SocketCommandContext Context)
         {
             try
             {

@@ -9,7 +9,7 @@ using Sora_Bot_1.SoraBot.Services;
 
 namespace Sora_Bot_1.SoraBot.Modules.ImdbModule
 {
-    public class Imdb : ModuleBase
+    public class Imdb : ModuleBase<SocketCommandContext>
     {
 
         ImdbService _imdbService;

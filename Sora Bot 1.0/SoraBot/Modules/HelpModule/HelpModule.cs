@@ -12,7 +12,7 @@ namespace Sora_Bot_1.SoraBot.Modules.HelpModule
 {
     [Group("help")]
     [Alias("h")]
-    public class HelpModule : ModuleBase //<SocketCommandContext>
+    public class HelpModule : ModuleBase<SocketCommandContext> //<SocketCommandContext>
     {
 
         private CommandService service;

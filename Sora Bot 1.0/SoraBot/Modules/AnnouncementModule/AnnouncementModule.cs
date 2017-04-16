@@ -10,7 +10,7 @@ using Sora_Bot_1.SoraBot.Services;
 namespace Sora_Bot_1.SoraBot.Modules.AnnouncementModule
 {
     [Group("announcements"), Alias("a")]
-    public class AnnouncementModule : ModuleBase
+    public class AnnouncementModule : ModuleBase<SocketCommandContext>
     {
         private UserGuildUpdateService updateService;
 

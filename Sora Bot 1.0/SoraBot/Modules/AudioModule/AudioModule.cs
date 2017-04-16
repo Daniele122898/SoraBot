@@ -3,18 +3,21 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Sora_Bot_1.SoraBot.Services;
+using Discord.Addons.InteractiveCommands;
 
 namespace Sora_Bot_1.SoraBot.Modules.AudioModule
 {
     //[Group("music")]
     //[Alias("m")]
-    public class AudioModule : ModuleBase
+    public class AudioModule : ModuleBase<SocketCommandContext>
     {
         private MusicService musicService;
+        private InteractiveService _interactive;
 
-        public AudioModule(MusicService _musicService)
+        public AudioModule(MusicService _musicService, InteractiveService inter)
         {
             musicService = _musicService;
+            _interactive = inter;
         }
 
         [Command("join", RunMode = RunMode.Async), Summary("Joines the channel of the User")]
@@ -33,9 +36,23 @@ namespace Sora_Bot_1.SoraBot.Modules.AudioModule
         }
 
         [Command("add", RunMode = RunMode.Async), Summary("Adds selected song to Queue")]
-        public async Task AddToQueue([Summary("URL to add")] string url)
+        public async Task AddToQueue([Summary("URL to add"), Remainder] string url)
         {
-            await musicService.AddQueue(url, Context);
+            //Check if url?
+            if (url.Contains("http://") || url.Contains("https://"))
+            {
+                await musicService.AddQueue(url, Context);
+            }
+            else
+            {
+                await musicService.AddQueueYT(Context, url, _interactive);
+            }
+        }
+
+        [Command("addyt", RunMode = RunMode.Async), Summary("Adds selected song to Queue")]
+        public async Task AddToQueueYT([Summary("Name of yt video to add"), Remainder] string name)
+        {
+            await musicService.AddQueueYT(Context, name, _interactive);
         }
 
         [Command("skip", RunMode = RunMode.Async), Summary("Skip current song in queue")]

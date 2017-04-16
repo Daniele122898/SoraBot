@@ -10,7 +10,7 @@ using Discord.Addons.InteractiveCommands;
 
 namespace Sora_Bot_1.SoraBot.Modules.AnimeSearchModule
 {
-    public class AnimeSearch : ModuleBase
+    public class AnimeSearch : ModuleBase<SocketCommandContext>
     {
         private AnimeService _animeService;
         private InteractiveService _interactive;
