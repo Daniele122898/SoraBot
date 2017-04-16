@@ -69,7 +69,7 @@ namespace Sora_Bot_1.SoraBot.Services
            
         }
 
-        public async Task GetManga(CommandContext Context, string manga, InteractiveService interactive)
+        public async Task GetManga(SocketCommandContext Context, string manga, InteractiveService interactive)
         {
             try
             {
@@ -145,7 +145,7 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
-        public async Task GetAnime(CommandContext Context, string anime, InteractiveService interactive)
+        public async Task GetAnime(SocketCommandContext Context, string anime, InteractiveService interactive)
         {
             try
             {

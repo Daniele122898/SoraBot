@@ -9,7 +9,7 @@ namespace Sora_Bot_1.SoraBot.Modules.TagModule
 {
     [Group("tag")]
     [Alias("t")]
-    public class TagModule : ModuleBase
+    public class TagModule : ModuleBase<SocketCommandContext>
     {
         private TagService tagService;
 

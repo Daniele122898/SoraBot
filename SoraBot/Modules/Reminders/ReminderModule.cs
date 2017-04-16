@@ -7,7 +7,7 @@ using Sora_Bot_1.SoraBot.Services;
 
 namespace Sora_Bot_1.SoraBot.Modules.Reminders
 {
-    public class ReminderModule : ModuleBase
+    public class ReminderModule : ModuleBase<SocketCommandContext>
     {
      /*   private ReminderService service;
 

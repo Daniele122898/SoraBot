@@ -17,7 +17,7 @@ namespace Sora_Bot_1.SoraBot.Services
             //guild,<user,<msg,time>>
 
 
-        public async Task SetReminder(CommandContext Context, string message)
+        public async Task SetReminder(SocketCommandContext Context, string message)
         {
             bool done = await Timer(Context,5000);
             //if (done)
@@ -26,7 +26,7 @@ namespace Sora_Bot_1.SoraBot.Services
             //}
         }
 
-        public async Task<bool> Timer(CommandContext Context,int time)
+        public async Task<bool> Timer(SocketCommandContext Context,int time)
         {
             bool done = false;
             await Task.Delay(time);

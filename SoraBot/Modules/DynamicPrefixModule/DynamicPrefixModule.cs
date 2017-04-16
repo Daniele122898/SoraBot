@@ -10,7 +10,7 @@ using Sora_Bot_1.SoraBot.Core;
 
 namespace Sora_Bot_1.SoraBot.Modules.DynamicPrefixModule
 {
-    public class DynamicPrefixModule : ModuleBase
+    public class DynamicPrefixModule : ModuleBase<SocketCommandContext>
     {
         private readonly CommandHandler handler;
 

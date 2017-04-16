@@ -12,7 +12,7 @@ namespace Sora_Bot_1.SoraBot.Services
 {
     public class ImdbService
     {
-        public async Task GetImdb(CommandContext Context, string target)
+        public async Task GetImdb(SocketCommandContext Context, string target)
         {
             try
             {

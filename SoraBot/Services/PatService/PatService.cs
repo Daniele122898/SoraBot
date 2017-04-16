@@ -28,7 +28,7 @@ namespace Sora_Bot_1.SoraBot.Services.PatService
             LoadDatabase();
         }
 
-        public async Task ChangeAffinity(affinityType type, IUser user, CommandContext Context)
+        public async Task ChangeAffinity(affinityType type, IUser user, SocketCommandContext Context)
         {
             try
             {
@@ -64,7 +64,6 @@ namespace Sora_Bot_1.SoraBot.Services.PatService
                     user.Id,
                     stats,
                     (key, oldValue) => stats);
-                //TODO SAVE DATABASE
                 SaveDatabase();
             }
             catch (Exception e)
@@ -74,7 +73,7 @@ namespace Sora_Bot_1.SoraBot.Services.PatService
             }
         }
 
-        public async Task GetAffinity(IUser user, CommandContext Context)
+        public async Task GetAffinity(IUser user, SocketCommandContext Context)
         {
             try
             {
@@ -114,7 +113,7 @@ namespace Sora_Bot_1.SoraBot.Services.PatService
             }
         }
 
-        public async Task ResetAffinity(CommandContext Context)
+        public async Task ResetAffinity(SocketCommandContext Context)
         {
             try
             {

@@ -13,6 +13,8 @@ using Discord.Commands;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
+using Sora_Bot_1.SoraBot.Services.YT;
+using Discord.Addons.InteractiveCommands;
 
 namespace Sora_Bot_1.SoraBot.Services
 {
@@ -28,16 +30,19 @@ namespace Sora_Bot_1.SoraBot.Services
 
         private ConcurrentDictionary<ulong, List<SongStruct>> queueDict = new ConcurrentDictionary<ulong, List<SongStruct>>();
 
+        private YTService _ytService;
+
         public struct SongStruct
         {
             public string name;
             public string user;
         }
 
-        public MusicService()
+        public MusicService(YTService ser)
         {
             InitializeLoader();
             LoadDatabase();
+            _ytService = ser;
         }
 
 
@@ -48,7 +53,7 @@ namespace Sora_Bot_1.SoraBot.Services
             audioDict.TryAdd(guildID, audioClient);
         }
 
-        public async Task LeaveChannel(CommandContext Context, IVoiceChannel _channel)
+        public async Task LeaveChannel(SocketCommandContext Context, IVoiceChannel _channel)
         {
             try
             {
@@ -120,7 +125,81 @@ namespace Sora_Bot_1.SoraBot.Services
 
         }
 
-        public async Task AddQueue(string url, CommandContext Context)
+        public async Task AddQueueYT(SocketCommandContext Context, string name, InteractiveService interactive)
+        {
+            try
+            {
+                IAudioClient aClient;
+                audioDict.TryGetValue(Context.Guild.Id, out aClient);
+                if (aClient == null)
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: Bot is not connected to any Voice Channels");
+                    return;
+                }
+                var _channel = (Context.Message.Author as IGuildUser)?.VoiceChannel;
+                if (_channel == null)
+                {
+                    await Context.Channel.SendMessageAsync(
+                        ":no_entry_sign: You must be in the same Voice Channel as me!");
+                    return;
+                }
+                var channel = (Context.Guild as SocketGuild).CurrentUser.VoiceChannel as IVoiceChannel;
+                if (channel.Id != _channel.Id)
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: You must be in the same Voice Channel as the me!");
+                    return;
+                }
+
+                var msg =
+                    await Context.Channel.SendMessageAsync(
+                        ":arrows_counterclockwise: Searching, Downloading and Adding to Queue...");
+
+
+                string tempName = await _ytService.GetYtURL(Context, name, interactive, msg);
+                if(tempName == "f")
+                {
+                    await msg.ModifyAsync(x =>
+                    {
+                        x.Content = ":no_entry_sign: Failed to get any results!";
+                    });
+                    return;
+                }
+                else if(tempName == "f2")
+                {
+                    return;
+                }
+                string nameT = await Download(tempName, msg, Context);
+                if (!nameT.Equals("f"))
+                {
+                    List<SongStruct> tempList = new List<SongStruct>();
+                    SongStruct tempStruct = new SongStruct
+                    {
+                        name = nameT,
+                        user = $"{Context.User.Username}#{Context.User.Discriminator}"
+                    };
+                    if (queueDict.ContainsKey(Context.Guild.Id))
+                    {
+                        queueDict.TryGetValue(Context.Guild.Id, out tempList);
+                        tempList.Add(tempStruct);
+                        queueDict.TryUpdate(Context.Guild.Id, tempList);
+                    }
+                    else
+                    {
+                        tempList.Add(tempStruct);
+                        queueDict.TryAdd(Context.Guild.Id, tempList);
+                    }
+                    SaveDatabase();
+                    //await Context.Channel.SendMessageAsync(":musical_note: Successfully Downloaded. Will play shortly");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await SentryService.SendError(e, Context);
+            }
+        }
+
+        public async Task AddQueue(string url, SocketCommandContext Context)
         {
             try
             {
@@ -180,7 +259,7 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
-        public async Task PlayQueue(CommandContext Context)
+        public async Task PlayQueue(SocketCommandContext Context)
         {
             try
             {
@@ -201,7 +280,7 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
-        public async Task ClearQueue(CommandContext Context)
+        public async Task ClearQueue(SocketCommandContext Context)
         {
             try
             {
@@ -226,7 +305,7 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
-        public async Task SkipQueueEntry(CommandContext Context)
+        public async Task SkipQueueEntry(SocketCommandContext Context)
         {
             try
             {
@@ -307,7 +386,7 @@ namespace Sora_Bot_1.SoraBot.Services
             return Process.Start(ffmpeg);
         }
 
-        private async Task PlayQueueAsync(IAudioClient client, CommandContext Context)
+        private async Task PlayQueueAsync(IAudioClient client, SocketCommandContext Context)
         {
             try
             {
@@ -331,14 +410,14 @@ namespace Sora_Bot_1.SoraBot.Services
                         }
                         else
                         {
-                            strToken.audioStream = client.CreatePCMStream(AudioApplication.Music, 1920, 2, null);
+                            strToken.audioStream = client.CreatePCMStream(AudioApplication.Music, null, 1920);
                             strToken.tokenSource = new CancellationTokenSource();
                             strToken.token = strToken.tokenSource.Token;
                             audioStreamDict.TryAdd(client, strToken);
                         }
 
                         var output = ffmpeg.StandardOutput.BaseStream; //1920, 2880, 960
-                        await output.CopyToAsync(strToken.audioStream, 960, strToken.token).ContinueWith(task =>
+                        await output.CopyToAsync(strToken.audioStream, 1920, strToken.token).ContinueWith(task =>
                         {
                             if (!task.IsCanceled && task.IsFaulted) //supress cancel exception
                                 Console.WriteLine(task.Exception);
@@ -363,7 +442,7 @@ namespace Sora_Bot_1.SoraBot.Services
         }
 
         /*
-        public async Task PlayMusic(string url, CommandContext Context)
+        public async Task PlayMusic(string url, SocketCommandContext Context)
         {
             IAudioClient aClient;
             audioDict.TryGetValue(Context.Guild.Id, out aClient);
@@ -379,7 +458,7 @@ namespace Sora_Bot_1.SoraBot.Services
             await SendAsync(aClient, url, msgToEdit, Context);
         }*/
 
-        public async Task StopMusic(CommandContext Context)
+        public async Task StopMusic(SocketCommandContext Context)
         {
             try
             {
@@ -417,7 +496,7 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
-        public async Task QueueList(CommandContext Context)
+        public async Task QueueList(SocketCommandContext Context)
         {
             List<SongStruct> queue = new List<SongStruct>();
             if (queueDict.TryGetValue(Context.Guild.Id, out queue))
@@ -451,7 +530,7 @@ namespace Sora_Bot_1.SoraBot.Services
                                 dur = Convert(duration);
                             efb.Name = "Now playing";
                             efb.IsInline = true;
-                            efb.Value = $"[{dur}] - **{titleT}** \n      \t*by {queue[0].user}*";
+                            efb.Value = $"[{dur}] - **[{titleT}]({StringEncoder.Base64Decode(queue[0].name)})** \n      \t*by {queue[0].user}*";
                         });
 
                         eb.AddField((efb) =>
@@ -481,7 +560,7 @@ namespace Sora_Bot_1.SoraBot.Services
                                 var title = info["fulltitle"].ToString();
                                 if (((efb.Value == null ? 0 : efb.Value.ToString().Length) + ($"**{i}.** {title} \n      \t- {queue[i].user}\n").Length) > 1000)
                                     break;
-                                efb.Value += $"**{i}.** [{dur}] - **{title}** \n      \t*by {queue[i].user}*\n";
+                                efb.Value += $"**{i}.** [{dur}] - **[{title}]({StringEncoder.Base64Decode(queue[i].name)})** \n      \t*by {queue[i].user}*\n";
                             }
                             if (queue.Count == 1)
                             {
@@ -509,7 +588,7 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
-        public async Task NowPlaying(CommandContext Context)
+        public async Task NowPlaying(SocketCommandContext Context)
         {
             try
             {
@@ -542,7 +621,7 @@ namespace Sora_Bot_1.SoraBot.Services
                                 dur = Convert(duration);
                             efb.Name = "Now playing";
                             efb.IsInline = false;
-                            efb.Value = $"[{dur}] - {title}";
+                            efb.Value = $"[{dur}] - [{title}]({StringEncoder.Base64Decode(queue[0].name)})";
                         });
 
                         eb.AddField((x) =>
@@ -599,7 +678,7 @@ namespace Sora_Bot_1.SoraBot.Services
         }
 
 
-        private async Task<string> Download(string path, IUserMessage msg, CommandContext Context)
+        private async Task<string> Download(string path, IUserMessage msg, SocketCommandContext Context)
         {
             bool stream = false;
             /*
@@ -796,6 +875,10 @@ namespace Sora_Bot_1.SoraBot.Services
         public string Convert(int value)
         {
             TimeSpan ts = TimeSpan.FromSeconds(value);
+            if(value> 3600)
+            {
+                return String.Format("{0}:{1}:{2:D2}", ts.Hours, ts.Minutes, ts.Seconds);
+            }
             return String.Format("{0}:{1:D2}", ts.Minutes, ts.Seconds);
         }
 

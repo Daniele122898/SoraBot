@@ -8,7 +8,7 @@ using Sora_Bot_1.SoraBot.Services.Mod;
 
 namespace Sora_Bot_1.SoraBot.Modules.Mod
 {
-    public class ModModule : ModuleBase
+    public class ModModule : ModuleBase<SocketCommandContext>
     {
 
         private ModService _modService;

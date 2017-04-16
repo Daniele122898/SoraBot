@@ -6,13 +6,13 @@ using Discord.WebSocket;
 
 namespace Sora_Bot_1.SoraBot.Modules.FunModule
 {
-    public class FunModule : ModuleBase
+    public class FunModule : ModuleBase<SocketCommandContext>
     {
         //$say hello -> hello
         [Command("say"), Summary("Echos a message")]
         public async Task Say([Remainder, Summary("The text to echo")] string echo)
         {
-            //ReplyAsync is a mtheod on modulebase
+            //ReplyAsync is a mtheod on ModuleBase<SocketCommandContext>
             await ReplyAsync(echo);
         }
 

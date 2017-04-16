@@ -9,7 +9,7 @@ using Sora_Bot_1.SoraBot.Services.StarBoradService;
 
 namespace Sora_Bot_1.SoraBot.Modules.StarBoardModule
 {
-    public class StarBoardModule : ModuleBase
+    public class StarBoardModule : ModuleBase<SocketCommandContext>
     {
         private StarBoardService starBoardService;
 

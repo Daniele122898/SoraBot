@@ -9,7 +9,7 @@ using Sora_Bot_1.SoraBot.Services.EPService;
 namespace Sora_Bot_1.SoraBot.Modules.EPModule
 {
     [Group("p")]
-    public class EPModule : ModuleBase
+    public class EPModule : ModuleBase<SocketCommandContext>
     {
         private EPService epService;
 

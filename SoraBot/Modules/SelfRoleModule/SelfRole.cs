@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Sora_Bot_1.SoraBot.Modules.SelfRoleModule
 {
-    public class SelfRole : ModuleBase
+    public class SelfRole : ModuleBase<SocketCommandContext>
     {
         private SelfRoleService _selfRoleService;
         public SelfRole(SelfRoleService roleService)

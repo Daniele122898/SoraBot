@@ -30,7 +30,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                 _punishLogs = punishLogsTemp;
         }
 
-        public async Task AddReason(CommandContext Context, string reason)
+        public async Task AddReason(SocketCommandContext Context, string reason)
         {
             try
             {
@@ -63,7 +63,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                     await Context.Channel.SendMessageAsync(":no_entry_sign: There are no logs found.");
                     return;
                 }
-                var channel = await Context.Guild.GetChannelAsync(str.channelID) as IMessageChannel;
+                var channel = Context.Guild.GetChannel(str.channelID) as IMessageChannel;
                 if (channel == null)
                 {
                     await Context.Channel.SendMessageAsync(":no_entry_sign: _punishLogs Channel is not set!");
@@ -127,7 +127,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                 _punishLogs.TryUpdate(Context.Guild.Id, str);
                 var msg = await Context.Channel.SendMessageAsync(":white_check_mark: Successfully updated reason!");
                 await Task.Delay(3000);
-                var bot = await Context.Guild.GetUserAsync(270931284489011202, Discord.CacheMode.AllowDownload) as IGuildUser;
+                var bot = Context.Guild.GetUser(270931284489011202) as IGuildUser;
                 if (bot.GuildPermissions.Has(GuildPermission.ManageMessages))
                 {
                     await Context.Message.DeleteAsync();
@@ -142,11 +142,11 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
             }
         }
 
-        public async Task ListCases(CommandContext Context, IUser userT)
+        public async Task ListCases(SocketCommandContext Context, IUser userT)
         {
             try
             {
-                var bot = await Context.Guild.GetUserAsync(270931284489011202, Discord.CacheMode.AllowDownload) as IGuildUser;
+                var bot = Context.Guild.GetUser(270931284489011202) as IGuildUser;
                 var mod = Context.User as SocketGuildUser;
                 if (!mod.GuildPermissions.Has(GuildPermission.BanMembers) && !mod.GuildPermissions.Has(GuildPermission.KickMembers))
                 {
@@ -222,11 +222,11 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
             }
         }
 
-        public async Task Kick(CommandContext Context, IUser userT, string reason)
+        public async Task Kick(SocketCommandContext Context, IUser userT, string reason)
         {
             try
             {
-                var bot = await Context.Guild.GetUserAsync(270931284489011202, Discord.CacheMode.AllowDownload) as IGuildUser;
+                var bot = Context.Guild.GetUser(270931284489011202) as IGuildUser;
                 if (!bot.GuildPermissions.Has(GuildPermission.KickMembers))
                 {
                     await Context.Channel.SendMessageAsync(":no_entry_sign: I don't have kick permissions :frowning:");
@@ -274,11 +274,11 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
 
         }
 
-        public async Task WarnUser(CommandContext Context, IUser userT, string reason)
+        public async Task WarnUser(SocketCommandContext Context, IUser userT, string reason)
         {
             try
             {
-                var bot = await Context.Guild.GetUserAsync(270931284489011202, Discord.CacheMode.AllowDownload) as IGuildUser;
+                var bot = Context.Guild.GetUser(270931284489011202) as IGuildUser;
                 var mod = Context.User as SocketGuildUser;
                 if (!mod.GuildPermissions.Has(GuildPermission.BanMembers) && !mod.GuildPermissions.Has(GuildPermission.KickMembers))
                 {
@@ -342,11 +342,11 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
             }
         }
 
-        public async Task RemoveWarnings(CommandContext Context, IUser userT, int amount)
+        public async Task RemoveWarnings(SocketCommandContext Context, IUser userT, int amount)
         {
             try
             {
-                var bot = await Context.Guild.GetUserAsync(270931284489011202, CacheMode.AllowDownload) as IGuildUser;
+                var bot = Context.Guild.GetUser(270931284489011202) as IGuildUser;
                 var mod = Context.User as SocketGuildUser;
                 if (!mod.GuildPermissions.Has(GuildPermission.BanMembers) && !mod.GuildPermissions.Has(GuildPermission.KickMembers))
                 {
@@ -414,7 +414,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                 }
                 ModServiceDB.SavePunishLogs(_punishLogs);
                 //Log
-                var channel = await Context.Guild.GetChannelAsync(str.channelID) as IMessageChannel;
+                var channel = Context.Guild.GetChannel(str.channelID) as IMessageChannel;
                 if (channel == null)
                     return;
 
@@ -454,11 +454,11 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
             }
         }
 
-        public async Task PermBan(CommandContext Context, IUser userT, string reason)
+        public async Task PermBan(SocketCommandContext Context, IUser userT, string reason)
         {
             try
             {
-                var bot = await Context.Guild.GetUserAsync(270931284489011202, Discord.CacheMode.AllowDownload) as IGuildUser;
+                var bot = Context.Guild.GetUser(270931284489011202) as IGuildUser;
                 if (!bot.GuildPermissions.Has(GuildPermission.BanMembers))
                 {
                     await Context.Channel.SendMessageAsync(":no_entry_sign: I don't have ban permissions :frowning:");
@@ -505,7 +505,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
             }
         }
 
-        public async Task setPunishLogsChannel(CommandContext Context, IMessageChannel channel)
+        public async Task setPunishLogsChannel(SocketCommandContext Context, IMessageChannel channel)
         {
             try
             {
@@ -536,7 +536,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
             }
         }
 
-        public async Task delPunishLogsChannel(CommandContext Context)
+        public async Task delPunishLogsChannel(SocketCommandContext Context)
         {
             try
             {
@@ -649,7 +649,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
             }
         }
 
-        private async Task LogAction(Action type, IUser user, IUser mod, string reason, CommandContext Context = null, SocketGuild guildP = null)
+        private async Task LogAction(Action type, IUser user, IUser mod, string reason, SocketCommandContext Context = null, SocketGuild guildP = null)
         {
             try
             {
@@ -746,7 +746,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
 
         //ModLogs
 
-        public async Task setModLgosChannel(CommandContext Context, IMessageChannel channel)
+        public async Task setModLgosChannel(SocketCommandContext Context, IMessageChannel channel)
         {
             try
             {
@@ -777,7 +777,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
             }
         }
 
-        public async Task removeModLogsChannel(CommandContext Context)
+        public async Task removeModLogsChannel(SocketCommandContext Context)
         {
             try
             {
@@ -1234,7 +1234,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
 
         }
 
-        public async Task ShowConfigLog(CommandContext Context)
+        public async Task ShowConfigLog(SocketCommandContext Context)
         {
             var user = Context.User as SocketGuildUser;
             if (!user.GuildPermissions.Has(GuildPermission.Administrator))
@@ -1299,7 +1299,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
             await Context.Channel.SendMessageAsync("", embed: eb);
         }
 
-        public async Task ToggleRole(CommandContext Context)
+        public async Task ToggleRole(SocketCommandContext Context)
         {
             var user = Context.User as SocketGuildUser;
             if (!user.GuildPermissions.Has(GuildPermission.Administrator))
@@ -1321,7 +1321,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
             await Context.Channel.SendMessageAsync($":white_check_mark: Successfully set Role Change log to {modLogs.roleChange}");
         }
 
-        public async Task ToggleServer(CommandContext Context)
+        public async Task ToggleServer(SocketCommandContext Context)
         {
             var user = Context.User as SocketGuildUser;
             if (!user.GuildPermissions.Has(GuildPermission.Administrator))
@@ -1342,7 +1342,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
             await Context.Channel.SendMessageAsync($":white_check_mark: Successfully set Server Change log to {modLogs.serverChange}");
         }
 
-        public async Task ToggleChannel(CommandContext Context)
+        public async Task ToggleChannel(SocketCommandContext Context)
         {
             var user = Context.User as SocketGuildUser;
             if (!user.GuildPermissions.Has(GuildPermission.Administrator))
@@ -1363,7 +1363,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
             await Context.Channel.SendMessageAsync($":white_check_mark: Successfully set Channel Change log to {modLogs.channelChange}");
         }
 
-        public async Task ToggleMessage(CommandContext Context)
+        public async Task ToggleMessage(SocketCommandContext Context)
         {
             var user = Context.User as SocketGuildUser;
             if (!user.GuildPermissions.Has(GuildPermission.Administrator))
