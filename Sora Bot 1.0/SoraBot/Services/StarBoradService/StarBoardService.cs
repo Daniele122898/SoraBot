@@ -57,6 +57,11 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                 {
                     if (reaction.Emoji.Name.Equals("⭐") || reaction.Emoji.Name.Equals("🌟"))
                     {
+                        var chan = (((reaction.Channel as IGuildChannel).Guild as SocketGuild)
+                                   .GetChannel(channelID) as
+                                   IMessageChannel);
+                        if (chan == null)
+                            return;
                         /*
                         if (!msg.IsSpecified) //!String.IsNullOrEmpty(tag)
                         {
@@ -124,9 +129,8 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                                     },
                                     Description = (msg.Content.Contains("http") ? "Link detected. Copied outside to embed link/picture" : msg.Content)
                                 };
-                                sentMessage = await (((reaction.Channel as IGuildChannel).Guild as SocketGuild)
-                                    .GetChannel(channelID) as
-                                    IMessageChannel).SendMessageAsync(
+
+                                sentMessage = await chan.SendMessageAsync(
                                     $"{reaction.Emoji.Name} in #{msg.Channel.Name}{(msg.Content.Contains("http") ? $" by {msg.Author.Username}#{msg.Author.Discriminator}\n{msg.Content}" : "")}",
                                     false, (msg.Content.Contains("http") ? null : eb));
 
@@ -149,9 +153,8 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                                     Description =
                                         msg.Content
                                 };
-                                sentMessage = await (((reaction.Channel as IGuildChannel).Guild as SocketGuild)
-                                    .GetChannel(channelID) as
-                                    IMessageChannel).SendMessageAsync(
+
+                                sentMessage = await chan.SendMessageAsync(
                                     $"{reaction.Emoji.Name} in #{msg.Channel.Name}\n",
                                     false, eb);
                             }
@@ -190,9 +193,13 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                         msgStruct.counter -= 1;
                         var guild = ((reaction.Channel as IGuildChannel)?.Guild as SocketGuild);
                         var channel = guild?.GetChannel(channelID) as IMessageChannel;
+                        if (channel == null)
+                            return;
                         var msgToEdit =
                             (IUserMessage)
                             await channel.GetMessageAsync(msgStruct.starMSGID, CacheMode.AllowDownload, null);
+                        if (msgToEdit == null)
+                            return;
 
                         if (msgStruct.counter < 1)
                         {

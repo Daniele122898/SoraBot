@@ -4,17 +4,17 @@ https://discordapp.com/oauth2/authorize?client_id=270931284489011202&scope=bot&p
 ## Major Changelogs (check frequent one with ´$changelog´)
 
 **Version**
-0.1.2.0.0
+0.1.3.0.0
 
 **Date**
-15.4.2017 14:00 UTC +2
+17.4.2017 20:00 UTC +2
 
 **Changes**
-  - Add Songs via YT name
-  - Get Lol User stats
-  - Search Gifs on Giphy
-  - Get Random Chuck norris jokes
-  - Get Weather for your city
+  - Added Reminders!
+  - Removed R rated content 
+    from gif search
+  - Fixed crucial Mod service bug
+  - Fixed some starboard bugs
 	  
 	  
 # Help => Can be found in Wiki as well (updated more frequently)

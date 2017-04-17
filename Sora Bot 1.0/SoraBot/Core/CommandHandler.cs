@@ -23,6 +23,7 @@ using Sora_Bot_1.SoraBot.Services.Weather;
 using Sora_Bot_1.SoraBot.Services.LeagueOfLegends;
 using Sora_Bot_1.SoraBot.Services.Giphy;
 using Sora_Bot_1.SoraBot.Services.YT;
+using Sora_Bot_1.SoraBot.Services.Reminder;
 
 namespace Sora_Bot_1.SoraBot.Core
 {
@@ -47,6 +48,8 @@ namespace Sora_Bot_1.SoraBot.Core
         private AnimeService _animeService;
         private TagService tagService;
         private UbService _ubService;
+        private ReminderService _remindService;
+        private InteractiveService _interactiveService;
         private RatelimitService ratelimitService;
         private EPService epService;
         private PlayingWith playingWith;
@@ -78,13 +81,14 @@ namespace Sora_Bot_1.SoraBot.Core
             tagService = new TagService();
             patService = new PatService();
             epService = new EPService(client);
+            _interactiveService = new InteractiveService(client);
             SentryService.client = client;
             //SentryService.Install();
 
             commands = new CommandService();
             map = new DependencyMap();
             playingWith = new PlayingWith(client);
-            map.Add(new InteractiveService(client));
+            map.Add(_interactiveService);
             map.Add(musicService);
             map.Add(_modService);
             map.Add(handler);
@@ -122,6 +126,8 @@ namespace Sora_Bot_1.SoraBot.Core
             client.LeftGuild += Client_LeftGuild;
             client.GuildAvailable += Client_GuildAvailable;
 
+            client.Ready += Client_Ready;
+
             //Bans
 
             client.UserBanned += _modService.Client_UserBanned;
@@ -139,6 +145,13 @@ namespace Sora_Bot_1.SoraBot.Core
             client.ChannelUpdated += _modService.Client_ChannelUpdated;
 
             client.GuildUpdated += _modService.Client_GuildUpdated;
+
+        }
+
+        private async Task Client_Ready()
+        {
+            _remindService = new ReminderService(client, _interactiveService);
+            map.Add(_remindService);
         }
 
         private async Task Client_GuildAvailable(SocketGuild guild)
