@@ -10,21 +10,17 @@ https://discordapp.com/oauth2/authorize?client_id=270931284489011202&scope=bot&p
 ## Major Changelogs (check frequent one with ´$changelog´)
 
 **Version**
-0.1.0.1.0
+0.1.3.0.0
 
 **Date**
-02.4.2017 20:00 UTC +1
+17.4.2017 20:00 UTC +2
 
 **Changes**
-  - Added kisses, hugs, pokes, slaps
-    => With them came Affinity
-  - Songs will show who requested it.
-  - The bot is not YT only anymore.
-    It can play basically anything
-    SoundCloud, Youtube, Vimeo and whatever
-  - Removed the patcount due to affinity
-  - AFK chars are now limited
-  - Fixed some bugs
+  - Added Reminders!
+  - Removed R rated content 
+    from gif search
+  - Fixed crucial Mod service bug
+  - Fixed some starboard bugs
 	  
 	  
 # Help => Can be found in Wiki as well (updated more frequently)
@@ -56,6 +52,16 @@ Sora can always be invoked with mentioning him. But using that function is proba
 | `getRoles`    | *none*       | `$getRoles`        | *none*       | Posts a list of all self-assignable roles in the Guild                                                                                                                       |
 | `getAllRoles` | *none*       | `$getAllRoles`     | *none*       | Posts a list of all roles in the Guild ordered by Position in the hirachy                                                                                                    |
 
+## Reminders
+**GENERAL** Finally Added reminders. The `$reminders` list only shows 10 most recent of your reminders. If you have more, they wont be shown in there. 
+They are shown in the list when you do `$rmremind` with less detail tho.
+
+| Command     | Parameter                                            | Example                                    | Output                                                                                                                                                                                            |
+|-------------|------------------------------------------------------|--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `remind`    | <what to remind you> **in** weeks days hours minutes | `$remind to update sora in 2 minutes 30 s` | The time can be written in any order BUT has to be written correctly. Dont write 2 mins **AND** 30 seconds. That will fail. Just use the amount and what type after => <amount> <type(w,d,h,m,s)> |
+| `reminders` | *none*                                               | `$reminders`                               | Shows a list of the 10 MOST RECENT reminders. It will show them in descending order with time and message                                                                                         |
+| `rmremind`  | *none*                                               | `$rmremind`                                | Posts a list of all your reminders, you then have to enter a valid index to remove the specified reminder!                                                                                        |
+
 ## Admin / Mod
 **GENERAL** This whole module needs permissions. Its to moderate and log your entire guild. This feature is currently in Beta and still in development (8.4.2017)
 
@@ -81,29 +87,40 @@ Sora can always be invoked with mentioning him. But using that function is proba
 
 **GENERAL** With these you can make search queries for ub definitions, movies, series, animes and mangas!
 
-| Command | Parameter                              | Example                        | Output                                                                                 |
-|---------|----------------------------------------|--------------------------------|----------------------------------------------------------------------------------------|
-| `imdb`  | Title of Movie / Series                | `$imdb Inception`              | Gives you data about the movie / series from IMDb like plot, rating, genres etc..      |
-| `ub`    | Term to search for in Urban Dictionary | `$ub ohayou`                   | Gives you the definition of the Term with examples and its ub ratings                  |
-| `anime` | Title of Anime Series / Movie          | `$anime Overlord`              | Gives you data about the Series / Movie from Anilist like plot, raiting, genres etc... |
-| `manga` | Title of Manga                         | `$manga Boku no hero academia` | Gives you data about the Manga from Anilist like plot, raiting, genres etc...          |
+| Command       | Parameter                              | Example                        | Output                                                                                 |
+|---------------|----------------------------------------|--------------------------------|----------------------------------------------------------------------------------------|
+| `imdb`        | Title of Movie / Series                | `$imdb Inception`              | Gives you data about the movie / series from IMDb like plot, rating, genres etc..      |
+| `ub`          | Term to search for in Urban Dictionary | `$ub ohayou`                   | Gives you the definition of the Term with examples and its ub ratings                  |
+| `anime`       | Title of Anime Series / Movie          | `$anime Overlord`              | Gives you data about the Series / Movie from Anilist like plot, raiting, genres etc... |
+| `manga`       | Title of Manga                         | `$manga Boku no hero academia` | Gives you data about the Manga from Anilist like plot, raiting, genres etc...          |
+| `gif`         | Name of Gif                            | `$gif funny cat`               | Gives a random Gif from Giphy with specified Title                                     |
+| `chucknorris` | *none*                                 | `$chucknorris`                 | Gives random Chuck Norris Jokes from chucknorris.io API                                |
+| `weather`     | City Name                              | `$weather Zurich`              | Gives the current weather in the location                                              |
+
+## League Of Legends
+
+| Command    | Parameter                    | Example                   | Output                                                                            |
+|------------|------------------------------|---------------------------|-----------------------------------------------------------------------------------|
+| `summoner` | <lol region> <summoner name> | `$summoner na Nightblue3` | Gives very basic information about the summoner and his Summoner Icon             |
+| `lolstats` | <lol region> <summoner name> | `$lolstats na Nightblue3` | Gives Detailed infromation about summoners Ranked 5v5, Aram and Normal game stats |
 
 ## Music
 
-**GENERAL** Sora can **FINALLY** play all sorts of sources. YT, Soundcloud, vimeo ~~and even youporn~~ :eyes:  Have fun :) (The previous music library was completely cleaned -> deleted over 4.5k songs and 29 GB)
-Newly added: Bot will leave the channel if no one is in it anymore
+**GENERAL** Sora can **FINALLY** play all sorts of sources. YT, Soundcloud, vimeo ~~and even youporn~~ :eyes:  Have fun :) 
+**ATTENTION** Sora can now add yt videos by NAME. use `$addyt <name>` for this new feature.
 
-Command | Parameter | Example | Output 
---- | --- | --- | ---
-`join` | *none* | `$join` | Joins the VoiceChannel of the calling user
-`add` | YT video Url | `$add https://www.youtube.com/watch?v=Zt8Im_1fowA` | Only works with YT links. Adds the video to your queue
-`skip` | *none* | `$skip` | Skips the current song and go to the next in the queue
-`clear` | *none* | `$clear` | Clears the whole queue for the Guild. **Requires** Manage Channels permissions
-`list` | *none* | `$list` | Shows the entire current queue
-`np` | *none* | `$np` | Shows the current track that is playing
-`play` | *none* | `$play` | Starts the playback of the current queue
-`leave` | *none* | `$leave` | Leaves the channel of the user
-`stop` | *none* | `$stop` | Stops the audio playback
+| Command                | Parameter                             | Example                                                                  | Output                                                                                                   |
+|------------------------|---------------------------------------|--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
+| `join`                 | *none*                                | `$join`                                                                  | Joins the VoiceChannel of the calling user                                                               |
+| `add`                  | Video / Song URL **OR** YT video name | `$add https://www.youtube.com/watch?v=Zt8Im_1fowA` / `$add Stressed Out` | If supported, it adds the URL to the queue. If no link is added it will search the YT API for yt videos. |
+| `addyt` **deprecated** | YT Video Name                         | `$addyt Axel Boy & Maxx Baer - Try Loving (Ft. MOZA)`                    | Gives you a list of Videos with that name, where you can choose which one to add.                        |
+| `skip`                 | *none*                                | `$skip`                                                                  | Skips the current song and go to the next in the queue                                                   |
+| `clear`                | *none*                                | `$clear`                                                                 | Clears the whole queue for the Guild. **Requires** Manage Channels permissions                           |
+| `list`                 | *none*                                | `$list`                                                                  | Shows the entire current queue                                                                           |
+| `np`                   | *none*                                | `$np`                                                                    | Shows the current track that is playing                                                                  |
+| `play`                 | *none*                                | `$play`                                                                  | Starts the playback of the current queue                                                                 |
+| `leave`                | *none*                                | `$leave`                                                                 | Leaves the channel of the user                                                                           |
+| `stop`                 | *none*                                | `$stop`                                                                  | Stops the audio playback                                                                                 |
 
 ## AFK / Away
 **GENERAL** Keep in mind that your AFK status is GLOBAL. So if you want to say `i suck dick` in one guild but rather not in another then.. Do it at your own risk ;) I might add local / guild bound AFK in the future. The AFK message will only trigger every 30 seconds to prevent spam.
@@ -145,7 +162,7 @@ Example: `$a welcome Welcome {user} to {server} you are our {count}th member!`
 
 | Command      	| Parameter                	| Example                                  	| Output                                                                                                                                                                                          	|
 |--------------	|--------------------------	|------------------------------------------	|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|
-| `t create`   	| [tagname] ¦ [tagvalue]   	| `$t create test ¦ this will be displyed` 	| Creates a tag                                                                                                                                                                                   	|
+| `t create`   	| [tagname] ¦ [tagvalue]   	| `$t create test ¦ this will be displyed` 	| Creates a tag (THE SYMBOL BETWEEN THE NAME AND VALUE IS A PIPE! CANT USE IT IN THIS MARKDOWN TABLE :()                                                                                                                                                                                  	|
 | `t remove`   	| tagname                  	| `$t remove test`                         	| Removes the specified tag => You either need to be the creator or the specified permission group to do that. (If not specified it's manage hannels)                                             	|
 | `t taglist`  	| *none*                   	| `$t taglist`                             	| This will list all tags in the Guild                                                                                                                                                            	|
 | `t`          	| tagname                  	| `$t test`                                	| This will post the value of the specified tag                                                                                                                                                   	|
@@ -186,11 +203,12 @@ You cannot star your own message. It will not be added to the starboard. Only di
 
 **PREFIX** This Command uses a module prefix. which means infront of all commands needs to be the prefix `info`!
 
-| Command      | Parameter       | Example                                    | Output                                                                                                                                                                    |
-|--------------|-----------------|--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `info`       | *none*          | `$info`                                    | Displays all the infos about Sora. (Current Guilds, Architecture, uptime, ping etc..)                                                                                     |
+| Command      | Parameter       | Example                                  | Output                                                                                                                                                                    |
+|--------------|-----------------|------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `info`       | *none*          | `$info`                                  | Displays all the infos about Sora. (Current Guilds, Architecture, uptime, ping etc..)                                                                                     |
 | `info user`  | [@mention user] | `$info user / $info user @Serenity#0783` | If no user is entered as Parameter, you yourself will be the user displayed. This will post infos about the user like a link to his avatar, when he created the acc etc.. |
-| `info guild` | *none*          | `$info guild`                                | Posts info about the guild similar to the user command                                                                                                                    |
+| `info guild` | *none*          | `$info guild`                            | Posts info about the guild similar to the user command                                                                                                                    |
+| `info perms` | @user           | `$info user @Serenity#0783`              | Posts info about users guild permissions! You **REQUIRE** any kind of mod perms to invoke this command                                                                    |
 
 ## Miscellaneous and Fun
 

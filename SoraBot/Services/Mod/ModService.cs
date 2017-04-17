@@ -58,6 +58,11 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                 }
                 punishStruct str = new punishStruct();
                 _punishLogs.TryGetValue(Context.Guild.Id, out str);
+                if (str == null)
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: You first must set up a Punish-Logs Channel! `$punishlogs [#channel]`");
+                    return;
+                }
                 if (str.punishes == null)
                 {
                     await Context.Channel.SendMessageAsync(":no_entry_sign: There are no logs found.");
@@ -177,7 +182,12 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                 //Get warnings
                 punishStruct str = new punishStruct();
                 _punishLogs.TryGetValue(Context.Guild.Id, out str);
-                if(str.punishes == null)
+                if (str == null)
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: You first must set up a Punish-Logs Channel! `$punishlogs [#channel]`");
+                    return;
+                }
+                if (str.punishes == null)
                 {
                     await Context.Channel.SendMessageAsync(":no_entry_sign: There are no logs found.");
                     return;
@@ -309,6 +319,11 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                 //Get warnings
                 punishStruct str = new punishStruct();
                 _punishLogs.TryGetValue(Context.Guild.Id, out str);
+                if(str == null)
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: You first must set up a Punish-Logs Channel! `$punishlogs [#channel]`");
+                    return;
+                }
                 if (str.punishes == null)
                 {
                     str.punishes = new List<punishCase>();
@@ -377,6 +392,11 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                 //Get warnings
                 punishStruct str = new punishStruct();
                 _punishLogs.TryGetValue(Context.Guild.Id, out str);
+                if (str == null)
+                {
+                    await Context.Channel.SendMessageAsync(":no_entry_sign: You first must set up a Punish-Logs Channel! `$punishlogs [#channel]`");
+                    return;
+                }
                 if (str.punishes == null)
                 {
                     await Context.Channel.SendMessageAsync(":no_entry_sign: There are no logs found.");

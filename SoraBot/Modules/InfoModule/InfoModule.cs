@@ -434,7 +434,7 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                 {
                     x.Name = "AFK Channel";
                     x.IsInline = true;
-                    x.Value = $"{(Context.Guild.AFKChannel == null ? $"No AFK Channel" : $"{Context.Guild.AFKChannel.Name}\n*in {Context.Guild.AFKTimeout} Min*")}";
+                    x.Value = $"{(Context.Guild.AFKChannel == null ? $"No AFK Channel" : $"{Context.Guild.AFKChannel.Name}\n*in {(int)(Context.Guild.AFKTimeout / 60)} Min*")}";
                 });
 
                 eb.AddField((x) =>
