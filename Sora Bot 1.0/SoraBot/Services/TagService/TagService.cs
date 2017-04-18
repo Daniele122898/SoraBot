@@ -216,22 +216,15 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
                         {
                             Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
                             IconUrl = Context.User.GetAvatarUrl()
-                        }
+                        },
+                        Title = "Tags in this Guild"
                     };
-
-                    eb.AddField((x) =>
+                    string tagsInGuild = "";
+                    foreach (var t in tagStruct)
                     {
-                        x.Name = "Tags in this Guild";
-                        x.Value = "";
-                        foreach (var t in tagStruct)
-                        {
-                            x.Value += $"**{t.tag}**\n";
-                        }
-                        if (x.Value.ToString().Length < 1)
-                        {
-                            x.Value = "None";
-                        }
-                    });
+                        tagsInGuild += $"**{t.tag}**\n";
+                    }
+                    eb.Description = tagsInGuild;
                     await Context.Channel.SendMessageAsync("", false, eb);
                 }
                 else

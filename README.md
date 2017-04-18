@@ -46,6 +46,16 @@ Sora can always be invoked with mentioning him. But using that function is proba
 | `getRoles`    | *none*       | `$getRoles`        | *none*       | Posts a list of all self-assignable roles in the Guild                                                                                                                       |
 | `getAllRoles` | *none*       | `$getAllRoles`     | *none*       | Posts a list of all roles in the Guild ordered by Position in the hirachy                                                                                                    |
 
+## Reminders
+**GENERAL** Finally Added reminders. The `$reminders` list only shows 10 most recent of your reminders. If you have more, they wont be shown in there. 
+They are shown in the list when you do `$rmremind` with less detail tho.
+
+| Command     | Parameter                                            | Example                                    | Output                                                                                                                                                                                            |
+|-------------|------------------------------------------------------|--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `remind`    | <what to remind you> **in** weeks days hours minutes | `$remind to update sora in 2 minutes 30 s` | The time can be written in any order BUT has to be written correctly. Dont write 2 mins **AND** 30 seconds. That will fail. Just use the amount and what type after => <amount> <type(w,d,h,m,s)> |
+| `reminders` | *none*                                               | `$reminders`                               | Shows a list of the 10 MOST RECENT reminders. It will show them in descending order with time and message                                                                                         |
+| `rmremind`  | *none*                                               | `$rmremind`                                | Posts a list of all your reminders, you then have to enter a valid index to remove the specified reminder!                                                                                        |
+
 ## Admin / Mod
 **GENERAL** This whole module needs permissions. Its to moderate and log your entire guild. This feature is currently in Beta and still in development (8.4.2017)
 
@@ -187,11 +197,12 @@ You cannot star your own message. It will not be added to the starboard. Only di
 
 **PREFIX** This Command uses a module prefix. which means infront of all commands needs to be the prefix `info`!
 
-| Command      | Parameter       | Example                                    | Output                                                                                                                                                                    |
-|--------------|-----------------|--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `info`       | *none*          | `$info`                                    | Displays all the infos about Sora. (Current Guilds, Architecture, uptime, ping etc..)                                                                                     |
+| Command      | Parameter       | Example                                  | Output                                                                                                                                                                    |
+|--------------|-----------------|------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `info`       | *none*          | `$info`                                  | Displays all the infos about Sora. (Current Guilds, Architecture, uptime, ping etc..)                                                                                     |
 | `info user`  | [@mention user] | `$info user / $info user @Serenity#0783` | If no user is entered as Parameter, you yourself will be the user displayed. This will post infos about the user like a link to his avatar, when he created the acc etc.. |
-| `info guild` | *none*          | `$info guild`                                | Posts info about the guild similar to the user command                                                                                                                    |
+| `info guild` | *none*          | `$info guild`                            | Posts info about the guild similar to the user command                                                                                                                    |
+| `info perms` | @user           | `$info user @Serenity#0783`              | Posts info about users guild permissions! You **REQUIRE** any kind of mod perms to invoke this command                                                                    |
 
 ## Miscellaneous and Fun
 

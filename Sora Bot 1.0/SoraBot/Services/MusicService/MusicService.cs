@@ -520,6 +520,8 @@ namespace Sora_Bot_1.SoraBot.Services
                         var infoT = JObject.Parse(infoJsonT);
 
                         var titleT = infoT["fulltitle"].ToString();
+                        if (String.IsNullOrWhiteSpace(titleT))
+                            titleT = "Couldn't find name";
 
                         eb.AddField((efb) =>
                         {
@@ -533,10 +535,8 @@ namespace Sora_Bot_1.SoraBot.Services
                             efb.Value = $"[{dur}] - **[{titleT}]({StringEncoder.Base64Decode(queue[0].name)})** \n      \t*by {queue[0].user}*";
                         });
 
-                        eb.AddField((efb) =>
-                        {
-                            efb.Name = "Queue";
-                            efb.IsInline = false;
+                        
+                            
                             int lenght = 0;
                             if (queue.Count > 11)
                             {
@@ -548,25 +548,35 @@ namespace Sora_Bot_1.SoraBot.Services
                             }
                             for (int i = 1; i < lenght; i++)
                             {
-                                var infoJson = File.ReadAllText($"{queue[i].name}.info.json");
-                                var info = JObject.Parse(infoJson);
+                                eb.AddField((efb) =>
+                                {
+                                    efb.Name = $"#{i} by {queue[i].user}";
+                                    efb.IsInline = false;   
+                                    var infoJson = File.ReadAllText($"{queue[i].name}.info.json");
+                                    var info = JObject.Parse(infoJson);
 
-                                int duration = 0;
-                                var con = Int32.TryParse(info["duration"].ToString(), out duration);
-                                string dur = "00:00";
-                                if (con)
-                                    dur = Convert(duration);
+                                    int duration = 0;
+                                    var con = Int32.TryParse(info["duration"].ToString(), out duration);
+                                    string dur = "00:00";
+                                    if (con)
+                                        dur = Convert(duration);
 
-                                var title = info["fulltitle"].ToString();
-                                if (((efb.Value == null ? 0 : efb.Value.ToString().Length) + ($"**{i}.** {title} \n      \t- {queue[i].user}\n").Length) > 1000)
-                                    break;
-                                efb.Value += $"**{i}.** [{dur}] - **[{title}]({StringEncoder.Base64Decode(queue[i].name)})** \n      \t*by {queue[i].user}*\n";
-                            }
+                                    var title = info["fulltitle"].ToString();
+                                    if (String.IsNullOrWhiteSpace(title))
+                                        title = "Couldn't find name";
+                                    efb.Value += $"[{dur}] - **[{title}]({StringEncoder.Base64Decode(queue[i].name)})**";//\n      \t*by {queue[i].user}*\n";
+                                });
+                              }       
                             if (queue.Count == 1)
                             {
+                            eb.AddField((efb) =>
+                            {
+                                efb.Name = "Queue";
+                                efb.IsInline = false;
                                 efb.Value = "No Songs in Queue";
+                            });
                             }
-                        });
+                        
 
                         await Context.Channel.SendMessageAsync("", false, eb);
                     }

@@ -24,6 +24,7 @@ using Sora_Bot_1.SoraBot.Services.LeagueOfLegends;
 using Sora_Bot_1.SoraBot.Services.Giphy;
 using Sora_Bot_1.SoraBot.Services.YT;
 using Sora_Bot_1.SoraBot.Services.Reminder;
+using Sora_Bot_1.SoraBot.Services.RateLimit;
 
 namespace Sora_Bot_1.SoraBot.Core
 {
@@ -51,11 +52,14 @@ namespace Sora_Bot_1.SoraBot.Core
         private ReminderService _remindService;
         private InteractiveService _interactiveService;
         private RatelimitService ratelimitService;
+        private RatelimitService2 _rateLimit2;
         private EPService epService;
         private PlayingWith playingWith;
         private int _commandsRan = 0;
         public static Dictionary<ulong, string> prefixDict = new Dictionary<ulong, string>();
         private JsonSerializer jSerializer = new JsonSerializer();
+
+        private bool loaded = false;
 
         public async Task Install(DiscordSocketClient c)
         {
@@ -74,6 +78,7 @@ namespace Sora_Bot_1.SoraBot.Core
             _ytService = new YTService();
             musicService = new MusicService(_ytService);
             _lolService = new lolService();
+            _rateLimit2 = new RatelimitService2();
             _gifService = new GifService();
             _animeService = new AnimeService();
             //remService = new ReminderService();
@@ -150,8 +155,12 @@ namespace Sora_Bot_1.SoraBot.Core
 
         private async Task Client_Ready()
         {
-            _remindService = new ReminderService(client, _interactiveService);
-            map.Add(_remindService);
+            if (!loaded)
+            {
+                _remindService = new ReminderService(client, _interactiveService);
+                map.Add(_remindService);
+                loaded = true;
+            }
         }
 
         private async Task Client_GuildAvailable(SocketGuild guild)
@@ -339,29 +348,19 @@ namespace Sora_Bot_1.SoraBot.Core
                 return;
 
             //Send to Ratelimiter Service
-            if(await ratelimitService.onlyCheck(context.User, context.Guild, context))
+            //if(await ratelimitService.onlyCheck(context.User, context.Guild, context))
+            //  return;
+
+            if (_rateLimit2.CheckIfRatelimited(context.User))
                 return;
 
-            //Execute the command. (result does no indicate a return value
-            // rather an object starting if the command executed successfully
-            /*
-            IResult result;
-            try
-            {
-                result = await commands.ExecuteAsync(context, argPos, map);
-                if (result.IsSuccess)
-                    await ratelimitService.checkRatelimit(context);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                await SentryService.SendError(e, context);
-            }*/
             var result = await commands.ExecuteAsync(context, argPos, map);
 
             if (result.IsSuccess)
             {
-                await ratelimitService.checkRatelimit(context.User);
+                //await ratelimitService.checkRatelimit(context.User);
+                Console.WriteLine("Command Successfully ran!");
+                await _rateLimit2.RateLimitMain(context.User);
                 _commandsRan++;
             }
 

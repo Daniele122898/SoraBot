@@ -354,8 +354,10 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                     {
                         using (JsonReader reader = new JsonTextReader(sr))
                         {
-                            starChannelDict =
+                            var temp =
                                 jSerializer.Deserialize<ConcurrentDictionary<ulong, ulong>>(reader);
+                            if (temp != null)
+                                starChannelDict = temp;
                         }
                     }
                 }

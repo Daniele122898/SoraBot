@@ -96,7 +96,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     }
                 }
 
-                if (!url.EndsWith(".jpg") && !url.EndsWith(".png") && !url.EndsWith(".gif"))
+                if (!url.EndsWith(".jpg") && !url.EndsWith(".png") && !url.EndsWith(".gif") && !url.EndsWith(".jpeg"))
                 {
                     await Context.Channel.SendMessageAsync(":no_entry_sign: You must link an Image!");
                     return;
