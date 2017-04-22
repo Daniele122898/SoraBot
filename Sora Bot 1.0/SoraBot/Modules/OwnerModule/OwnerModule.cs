@@ -187,6 +187,13 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
             Console.WriteLine(write);
         }
 
+        [Command("retry")]
+        [RequireOwner]
+        public async Task RetryTry()
+        {
+            await Context.Channel.SendMessageAsync("test", false, null, new RequestOptions { Timeout = 5000, RetryMode = RetryMode.AlwaysRetry });
+        }
+
         [Command("shutdown")]
         [RequireOwner]
         public async Task ShutDown()

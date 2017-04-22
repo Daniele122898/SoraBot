@@ -17,7 +17,7 @@ namespace Sora_Bot_1.SoraBot.Services.RateLimit
         private const int BUCKET_DRAIN_SIZE = 1;
         private const int BUCKET_RATELIMITER = 20;
         private const int COMBO_MAX = 5;
-        private const int COMBO_PENALTY = 5;
+        private const int COMBO_PENALTY = 12;
         private const int COMBO_TIME_INTERVALL = 6;
         private const int COMBO_RATELIMITER = 30;
 
@@ -41,10 +41,6 @@ namespace Sora_Bot_1.SoraBot.Services.RateLimit
                     {
                         if (bucket.Value.bucketSize < BUCKET_MAX_FILL)
                             bucket.Value.bucketSize += BUCKET_DROP_SIZE;
-                        Console.WriteLine($"{bucket.Key} gained a drop : {bucket.Value.bucketSize}");
-                    }
-                    foreach (var bucket in temp)
-                    {
                         _bucketDict.TryUpdate(bucket.Key, bucket.Value);
                     }
                     //SAVE DB
@@ -77,10 +73,8 @@ namespace Sora_Bot_1.SoraBot.Services.RateLimit
                     };
                     _bucketDict.TryAdd(user.Id, data);
                     //TODO SAVE DATABASE
-                    Console.WriteLine("BUCKET CREATED");
                     return;
                 }
-                Console.WriteLine("BUCKET EXISTED");
             }
             catch (Exception e)
             {
@@ -95,7 +89,9 @@ namespace Sora_Bot_1.SoraBot.Services.RateLimit
             {
                 CreateBucketIfNotExistant(user);
                 if (!CheckComboAndAdd(user).Result)
+                {
                     return;
+                }
                 await SubstractFromBucket(user);
             }
             catch (Exception e)
@@ -108,11 +104,9 @@ namespace Sora_Bot_1.SoraBot.Services.RateLimit
         {
             try
             {
-                Console.WriteLine("CHECKING RATELIMIT");
                 BucketData data = new BucketData();
                 if (!_bucketDict.TryGetValue(user.Id, out data))
                     return false;
-                Console.WriteLine($"RATELIMITED TILL COMPARE: {data.rateLimitedTill.CompareTo(DateTime.UtcNow)}");
                 if (data.rateLimitedTill.CompareTo(DateTime.UtcNow) >= 0)
                     return true;
                 if (data.bucketSize <= 0)
@@ -148,7 +142,6 @@ namespace Sora_Bot_1.SoraBot.Services.RateLimit
                                                                     $"User: {user.Username}#{user.Discriminator} \t{user.Id}");
                 }
                 _bucketDict.TryUpdate(user.Id, data);
-                Console.WriteLine($"SUBSTRACTED FROM BUCKET: SIZE NOW {data.bucketSize}");
                 //TODO SAVE DATABASE
             }
             catch (Exception e)
@@ -163,8 +156,6 @@ namespace Sora_Bot_1.SoraBot.Services.RateLimit
             {
                 BucketData data = new BucketData();
                 if (!_bucketDict.TryGetValue(user.Id, out data))
-                    return false;
-                if (data.combo >= COMBO_MAX)
                     return false;
                 //Check if still in combo time
                 if (DateTime.UtcNow.Subtract(data.lastCommand).TotalSeconds <= COMBO_TIME_INTERVALL)
@@ -183,12 +174,10 @@ namespace Sora_Bot_1.SoraBot.Services.RateLimit
                         data.bucketSize -= COMBO_PENALTY;
                         _bucketDict.TryUpdate(user.Id, data);
                         //TODO SAVE DATABASE
-                        Console.WriteLine($"COMBO BREAKER : {data.combo}");
                         return false;
                     }
                     _bucketDict.TryUpdate(user.Id, data);
                     //TODO SAVE DATABASE
-                    Console.WriteLine($"COMBO ADDED : {data.combo}");
                     return true;
                 }
                 //Reset combo
@@ -196,7 +185,6 @@ namespace Sora_Bot_1.SoraBot.Services.RateLimit
                 data.combo = 1;
                 _bucketDict.TryUpdate(user.Id, data);
                 //TODO SAVE DATABASE
-                Console.WriteLine("COMBO RESTARTED");
                 return true;
             }
             catch (Exception e)
