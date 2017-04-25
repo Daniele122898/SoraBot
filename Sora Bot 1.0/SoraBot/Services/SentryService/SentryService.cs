@@ -37,6 +37,11 @@ namespace Sora_Bot_1.SoraBot.Services
             try
             {
                 var err = e.ToString();
+
+                //CHECK IF ERROR 50001
+                if (err.Contains("error 50001: Missing Access"))
+                    return;
+
                 if (err.Length <2000)
                 {
                     var eb = new EmbedBuilder()
@@ -95,7 +100,12 @@ namespace Sora_Bot_1.SoraBot.Services
             try
             {
                 var err = e.ToString();
-                if(err.Length < 1700)
+
+                //CHECK IF error 50001: Missing Access
+                if(err.Contains("error 50001: Missing Access"))
+                    return;
+
+                if (err.Length < 1700)
                 {
                     var eb = new EmbedBuilder()
                     {

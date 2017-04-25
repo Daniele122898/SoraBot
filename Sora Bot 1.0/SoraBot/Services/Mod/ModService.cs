@@ -153,30 +153,40 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
             {
                 var bot = Context.Guild.GetUser(270931284489011202) as IGuildUser;
                 var mod = Context.User as SocketGuildUser;
-                if (!mod.GuildPermissions.Has(GuildPermission.BanMembers) && !mod.GuildPermissions.Has(GuildPermission.KickMembers))
-                {
-                    await Context.Channel.SendMessageAsync(":no_entry_sign: You don't have kick / ban permissions :frowning: You need at least one mod permission to list cases");
-                    return;
-                }
-                var modHighestRole = mod.Roles.OrderByDescending(r => r.Position).First();
                 var user = userT as SocketGuildUser;
-                var usersHighestRole = user.Roles.OrderByDescending(r => r.Position).First();
-
-                if (usersHighestRole.Position > modHighestRole.Position)
+                //CHECK IF USER TRIES TO FIND HIS OWN CASES
+                if (Context.User.Id != userT.Id)
                 {
-                    await Context.Channel.SendMessageAsync(":no_entry_sign: You can't view the cases of someone above you in the role hierarchy!");
-                    return;
-                }
+
+                    if (!mod.GuildPermissions.Has(GuildPermission.BanMembers) &&
+                        !mod.GuildPermissions.Has(GuildPermission.KickMembers))
+                    {
+                        await Context.Channel.SendMessageAsync(
+                            ":no_entry_sign: You don't have kick / ban permissions :frowning: You need at least one mod permission to list cases");
+                        return;
+                    }
+                    var modHighestRole = mod.Roles.OrderByDescending(r => r.Position).First();
+                    
+                    var usersHighestRole = user.Roles.OrderByDescending(r => r.Position).First();
+
+                    if (usersHighestRole.Position > modHighestRole.Position)
+                    {
+                        await Context.Channel.SendMessageAsync(
+                            ":no_entry_sign: You can't view the cases of someone above you in the role hierarchy!");
+                        return;
+                    }
 
 
-                var botHighestRole = bot.RoleIds.Select(x => Context.Guild.GetRole(x))
-                                               .OrderByDescending(x => x.Position)
-                                               .First();
+                    var botHighestRole = bot.RoleIds.Select(x => Context.Guild.GetRole(x))
+                        .OrderByDescending(x => x.Position)
+                        .First();
 
-                if (usersHighestRole.Position > botHighestRole.Position)
-                {
-                    await Context.Channel.SendMessageAsync(":no_entry_sign: I can't list the cases of someone above me in the role hierarchy!");
-                    return;
+                    if (usersHighestRole.Position > botHighestRole.Position)
+                    {
+                        await Context.Channel.SendMessageAsync(
+                            ":no_entry_sign: I can't list the cases of someone above me in the role hierarchy!");
+                        return;
+                    }
                 }
 
                 //Get warnings
@@ -209,8 +219,6 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                         IconUrl = Context.User.GetAvatarUrl()
                     },
                 };
-
-                var warnings = str.punishes.Where(x => x.userID == user.Id && x.type == Action.Warn).ToList();
 
 
                 foreach (var c in cases)

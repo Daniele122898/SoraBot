@@ -171,7 +171,6 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
                 await SentryService.SendError(e);
             }
         }
@@ -238,7 +237,6 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
                 await SentryService.SendError(e);
             }
         }
@@ -261,7 +259,6 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
                 await SentryService.SendError(e, Context);
             }
         }

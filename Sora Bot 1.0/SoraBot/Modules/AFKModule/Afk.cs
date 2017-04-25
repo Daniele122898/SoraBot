@@ -18,7 +18,7 @@ namespace Sora_Bot_1.SoraBot.Modules.AFKModule
             _afkService = afkService;
         }
 
-        [Command("afk"), Summary("Sets you AFK with a specified message to deliver to anyone that mentions you")]
+        [Command("afk"), Alias("away"), Summary("Sets you AFK with a specified message to deliver to anyone that mentions you")]
         public async Task ToggleAFK([Summary("Message to deliver when you get mentioned"), Remainder]string msg = "")
         {
             await _afkService.ToggleAFK(Context, msg);

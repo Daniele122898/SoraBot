@@ -359,7 +359,6 @@ namespace Sora_Bot_1.SoraBot.Core
             if (result.IsSuccess)
             {
                 //await ratelimitService.checkRatelimit(context.User);
-                Console.WriteLine("Command Successfully ran!");
                 await _rateLimit2.RateLimitMain(context.User);
                 _commandsRan++;
             }

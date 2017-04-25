@@ -33,5 +33,11 @@ namespace Sora_Bot_1.SoraBot.Modules.AnimeSearchModule
             await _animeService.GetManga(Context, manga, _interactive);
         }
 
+        [Command("character", RunMode = RunMode.Async), Alias("char"), Summary("Gets the stats of your desired Character")]
+        public async Task GetChar([Summary("Character to search"), Remainder]string charName)
+        {
+            await _animeService.GetAnimeChar(Context, charName, _interactive);
+        }
+
     }
 }

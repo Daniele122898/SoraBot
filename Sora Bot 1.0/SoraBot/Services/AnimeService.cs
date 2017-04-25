@@ -145,6 +145,112 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
+        public async Task GetAnimeChar(SocketCommandContext Context, string charName, InteractiveService interactive)
+        {
+            try
+            {
+                if (Environment.TickCount > timeToUpdate)
+                {
+                    await RequestAuth();
+                }
+
+                var search = System.Net.WebUtility.UrlEncode(charName);
+                var link = "http://anilist.co/api/character/search/" + Uri.EscapeUriString(search);
+                using (var http = new HttpClient())
+                {
+                    var res = await http.GetStringAsync(link + $"?access_token={anilistToken}").ConfigureAwait(false);
+                    var results = JArray.Parse(res);
+                    int index;
+                    if (results.Count > 1)
+                    {
+
+                        string choose = "";
+                        var ebC = new EmbedBuilder()
+                        {
+                            Color = new Color(4, 97, 247),
+                            Title = "Enter the Index of the Character you want more info about.",
+                        };
+                        int count = 1;
+                        foreach (var r in results)
+                        {
+                            choose += $"**{count}.** {r["name_first"]} {r["name_last"]}\n";
+                            count++;
+                        }
+                        ebC.Description = choose;
+                        await Context.Channel.SendMessageAsync("", embed: ebC);
+                        var response = await interactive.WaitForMessage(Context.User, Context.Channel,
+                            TimeSpan.FromSeconds(20));
+                        if (response == null)
+                        {
+                            await Context.Channel.SendMessageAsync(
+                                $":no_entry_sign: Answer timed out {Context.User.Mention} (≧д≦ヾ)");
+                            return;
+                        }
+
+                        if (!Int32.TryParse(response.Content, out index))
+                        {
+                            await Context.Channel.SendMessageAsync(":no_entry_sign: Only add the Index");
+                            return;
+                        }
+                        if (index > (results.Count) || index < 1)
+                        {
+                            await Context.Channel.SendMessageAsync(":no_entry_sign: Invalid Number");
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        index = 1;
+                    }
+                    var smallObj = JArray.Parse(res)[index - 1];
+                    var aniData =
+                        await http.GetStringAsync("http://anilist.co/api/character/" + smallObj["id"] +
+                                                  $"?access_token={anilistToken}").ConfigureAwait(false);
+                    //return await Task.Run(() => { try { return JsonConvert.DeserializeObject<AnimeResult>(aniData); } catch { return null; } }).ConfigureAwait(false);
+                    var animeDa = JsonConvert.DeserializeObject<CharacterResult>(aniData);
+
+                    var eb = animeDa.GetEmbed();
+                    eb.WithFooter(x =>
+                    {
+                        x.Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}";
+                        x.IconUrl = Context.User.GetAvatarUrl();
+                    });
+
+                    //.AddField(efb => efb.WithName("Japanese Name").WithValue(name_japanese).WithIsInline(true));
+                    if (!String.IsNullOrWhiteSpace(animeDa.name_japanese))
+                    {
+                        eb.AddField((x) =>
+                        {
+                            x.Name = "Japanese Name";
+                            x.IsInline = true;
+                            x.Value = animeDa.name_japanese;
+                        });
+                    }
+
+                    if (!String.IsNullOrWhiteSpace(animeDa.name_alt))
+                    {
+                        eb.AddField((x) =>
+                        {
+                            x.Name = "Alt Name";
+                            x.IsInline = true;
+                            x.Value = animeDa.name_alt;
+                        });
+                    }
+
+
+                    
+
+                    eb.Build();
+
+                    await Context.Channel.SendMessageAsync("", false, eb);
+                }
+            }
+            catch (Exception e)
+            {
+                await Context.Channel.SendMessageAsync(":no_entry_sign: Couldn't find Character. Try later or try another one.");
+            }
+        }
+
         public async Task GetAnime(SocketCommandContext Context, string anime, InteractiveService interactive)
         {
             try
@@ -221,6 +327,35 @@ namespace Sora_Bot_1.SoraBot.Services
                 await Context.Channel.SendMessageAsync(":no_entry_sign: Couldn't find Anime. Try later or try another one.");
             }   
         }
+
+    }
+
+    public class CharacterResult
+    {
+        public int id { get; set; }
+        public string name_first { get; set; }
+        public string name_last { get; set; }
+        public string name_japanese { get; set; }
+        public string name_alt { get; set; }
+        public string info { get; set; }
+        public bool favorite { get; set; }
+        public string image_url_lge { get; set; }
+        public string image_url_med { get; set; }
+        public string Link => "http://anilist.co/character/" + id;
+        public string Synopsis => info?.Substring(0, info.Length > 2000 ? 2000 : info.Length) + (info.Length > 2000 ? "..." : "");
+
+        public EmbedBuilder GetEmbed() =>
+            new EmbedBuilder()
+                .WithColor(new Color(4, 97, 247))
+                .WithAuthor(x =>
+                {
+                    x.Name = "Anilist";
+                    x.IconUrl = "https://anilist.co/img/logo_al.png";
+                })
+                .WithTitle($"{name_first} {name_last}")
+                .WithUrl(Link)
+                .WithDescription($"{(String.IsNullOrWhiteSpace(Synopsis)? "No Info found!": "")}" + Synopsis.Replace("<br>", Environment.NewLine))
+                .WithImageUrl(image_url_lge);
 
     }
 
