@@ -17,7 +17,7 @@ namespace Sora_Bot_1.SoraBot.Services
 
         private ConcurrentDictionary<ulong, _afkStruct> _afkDict = new ConcurrentDictionary<ulong, _afkStruct>();
         private JsonSerializer _jSerializer = new JsonSerializer();
-        private int _timeAdd = 30000;
+        private const int SECONDS_AFTER_AFK = 30;
 
         public AfkSertvice()
         {
@@ -90,7 +90,7 @@ namespace Sora_Bot_1.SoraBot.Services
                     {
                         return;
                     }
-                    str.timeToTriggerAgain = DateTime.UtcNow.AddSeconds(30);
+                    str.timeToTriggerAgain = DateTime.UtcNow.AddSeconds(SECONDS_AFTER_AFK);
                     var eb = new EmbedBuilder()
                     {
                         Color = new Color(4, 97, 247),

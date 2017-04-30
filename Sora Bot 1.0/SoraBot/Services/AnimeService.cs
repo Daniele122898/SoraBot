@@ -139,7 +139,7 @@ namespace Sora_Bot_1.SoraBot.Services
                 }
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 await Context.Channel.SendMessageAsync(":no_entry_sign: Couldn't find Manga. Try later or try another one.");
             }
@@ -245,7 +245,7 @@ namespace Sora_Bot_1.SoraBot.Services
                     await Context.Channel.SendMessageAsync("", false, eb);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 await Context.Channel.SendMessageAsync(":no_entry_sign: Couldn't find Character. Try later or try another one.");
             }
@@ -322,7 +322,7 @@ namespace Sora_Bot_1.SoraBot.Services
                 }
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 await Context.Channel.SendMessageAsync(":no_entry_sign: Couldn't find Anime. Try later or try another one.");
             }   

@@ -17,9 +17,10 @@ namespace Sora_Bot_1.SoraBot.Services.Reminder
     {
         private Timer _timer;
         private DiscordSocketClient _client;
-        private double _nextIntervall = 10;
         private ConcurrentDictionary<ulong, List<RemindData>> _remindDict = new ConcurrentDictionary<ulong, List<RemindData>>();
         private InteractiveService _interactiveService;
+
+        private const int INITIAL_DELAY = 40;
 
         public ReminderService(DiscordSocketClient client, InteractiveService inter)
         {
@@ -38,7 +39,7 @@ namespace Sora_Bot_1.SoraBot.Services.Reminder
                 
                 Task.Factory.StartNew(() => { InitializeTimer(); });
 
-                ChangeToClosestInterval();
+                //ChangeToClosestInterval(); DELAY THE FIRST RUN TO THE INITIAL DELAY!
             }
             catch (Exception e)
             {
@@ -76,8 +77,8 @@ namespace Sora_Bot_1.SoraBot.Services.Reminder
                     ReminderDB.SaveReminders(_remindDict);
                 },
                 null,
-                TimeSpan.FromSeconds(20),// Time that message should fire after bot has started
-                TimeSpan.FromSeconds(20)); //time after which message should repeat (timout.infinite for no repeat)
+                TimeSpan.FromSeconds(INITIAL_DELAY),// Time that message should fire after bot has started
+                TimeSpan.FromSeconds(INITIAL_DELAY)); //time after which message should repeat (timout.infinite for no repeat)
 
                 Console.WriteLine("TIMER INITIALIZED");
 
@@ -318,7 +319,7 @@ namespace Sora_Bot_1.SoraBot.Services.Reminder
                 message = message.Replace("min", "m");
 
                 var msg = message.Substring(message.LastIndexOf("in") + 2);
-                Console.WriteLine($"MSG: {msg}");
+
                 var regex = Regex.Matches(msg, @"(\d+)\s{0,1}([a-zA-Z]*)");
                 double timeToAdd = 0;
                 for (int i = 0; i < regex.Count; i++)
@@ -414,7 +415,7 @@ namespace Sora_Bot_1.SoraBot.Services.Reminder
                         timeToUpdate = delta;
                 }
             }
-            _nextIntervall = timeToUpdate;
+
             if (Double.IsPositiveInfinity(timeToUpdate))
             {
                 _timer.Change(Timeout.Infinite, Timeout.Infinite);

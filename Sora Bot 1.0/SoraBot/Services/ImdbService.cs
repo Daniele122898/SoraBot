@@ -35,7 +35,7 @@ namespace Sora_Bot_1.SoraBot.Services
                     await Context.Channel.SendMessageAsync("", false, eb);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 await Context.Channel.SendMessageAsync(":no_entry_sign: Couldn't find IMDb entry. Try later or try another one.");
             }

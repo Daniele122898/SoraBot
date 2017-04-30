@@ -1,19 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.Net;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Microsoft.VisualBasic;
 using Sora_Bot_1.SoraBot.Core;
 using Sora_Bot_1.SoraBot.Services;
 using Sora_Bot_1.SoraBot.Services.ChangelogService;
 using Sora_Bot_1.SoraBot.Services.EPService;
 using Sora_Bot_1.SoraBot.Services.StarBoradService;
-
+using System.Collections.Concurrent;
+using Sora_Bot_1.SoraBot.Services.ConfigService;
 
 namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
 {
@@ -29,6 +32,10 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
         private AnimeService _aniServ;
         private EPService epService;
 
+        private ConcurrentDictionary<string, string> configDict = new ConcurrentDictionary<string, string>();
+        private string _token;
+
+
         public OwnerModule(CommandHandler _handler, UserGuildUpdateService service, StarBoardService starboards,
             EPService _epService, AnimeService aniSer)
         {
@@ -37,6 +44,25 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
             starBoardService = starboards;
             epService = _epService;
             _aniServ = aniSer;
+            /* //TODO FIX THIS SHIT UP
+            configDict = ConfigService.getConfig();
+
+#if DEBUG
+            if (!configDict.TryGetValue("token2", out _token))
+            {
+                throw new Exception("FAILED TO GET TOKEN2");
+            }
+            else
+            {
+                Console.WriteLine("GOT DEBUG TOKEN");
+            }
+#else
+            if (!configDict.TryGetValue("token1", out _token))
+            {
+                throw new Exception("FAILED TO GET TOKEN1");
+            }
+#endif
+*/
         }
 
         [Command("auth")]
@@ -56,7 +82,6 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
         }
 
         //END PREFIX
-
         //EPSERIVCE
 
         [Command("epCount")]
@@ -67,15 +92,40 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
         }
         //END EPSERVICE
 
-        //ANNOUNCEMENTS
+        //DISCONNECT AND RECONNECT
+        [Command("reconnect")]
+        [RequireOwner]
+        public async Task ReconnectToDiscord()
+        {
+            //TODO RECONNECT
+            var client = Context.Client;
+            await client.LogoutAsync();
+            await client.StopAsync();
+
+
 
             /*
-        [Command("here"), Summary("Sets the Channel in which the message was written as Channel to announce")]
-        [RequireOwner]
-        public async Task SetAnnounceChannel()
-        {
-            await updateService.SetChannel(Context);
-        }*/
+            await Task.Delay(20000);
+            client = createClient().Result;
+            await client.LoginAsync(TokenType.Bot, token);
+            //await client.ConnectAsync(); TODO StartAsync();
+            await client.StartAsync();
+            commands = new CommandHandler();
+            await commands.Install(client);
+            client.Disconnected += Client_Disconnected;
+            await SentryService.SendMessage($"**THE BOT HAS DISCONNECTED AND SUCCESFULLY RECONNECTED**");
+        */
+        }
+
+        //ANNOUNCEMENTS
+
+        /*
+    [Command("here"), Summary("Sets the Channel in which the message was written as Channel to announce")]
+    [RequireOwner]
+    public async Task SetAnnounceChannel()
+    {
+        await updateService.SetChannel(Context);
+    }*/
 
         [Command("loadChange")]
         [RequireOwner]

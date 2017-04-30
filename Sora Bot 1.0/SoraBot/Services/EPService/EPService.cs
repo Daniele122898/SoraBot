@@ -891,6 +891,16 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 if (userEPDict.ContainsKey(context.User.Id))
                 {
                     userEPDict.TryGetValue(context.User.Id, out user);
+
+                    if (user.CanGainAgain == default(DateTime))
+                        user.CanGainAgain = DateTime.UtcNow;
+
+                    if (user.CanGainAgain.CompareTo(DateTime.UtcNow) > 0)
+                        return;
+
+                    user.CanGainAgain = DateTime.UtcNow.AddSeconds(10);
+                    
+
                     int previousLvl = user.level;
                     user.ep += CalculateEP(context);
                     user.level = (int) Math.Round(0.15F * Math.Sqrt(user.ep));
@@ -933,6 +943,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
         {
             public float ep;
             public int level;
+            public DateTime CanGainAgain;
         }
 
         private ImageCodecInfo GetEncoderInfo(String mimeType)

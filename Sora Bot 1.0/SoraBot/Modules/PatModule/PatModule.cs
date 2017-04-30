@@ -86,7 +86,6 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
         {
             "https://media.giphy.com/media/ZRSGWtBJG4Tza/giphy.gif",
             "https://68.media.tumblr.com/d07fcdd5deb9d2cf1c8c44ffad04e274/tumblr_ok1kd5VJju1vlvf9to1_500.gif",
-            "https://media.giphy.com/media/vUrwEOLtBUnJe/giphy.gif",
             "http://s8.favim.com/orig/151119/akagami-no-shirayukihime-anime-boy-couple-Favim.com-3598058.gif",
             "https://s-media-cache-ak0.pinimg.com/originals/e3/4e/31/e34e31123f8f35d5c771a2d6a70bef52.gif",
             "http://31.media.tumblr.com/cff863fa92395a5b348b000045f36df8/tumblr_mucrmkCyL41s8qxfko1_500.gif",

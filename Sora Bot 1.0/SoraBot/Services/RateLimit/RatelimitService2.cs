@@ -18,7 +18,7 @@ namespace Sora_Bot_1.SoraBot.Services.RateLimit
         private const int BUCKET_RATELIMITER = 20;
         private const int COMBO_MAX = 5;
         private const int COMBO_PENALTY = 12;
-        private const int COMBO_TIME_INTERVALL = 6;
+        private const int COMBO_TIME_INTERVALL = 3;
         private const int COMBO_RATELIMITER = 30;
 
         private ConcurrentDictionary<ulong, BucketData> _bucketDict = new ConcurrentDictionary<ulong, BucketData>();
@@ -46,8 +46,8 @@ namespace Sora_Bot_1.SoraBot.Services.RateLimit
                     //SAVE DB
                 },
                null,
-               TimeSpan.FromSeconds(10),// Time that message should fire after bot has started
-               TimeSpan.FromSeconds(10)); //time after which message should repeat (timout.infinite for no repeat)
+               TimeSpan.FromSeconds(BUCKET_DROP_INTERVAL),// Time that message should fire after bot has started
+               TimeSpan.FromSeconds(BUCKET_DROP_INTERVAL)); //time after which message should repeat (timout.infinite for no repeat)
 
                 Console.WriteLine("BUCKET REFILL INITIALIZED");
 

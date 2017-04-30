@@ -25,6 +25,7 @@ using Sora_Bot_1.SoraBot.Services.Giphy;
 using Sora_Bot_1.SoraBot.Services.YT;
 using Sora_Bot_1.SoraBot.Services.Reminder;
 using Sora_Bot_1.SoraBot.Services.RateLimit;
+using Sora_Bot_1.SoraBot.Services.UserBlacklist;
 
 namespace Sora_Bot_1.SoraBot.Core
 {
@@ -48,6 +49,7 @@ namespace Sora_Bot_1.SoraBot.Core
         private SelfRoleService _selfRoleService;
         private AnimeService _animeService;
         private TagService tagService;
+        private BlackListService _blackListService;
         private UbService _ubService;
         private ReminderService _remindService;
         private InteractiveService _interactiveService;
@@ -74,8 +76,12 @@ namespace Sora_Bot_1.SoraBot.Core
             _ubService = new UbService();
             _imdbService = new ImdbService();
             _modService = new ModService();
+
+            _remindService = new ReminderService(client, _interactiveService); // TODO FIX THIS PIECE OF TRASH <---
+
             _weatherService = new WeatherService();
             _ytService = new YTService();
+            _blackListService = new BlackListService();
             musicService = new MusicService(_ytService);
             _lolService = new lolService();
             _rateLimit2 = new RatelimitService2();
@@ -89,6 +95,9 @@ namespace Sora_Bot_1.SoraBot.Core
             _interactiveService = new InteractiveService(client);
             SentryService.client = client;
             //SentryService.Install();
+ 
+
+
 
             commands = new CommandService();
             map = new DependencyMap();
@@ -96,6 +105,9 @@ namespace Sora_Bot_1.SoraBot.Core
             map.Add(_interactiveService);
             map.Add(musicService);
             map.Add(_modService);
+
+            map.Add(_remindService); // TODO FIX THIS PIECE OF TRASH <---
+
             map.Add(handler);
             map.Add(_afkService);
             map.Add(_selfRoleService);
@@ -105,6 +117,7 @@ namespace Sora_Bot_1.SoraBot.Core
             map.Add(_animeService);
             map.Add(_lolService);
             map.Add(patService);
+            map.Add(_blackListService);
             map.Add(_gifService);
             map.Add(_ubService);
             map.Add(_ytService);
@@ -131,7 +144,7 @@ namespace Sora_Bot_1.SoraBot.Core
             client.LeftGuild += Client_LeftGuild;
             client.GuildAvailable += Client_GuildAvailable;
 
-            client.Ready += Client_Ready;
+            //client.Ready += Client_Ready; TODO READO THE READY EVENT HOOK
 
             //Bans
 
@@ -153,15 +166,15 @@ namespace Sora_Bot_1.SoraBot.Core
 
         }
 
+        /*
         private async Task Client_Ready()
         {
             if (!loaded)
             {
-                _remindService = new ReminderService(client, _interactiveService);
-                map.Add(_remindService);
+
                 loaded = true;
             }
-        }
+        }*/ //TODO REDO READY EVENT
 
         private async Task Client_GuildAvailable(SocketGuild guild)
         {
@@ -332,6 +345,9 @@ namespace Sora_Bot_1.SoraBot.Core
             if (context.IsPrivate)
                 return;
             if (context.User.IsBot)
+                return;
+
+            if (_blackListService.CheckIfBlacklisted(context))
                 return;
 
             string prefix;

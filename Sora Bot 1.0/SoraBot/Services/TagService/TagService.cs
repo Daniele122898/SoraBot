@@ -219,12 +219,38 @@ namespace Sora_Bot_1.SoraBot.Services.TagService
                         },
                         Title = "Tags in this Guild"
                     };
-                    string tagsInGuild = "";
-                    foreach (var t in tagStruct)
+
+                    int rowsCount = (int)Math.Ceiling((double)tagStruct.Count / 15);
+                    if (rowsCount < 2)
                     {
-                        tagsInGuild += $"**{t.tag}**\n";
+                        string tagsInGuild = "";
+                        foreach (var t in tagStruct)
+                        {
+                            tagsInGuild += $"**{t.tag}**\n";
+                        }
+                        eb.Description = tagsInGuild;
                     }
-                    eb.Description = tagsInGuild;
+                    else
+                    {
+                        int addToJ = 0;
+                        int amountLeft = tagStruct.Count;
+                        for (int i = 1; i <= rowsCount; i++)
+                        {
+                            string toAdd = "";
+                            for (int j = 0; j < (amountLeft > 15? 15: amountLeft); j++)
+                            {
+                                toAdd += $"{tagStruct[j+addToJ].tag}\n";
+                            }
+                            eb.AddField((x) =>
+                            {
+                                x.Name = $"Tags #{i}";
+                                x.IsInline = true;
+                                x.Value = toAdd;
+                            });
+                            amountLeft -= 15;
+                            addToJ += 15;
+                        }
+                    }
                     await Context.Channel.SendMessageAsync("", false, eb);
                 }
                 else

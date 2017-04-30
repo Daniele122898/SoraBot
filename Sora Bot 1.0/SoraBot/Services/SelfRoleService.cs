@@ -15,7 +15,9 @@ namespace Sora_Bot_1.SoraBot.Services
 {
     public class SelfRoleService
     {
-        private ConcurrentDictionary<ulong, List<ulong>> _availableRoles = new ConcurrentDictionary<ulong, List<ulong>>();
+        private ConcurrentDictionary<ulong, List<ulong>> _availableRoles =
+            new ConcurrentDictionary<ulong, List<ulong>>();
+
         private JsonSerializer _jSerializer = new JsonSerializer();
 
         public SelfRoleService()
@@ -39,20 +41,24 @@ namespace Sora_Bot_1.SoraBot.Services
                     await Context.Channel.SendMessageAsync(":no_entry_sign: Couldn't find specified role!");
                     return;
                 }
-                else if (soraRole == null)
+                if (soraRole == null)
                 {
-                    await Context.Channel.SendMessageAsync(":no_entry_sign: Couldn't find my own role! I apparently do not own any roles... Pls report this if it ever happens");
-                    await SentryService.SendMessage($"Couldn't find Soras role? ;_; in {Context.Guild.Name} ({Context.Guild.Id})");
+                    await Context.Channel.SendMessageAsync(
+                        ":no_entry_sign: Couldn't find my own role! I apparently do not own any roles... Pls report this if it ever happens");
+                    await SentryService.SendMessage(
+                        $"Couldn't find Soras role? ;_; in {Context.Guild.Name} ({Context.Guild.Id})");
                     return;
                 }
-                else if(soraRole.Position < role.Position)
+                if (soraRole.Position < role.Position)
                 {
-                    await Context.Channel.SendMessageAsync(":no_entry_sign: Can't assign Roles that are above me in the role hirachy! **If this is NOT true, open the role hirachy and move any role up once and then back to its initial position! This will update all role positions!**");
+                    await Context.Channel.SendMessageAsync(
+                        ":no_entry_sign: Can't assign Roles that are above me in the role hirachy! **If this is NOT true, open the role hirachy and move any role up once and then back to its initial position! This will update all role positions!**");
                     return;
                 }
-                else if (!sora.GuildPermissions.Has(GuildPermission.ManageRoles))
+                if (!sora.GuildPermissions.Has(GuildPermission.ManageRoles))
                 {
-                    await Context.Channel.SendMessageAsync(":no_entry_sign: Sora needs Manage Roles permissions to add roles!");
+                    await Context.Channel.SendMessageAsync(
+                        ":no_entry_sign: Sora needs Manage Roles permissions to add roles!");
                     return;
                 }
                 Console.WriteLine($"{soraRole.Position} : {role.Position}");
@@ -66,11 +72,8 @@ namespace Sora_Bot_1.SoraBot.Services
                         await Context.Channel.SendMessageAsync(":no_entry_sign: This role already is self-assignable");
                         return;
                     }
-                    else
-                    {
-                        roleIDs.Add(role.Id);
-                        _availableRoles.TryUpdate(Context.Guild.Id, roleIDs);
-                    }
+                    roleIDs.Add(role.Id);
+                    _availableRoles.TryUpdate(Context.Guild.Id, roleIDs);
                 }
                 else
                 {
@@ -81,15 +84,14 @@ namespace Sora_Bot_1.SoraBot.Services
                 SaveDatabase();
 
                 await Context.Channel.SendMessageAsync($":white_check_mark: Successfully added Role `{role.Name}`");
-
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e);
-                await Context.Channel.SendMessageAsync($":no_entry_sign: Failed to add role. I'm probably missing the perms!");
+                await Context.Channel.SendMessageAsync(
+                    $":no_entry_sign: Failed to add role. I'm probably missing the perms!");
                 await SentryService.SendError(e, Context);
             }
-            
         }
 
         public async Task GetRolesInGuild(SocketCommandContext Context)
@@ -98,11 +100,13 @@ namespace Sora_Bot_1.SoraBot.Services
             {
                 if (!_availableRoles.ContainsKey(Context.Guild.Id))
                 {
-                    await Context.Channel.SendMessageAsync(":no_entry_sign: There are no self-assignable roles in this guild!");
+                    await Context.Channel.SendMessageAsync(
+                        ":no_entry_sign: There are no self-assignable roles in this guild!");
                     return;
                 }
                 List<ulong> roleIDs = new List<ulong>();
                 _availableRoles.TryGetValue(Context.Guild.Id, out roleIDs);
+                List<ulong> rolesToDelete = new List<ulong>();
                 var eb = new EmbedBuilder()
                 {
                     Color = new Color(4, 97, 247),
@@ -116,7 +120,23 @@ namespace Sora_Bot_1.SoraBot.Services
                 };
                 foreach (var rId in roleIDs)
                 {
-                    eb.Description += $"{Context.Guild.GetRole(rId).Name}\n";
+                    var role = Context.Guild.GetRole(rId);
+                    if (role == null)
+                    {
+                        rolesToDelete.Add(rId);
+                        continue;
+                    }
+                    eb.Description += $"{role.Name}\n";
+                }
+
+                if (rolesToDelete.Count > 0)
+                {
+                    foreach (var role in rolesToDelete)
+                    {
+                        roleIDs.Remove(role);
+                    }
+                    _availableRoles.TryUpdate(Context.Guild.Id, roleIDs);
+                    SaveDatabase();
                 }
 
                 await Context.Channel.SendMessageAsync("", false, eb);
@@ -124,7 +144,8 @@ namespace Sora_Bot_1.SoraBot.Services
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                await Context.Channel.SendMessageAsync($":no_entry_sign: Failed to add role. I'm probably missing the perms!");
+                await Context.Channel.SendMessageAsync(
+                    $":no_entry_sign: Failed to add role. I'm probably missing the perms!");
                 await SentryService.SendError(e, Context);
             }
         }
@@ -135,17 +156,24 @@ namespace Sora_Bot_1.SoraBot.Services
             {
                 if (!_availableRoles.ContainsKey(Context.Guild.Id))
                 {
-                    await Context.Channel.SendMessageAsync(":no_entry_sign: There are no self-assignable roles in this guild!");
+                    await Context.Channel.SendMessageAsync(
+                        ":no_entry_sign: There are no self-assignable roles in this guild!");
                     return;
                 }
 
                 List<ulong> roleIDs = new List<ulong>();
                 _availableRoles.TryGetValue(Context.Guild.Id, out roleIDs);
-
+                bool success = false;
+                List<ulong> rolesToDelete = new List<ulong>();
                 foreach (var rId in roleIDs)
                 {
                     var role = Context.Guild.GetRole(rId);
-                    if (role.Name == roleName)
+                    if (role == null)
+                    {
+                        rolesToDelete.Add(rId);
+                        continue;
+                    }
+                    if (role.Name.Equals(roleName, StringComparison.CurrentCultureIgnoreCase))
                     {
                         roleIDs.Remove(rId);
                         if (roleIDs.Count < 1)
@@ -157,21 +185,39 @@ namespace Sora_Bot_1.SoraBot.Services
                         {
                             _availableRoles.TryUpdate(Context.Guild.Id, roleIDs);
                         }
+
                         SaveDatabase();
-                        await Context.Channel.SendMessageAsync($":white_check_mark: Successfully removed Role `{role.Name}`");
-                        return;
+                        await Context.Channel.SendMessageAsync(
+                            $":white_check_mark: Successfully removed Role `{role.Name}`");
+                        success = true;
+                        break;
                     }
                 }
-                await Context.Channel.SendMessageAsync(":no_entry_sign: Specified role could not be found! Use `<prefix>getRoles` to get a list of all self-assignable roles!");
+
+                if (rolesToDelete.Count > 0)
+                {
+                    foreach (var role in rolesToDelete)
+                    {
+                        roleIDs.Remove(role);
+                    }
+                    _availableRoles.TryUpdate(Context.Guild.Id, roleIDs);
+                    SaveDatabase();
+                }
+                if(success)
+                    return;
+
+                await Context.Channel.SendMessageAsync(
+                    ":no_entry_sign: Specified role could not be found! Use `<prefix>getRoles` to get a list of all self-assignable roles!");
             }
             catch (Exception e)
             {
-                await Context.Channel.SendMessageAsync($":no_entry_sign: Failed to add role. I'm probably missing the perms!");
+                await Context.Channel.SendMessageAsync(
+                    $":no_entry_sign: Failed to add role. I'm probably missing the perms!");
                 Console.WriteLine(e);
                 await SentryService.SendError(e, Context);
             }
         }
-       
+
         public async Task IAmNotRole(SocketCommandContext Context, string roleName)
         {
             try
@@ -179,37 +225,58 @@ namespace Sora_Bot_1.SoraBot.Services
                 var sora = Context.Guild.GetUser(270931284489011202);
                 if (!sora.GuildPermissions.Has(GuildPermission.ManageRoles))
                 {
-                    await Context.Channel.SendMessageAsync(":no_entry_sign: Sora needs Manage Roles permissions to add roles!");
+                    await Context.Channel.SendMessageAsync(
+                        ":no_entry_sign: Sora needs Manage Roles permissions to add roles!");
                     return;
                 }
-                else if (!_availableRoles.ContainsKey(Context.Guild.Id))
+                if (!_availableRoles.ContainsKey(Context.Guild.Id))
                 {
-                    await Context.Channel.SendMessageAsync(":no_entry_sign: There are no self-assignable roles in this guild!");
+                    await Context.Channel.SendMessageAsync(
+                        ":no_entry_sign: There are no self-assignable roles in this guild!");
                     return;
                 }
 
                 List<ulong> roleIDs = new List<ulong>();
                 _availableRoles.TryGetValue(Context.Guild.Id, out roleIDs);
                 IRole roleToDel = null;
+                List<ulong> rolesToDelete = new List<ulong>();
                 foreach (var rId in roleIDs)
                 {
                     var role = Context.Guild.GetRole(rId);
-                    if (role.Name == roleName)
+                    if (role == null)
+                    {
+                        rolesToDelete.Add(rId);
+                        continue;
+                    }
+                    if (role.Name.Equals(roleName, StringComparison.CurrentCultureIgnoreCase))
                     {
                         roleToDel = role;
                         break;
                     }
                 }
+
+                if (rolesToDelete.Count > 0)
+                {
+                    foreach (var role in rolesToDelete)
+                    {
+                        roleIDs.Remove(role);
+                    }
+                    _availableRoles.TryUpdate(Context.Guild.Id, roleIDs);
+                    SaveDatabase();
+                }
+
                 if (roleToDel == null)
                 {
-                    await Context.Channel.SendMessageAsync($"The role `{roleName}` could not be found! Use `<prefix>getRoles` to get a list of all self-assignable roles!");
+                    await Context.Channel.SendMessageAsync(
+                        $"The role `{roleName}` could not be found! Use `<prefix>getRoles` to get a list of all self-assignable roles!");
                     return;
                 }
 
                 var soraRole = sora.Roles.OrderByDescending(r => r.Position).FirstOrDefault();
                 if (soraRole.Position < roleToDel.Position)
                 {
-                    await Context.Channel.SendMessageAsync(":no_entry_sign: Can't remove Roles that are above me (highest role that i have) in the role hirachy! **If this is NOT true, open the role hirachy and move any role up once and then back to its initial position! This will update all role positions!**");
+                    await Context.Channel.SendMessageAsync(
+                        ":no_entry_sign: Can't remove Roles that are above me (highest role that i have) in the role hirachy! **If this is NOT true, open the role hirachy and move any role up once and then back to its initial position! This will update all role positions!**");
                     return;
                 }
 
@@ -230,12 +297,14 @@ namespace Sora_Bot_1.SoraBot.Services
                 }
 
                 await user.RemoveRoleAsync(roleToDel, null);
-                await Context.Channel.SendMessageAsync($":white_check_mark: Successfully removed `{roleToDel.Name}` from your roles!");
+                await Context.Channel.SendMessageAsync(
+                    $":white_check_mark: Successfully removed `{roleToDel.Name}` from your roles!");
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                await Context.Channel.SendMessageAsync($":no_entry_sign: Failed to add role. I'm probably missing the perms!");
+                await Context.Channel.SendMessageAsync(
+                    $":no_entry_sign: Failed to add role. I'm probably missing the perms!");
                 await SentryService.SendError(e, Context);
             }
         }
@@ -247,37 +316,58 @@ namespace Sora_Bot_1.SoraBot.Services
                 var sora = Context.Guild.GetUser(270931284489011202);
                 if (!sora.GuildPermissions.Has(GuildPermission.ManageRoles))
                 {
-                    await Context.Channel.SendMessageAsync(":no_entry_sign: Sora needs Manage Roles permissions to add roles!");
+                    await Context.Channel.SendMessageAsync(
+                        ":no_entry_sign: Sora needs Manage Roles permissions to add roles!");
                     return;
                 }
-                else if (!_availableRoles.ContainsKey(Context.Guild.Id))
+                if (!_availableRoles.ContainsKey(Context.Guild.Id))
                 {
-                    await Context.Channel.SendMessageAsync(":no_entry_sign: There are no self-assignable roles in this guild!");
+                    await Context.Channel.SendMessageAsync(
+                        ":no_entry_sign: There are no self-assignable roles in this guild!");
                     return;
                 }
 
                 List<ulong> roleIDs = new List<ulong>();
                 _availableRoles.TryGetValue(Context.Guild.Id, out roleIDs);
                 IRole roleToAdd = null;
+                List<ulong> rolesToDelete = new List<ulong>();
                 foreach (var rId in roleIDs)
                 {
                     var role = Context.Guild.GetRole(rId);
-                    if (role.Name == roleName)
+                    if (role == null)
+                    {
+                        rolesToDelete.Add(rId);
+                        continue;
+                    }
+                    if (role.Name.Equals(roleName, StringComparison.CurrentCultureIgnoreCase))
                     {
                         roleToAdd = role;
                         break;
                     }
                 }
+
+                if (rolesToDelete.Count > 0)
+                {
+                    foreach (var role in rolesToDelete)
+                    {
+                        roleIDs.Remove(role);
+                    }
+                    _availableRoles.TryUpdate(Context.Guild.Id, roleIDs);
+                    SaveDatabase();
+                }
+
                 if (roleToAdd == null)
                 {
-                    await Context.Channel.SendMessageAsync($"The role `{roleName}` could not be found! Use `<prefix>getRoles` to get a list of all self-assignable roles!");
+                    await Context.Channel.SendMessageAsync(
+                        $"The role `{roleName}` could not be found! Use `<prefix>getRoles` to get a list of all self-assignable roles!");
                     return;
                 }
 
                 var soraRole = sora.Roles.OrderByDescending(r => r.Position).FirstOrDefault();
                 if (soraRole.Position < roleToAdd.Position)
                 {
-                    await Context.Channel.SendMessageAsync(":no_entry_sign: Can't assign Roles that are above me (highest role that i have) in the role hirachy! **If this is NOT true, open the role hirachy and move any role up once and then back to its initial position! This will update all role positions!**");
+                    await Context.Channel.SendMessageAsync(
+                        ":no_entry_sign: Can't assign Roles that are above me (highest role that i have) in the role hirachy! **If this is NOT true, open the role hirachy and move any role up once and then back to its initial position! This will update all role positions!**");
                     return;
                 }
 
@@ -285,20 +375,23 @@ namespace Sora_Bot_1.SoraBot.Services
 
                 foreach (var role in user.Roles)
                 {
-                    if(role.Name == roleName)
+                    if (role.Name.ToLower() == roleName.ToLower())
                     {
-                        await Context.Channel.SendMessageAsync(":no_entry_sign: You already have that role! Use `<prefix>iamnot <rolename>` to get remove a self-assignable role from yourself.");
+                        await Context.Channel.SendMessageAsync(
+                            ":no_entry_sign: You already have that role! Use `<prefix>iamnot <rolename>` to get remove a self-assignable role from yourself.");
                         return;
                     }
                 }
 
                 await user.AddRoleAsync(roleToAdd, null);
-                await Context.Channel.SendMessageAsync($":white_check_mark: Successfully added `{roleToAdd.Name}` to your roles!");
+                await Context.Channel.SendMessageAsync(
+                    $":white_check_mark: Successfully added `{roleToAdd.Name}` to your roles!");
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                await Context.Channel.SendMessageAsync($":no_entry_sign: Failed to add role. I'm probably missing the perms!");
+                await Context.Channel.SendMessageAsync(
+                    $":no_entry_sign: Failed to add role. I'm probably missing the perms!");
                 await SentryService.SendError(e, Context);
             }
         }

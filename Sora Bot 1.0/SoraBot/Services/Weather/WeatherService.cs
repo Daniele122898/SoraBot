@@ -10,7 +10,15 @@ namespace Sora_Bot_1.SoraBot.Services.Weather
 {
     public class WeatherService
     {
-
+        private string weatherID;
+        public WeatherService()
+        {
+            var configDict = ConfigService.ConfigService.getConfig();
+            if (!configDict.TryGetValue("weather", out weatherID))
+            {
+                Console.WriteLine("COULDN'T GET WEATHER API ID FROM CONFIG!");
+            }
+        }
         public async Task GetWeather(SocketCommandContext Context, string query)
         {
             try
@@ -19,7 +27,7 @@ namespace Sora_Bot_1.SoraBot.Services.Weather
                 string response = "";
                 using (var http = new HttpClient())
                 {
-                    response = await http.GetStringAsync($"http://api.openweathermap.org/data/2.5/weather?q={search}&appid=42cd627dd60debf25a5739e50a217d74&units=metric").ConfigureAwait(false);
+                    response = await http.GetStringAsync($"http://api.openweathermap.org/data/2.5/weather?q={search}&appid={weatherID}&units=metric").ConfigureAwait(false);
                 }
                 var data = JsonConvert.DeserializeObject<WeatherData>(response);
 

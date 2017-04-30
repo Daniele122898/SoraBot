@@ -7,6 +7,7 @@ using Discord;
 using Discord.Audio;
 using Discord.Commands;
 using Discord.WebSocket;
+using Sora_Bot_1.SoraBot.Modules.OwnerModule;
 using Sora_Bot_1.SoraBot.Services;
 using Sora_Bot_1.SoraBot.Services.ConfigService;
 
@@ -64,6 +65,27 @@ namespace Sora_Bot_1.SoraBot.Core
 
             //Block this task until the program is exited
             await Task.Delay(-1);
+        }
+
+        private async Task Owner_reconnectToDisc()
+        {
+            try
+            {
+                Console.WriteLine("TRYING TO RECONNECT");
+                await Task.Delay(20000);
+                client = createClient().Result;
+                await client.LoginAsync(TokenType.Bot, token);
+                //await client.ConnectAsync(); TODO StartAsync();
+                await client.StartAsync();
+                commands = new CommandHandler();
+                await commands.Install(client);
+                client.Disconnected += Client_Disconnected;
+                await SentryService.SendMessage($"**THE BOT HAS DISCONNECTED AND SUCCESFULLY RECONNECTED**");
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+            }
         }
 
         private async Task Client_Disconnected(Exception e)
