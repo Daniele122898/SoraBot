@@ -36,13 +36,6 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
         private JsonSerializer jSerializer = new JsonSerializer();
         private int timeToUpdate = Environment.TickCount + 30000;
         private List<ulong> lvlSubsriberList = new List<ulong>();
-        private int profileX = 26;
-        private int profileY = 15;
-        private int profileSIZE = 121;
-
-        private int profileX1 = 73;
-        private int profileY1 = 273;
-        private int profileSIZE1 = 155;
 
 
         public EPService(DiscordSocketClient c)
@@ -151,9 +144,6 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     Console.WriteLine("DONE BG STREAM");
                 }
 
-                //IMAGE RESIZE
-                int size = profileSIZE;
-
                 Configuration.Default.AddImageFormat(new PngFormat());
 
                 using (var input = ImageSharp.Image.Load($"{Context.User.Id}BG.jpg"))
@@ -207,66 +197,6 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 Console.WriteLine(e);
                 await SentryService.SendError(e, Context);
                 await Context.Channel.SendMessageAsync(":no_entry_sign: Failed to Download Image! Take another one, sorry :persevere:");
-            }
-        }
-
-        public async Task changeProfileCord(string cords, SocketCommandContext context)
-        {
-            try
-            {
-                string[] cordS = cords.Split(' ');
-                if (cordS.Length != 2)
-                {
-                    await context.Channel.SendMessageAsync(":no_entry_sign: Coordinates have to be 2 integers => x y");
-                    return;
-                }
-                /*
-                    var coolInput = "abcd123!!!E$%$§&$%";
-                    var sanitized = Regex.Replace(coolInput, @"\D", "");
-                    cordS[1].Any(char.IsDigit)
-                */
-                int x;
-                int y;
-                if (Int32.TryParse(cordS[0], NumberStyles.Integer, new NumberFormatInfo(), out x) &&
-                    Int32.TryParse(cordS[1], NumberStyles.Integer, new NumberFormatInfo(), out y))
-                {
-                    profileX1 = x;
-                    profileY1 = y;
-                    await context.Channel.SendMessageAsync($":white_check_mark: Set coordinates to {x} {y}");
-                    return;
-                }
-                else
-                {
-                    await context.Channel.SendMessageAsync(":no_entry_sign: Coordinates have to be 2 integers => x y");
-                    return;
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                await SentryService.SendError(e, context);
-            }
-        }
-
-        public async Task size(string sizeS, SocketCommandContext context)
-        {
-            try
-            {
-                int size;
-                if (Int32.TryParse(sizeS, NumberStyles.Integer, new NumberFormatInfo(), out size))
-                {
-                    profileSIZE1 = size;
-                    await context.Channel.SendMessageAsync($":white_check_mark: Size set to {size}");
-                }
-                else
-                {
-                    await context.Channel.SendMessageAsync(":no_entry_sign: Size has to be an integer");
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                await SentryService.SendError(e, context);
             }
         }
 

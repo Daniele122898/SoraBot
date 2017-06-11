@@ -44,20 +44,6 @@ namespace Sora_Bot_1.SoraBot.Modules.EPModule
             await epService.ToggleEPSubscribe(Context);
         }
 
-        [Command("setCord")]
-        [RequireOwner]
-        public async Task setCords([Remainder] string cords)
-        {
-            await epService.changeProfileCord(cords, Context);
-        }
-
-        [Command("setSize")]
-        [RequireOwner]
-        public async Task setSize(string size)
-        {
-            await epService.size(size, Context);
-        }
-
         [Command("setbg", RunMode = RunMode.Async), Summary("Set's your profile BG with the provided URL. If no URL is specified it will return to the default Profile Crad. **this feature requires lvl 20!**")]
         public async Task setBG(string url = null)
         {

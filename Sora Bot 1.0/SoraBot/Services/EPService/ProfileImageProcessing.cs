@@ -36,7 +36,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
 
                 DrawMask(_bgMaskImage, output, new ImageSharp.Size(900, 500));
 
-                DrawStats(rank, level, ep, output, new System.Numerics.Vector2(240, 435), new System.Numerics.Vector2(530, 435), new System.Numerics.Vector2(860, 435), Rgba32.Gray);
+                DrawStats(rank, level, ep, output, new System.Numerics.Vector2(240, 435), new System.Numerics.Vector2(530, 435), new System.Numerics.Vector2(850, 435), Rgba32.Gray);
 
                 DrawTitle(name, output, new System.Numerics.Vector2(300, 300), Rgba32.White);
 
@@ -51,13 +51,13 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
         {
             using (var output = new Image<Rgba32>(890, 150))
             {
-                DrawBackGroundWithImage(_noBgMask, output, new ImageSharp.Size(1000, 150));
+                DrawMask(_noBgMask, output, new ImageSharp.Size(1000, 150));
 
                 DrawAvatar(avatarUrl, output, new Rectangle(26, 15, 121, 121));
 
                 DrawMask(_noBgMaskOverlay, output, new ImageSharp.Size(1000, 150));
 
-                DrawStats(rank, level, ep, output, new System.Numerics.Vector2(200, 92), new System.Numerics.Vector2(480, 92), new System.Numerics.Vector2(850, 92), Rgba32.Black);
+                DrawStats(rank, level, ep, output, new System.Numerics.Vector2(200, 92), new System.Numerics.Vector2(480, 92), new System.Numerics.Vector2(830, 92), Rgba32.Black);
 
                 DrawTitle(name, output, new System.Numerics.Vector2(200, -5), Rgba32.FromHex("#2398e1"));
 
@@ -72,11 +72,6 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
 
             output.DrawImage(mask, 1, size, new Point(0, 0));
 
-        }
-
-        private static void DrawBackGroundWithImage(Image<Rgba32> bg, Image<Rgba32> output, ImageSharp.Size size)
-        {
-            output.DrawImage(bg, 1, size, new Point(0, 0));
         }
 
         private static void DrawBackground(string backgroundUrl, Image<Rgba32> output, ImageSharp.Size size)
