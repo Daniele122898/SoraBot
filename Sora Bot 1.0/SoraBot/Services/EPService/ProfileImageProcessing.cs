@@ -12,16 +12,19 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
     public static class ProfileImageProcessing
     {
         private static FontCollection _fontCollection;
-        private static Font _iconFont;
-        private static Font _textFont;
         private static Font _titleFont;
+
+        private static Image<Rgba32> _bgMaskImage;
+        private static Image<Rgba32> _noBgMask;
+        private static Image<Rgba32> _noBgMaskOverlay;
 
         public static void Initialize()
         {
             _fontCollection = new FontCollection();
-            _iconFont = _fontCollection.Install("fonts/fontawesome-webfont.ttf");
             _titleFont = _fontCollection.Install("fonts/Lato-Bold.ttf");
-            _textFont = _fontCollection.Install("fonts/Lato-Regular.ttf");
+            _bgMaskImage = Image.Load("moreBGtemp.png");
+            _noBgMask = Image.Load("profilecardtemplate.png");
+            _noBgMaskOverlay = Image.Load("ProfileMASK.png");
         }
 
         public static void GenerateProfileWithBg(string avatarUrl, string backgroundUrl, string name, int rank,
@@ -31,7 +34,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             {
                 DrawBackground(backgroundUrl, output, new ImageSharp.Size(900, 500));
 
-                DrawMask("moreBGtemp.png", output, new ImageSharp.Size(900, 500));
+                DrawMask(_bgMaskImage, output, new ImageSharp.Size(900, 500));
 
                 DrawStats(rank, level, ep, output, new System.Numerics.Vector2(240, 435), new System.Numerics.Vector2(530, 435), new System.Numerics.Vector2(860, 435), Rgba32.Gray);
 
@@ -48,11 +51,11 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
         {
             using (var output = new Image<Rgba32>(890, 150))
             {
-                DrawBackground("profilecardtemplate.png", output, new ImageSharp.Size(1000, 150));
+                DrawBackGroundWithImage(_noBgMask, output, new ImageSharp.Size(1000, 150));
 
                 DrawAvatar(avatarUrl, output, new Rectangle(26, 15, 121, 121));
 
-                DrawMask("ProfileMASK.png", output, new ImageSharp.Size(1000, 150));
+                DrawMask(_noBgMaskOverlay, output, new ImageSharp.Size(1000, 150));
 
                 DrawStats(rank, level, ep, output, new System.Numerics.Vector2(200, 92), new System.Numerics.Vector2(480, 92), new System.Numerics.Vector2(850, 92), Rgba32.Black);
 
@@ -64,13 +67,16 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             }//dispose of output to help save memory
         }
 
-        private static void DrawMask(string maskUrl, Image<Rgba32> output, ImageSharp.Size size)
+        private static void DrawMask(Image<Rgba32> mask, Image<Rgba32> output, ImageSharp.Size size)
         {
-            using (Image<Rgba32> background = Image.Load(maskUrl))//900x500
-            {
-                //draw on the background
-                output.DrawImage(background, 1, size, new Point(0, 0));
-            }//once draw it can be disposed as its no onger needed in memory
+
+            output.DrawImage(mask, 1, size, new Point(0, 0));
+
+        }
+
+        private static void DrawBackGroundWithImage(Image<Rgba32> bg, Image<Rgba32> output, ImageSharp.Size size)
+        {
+            output.DrawImage(bg, 1, size, new Point(0, 0));
         }
 
         private static void DrawBackground(string backgroundUrl, Image<Rgba32> output, ImageSharp.Size size)
