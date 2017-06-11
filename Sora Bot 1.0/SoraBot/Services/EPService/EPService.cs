@@ -52,6 +52,8 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             LoadDatabase();
             LoadDatabaseGuild();
             LoadDatabaseBG();
+
+            ProfileImageProcessing.Initialize();
         }
 
         public async Task SetBG(string url, SocketCommandContext Context)
@@ -164,8 +166,8 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                         //int height = image.Height / divide;
                         input.Resize(new ResizeOptions
                         {
-                            Size = new ImageSharp.Size(900, 10000),
-                            Mode = ResizeMode.Max
+                            Size = new ImageSharp.Size(900, 500),
+                            Mode = ResizeMode.Crop
                         });
                         //image.ExifProfile = null; TODO FIX THIS
                         //image.Quality = quality;
@@ -414,11 +416,13 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 }
                 if (userBG.ContainsKey(user.Id))
                 {
-                    await DrawText(user.GetAvatarUrl(), user, Context);
+                    //await DrawText(user.GetAvatarUrl(), user, Context);
+                    await DrawProfileWithBG(user.GetAvatarUrl(), user, Context);
                 }
                 else
                 {
-                    await DrawText2(user.GetAvatarUrl(), user, Context);
+                    //await DrawText2(user.GetAvatarUrl(), user, Context);
+                    await DrawProfile(user.GetAvatarUrl(), user, Context);
                 }
                 //await Context.Channel.SendMessageAsync($"Image \n{img}");
                 if (File.Exists($"{user.Id}.png"))
@@ -440,377 +444,169 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             }
         }
 
-        private async Task DrawText(String AvatarUrl, IUser userInfo, SocketCommandContext Context)
+        private async Task DrawProfileWithBG(String AvatarUrl, IUser userInfo, SocketCommandContext Context)
         {
-            try
+            if (String.IsNullOrEmpty(AvatarUrl))
+                AvatarUrl =
+                    "http://is2.mzstatic.com/image/pf/us/r30/Purple7/v4/89/51/05/89510540-66df-9f6f-5c91-afa5e48af4e8/mzl.sbwqpbfh.png";
+
+            Uri requestUri = new Uri(AvatarUrl);
+
+            if (File.Exists($"{userInfo.Id}Avatar.png"))
             {
-                var fontFamily = new FontFamily("lato");
-                System.Drawing.Image img = new Bitmap(900, 500);
+                File.Delete($"{userInfo.Id}Avatar.png");
+            }
 
-                Graphics drawing = Graphics.FromImage(img);
+            using (var client = new HttpClient())
+            using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
+            using (
+                Stream contentStream = await (await client.SendAsync(request)).Content.ReadAsStreamAsync(),
+                    stream = new FileStream($"{userInfo.Id}Avatar.png", FileMode.Create, FileAccess.Write,
+                        FileShare.None, 3145728, true))
+            {
+                await contentStream.CopyToAsync(stream);
+                await contentStream.FlushAsync();
+                contentStream.Dispose();
+                await stream.FlushAsync();
+                stream.Dispose();
+                Console.WriteLine("DONE STREAM");
+            }
 
-                System.Drawing.Color backColor = Color.Gainsboro;
+            var username = userInfo.Username;
+            if (userInfo.Username.Length > 20)
+            {
+                username = userInfo.Username.Remove(20) + "...";
+            }
 
-                var bgIMG = System.Drawing.Image.FromFile($"{userInfo.Id}BGF.png");
-                var statMask = System.Drawing.Image.FromFile($"moreBGtemp.png");
 
-                Point point = new Point(0, 0);
 
-                drawing.DrawImage(bgIMG, point);
-                drawing.DrawImage(statMask, point);
-                bgIMG.Dispose();
-                statMask.Dispose();
+            //GET RANK
 
-                if (String.IsNullOrEmpty(AvatarUrl))
-                    AvatarUrl =
-                        "http://is2.mzstatic.com/image/pf/us/r30/Purple7/v4/89/51/05/89510540-66df-9f6f-5c91-afa5e48af4e8/mzl.sbwqpbfh.png";
+            var guild = ((SocketGuild)Context.Guild);
+            //guild.DownloadUsersAsync();
 
-                Uri requestUri = new Uri(AvatarUrl);
+            if (guild.MemberCount < 200)
+            {
+                guild.DownloadUsersAsync().Wait();
+                //await guild.DownloadUsersAsync();
+            }
 
-                if (File.Exists($"{userInfo.Id}Avatar.png"))
+            //FEED LIST
+            Dictionary<ulong, float> epList = new Dictionary<ulong, float>();
+            foreach (var u in guild.Users)
+            {
+                if (!u.IsBot && userEPDict.ContainsKey(u.Id))
                 {
-                    File.Delete($"{userInfo.Id}Avatar.png");
-                }
-
-                using (var client = new HttpClient())
-                using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
-                using (
-                    Stream contentStream = await (await client.SendAsync(request)).Content.ReadAsStreamAsync(),
-                        stream = new FileStream($"{userInfo.Id}Avatar.png", FileMode.Create, FileAccess.Write,
-                            FileShare.None, 3145728, true))
-                {
-                    await contentStream.CopyToAsync(stream);
-                    await contentStream.FlushAsync();
-                    contentStream.Dispose();
-                    await stream.FlushAsync();
-                    stream.Dispose();
-                    Console.WriteLine("DONE STREAM");
-                }
-
-
-                /*
-                Image img;
-                using (var bmpTemp = new Bitmap("image_file_path"))
-                {
-                    img = new Bitmap(bmpTemp);
-                }*/
-
-                var pointA = new Point(profileX1, profileY1);
-                //var resizedImg = ResizeImage(avatarIMG, 57, 57);
-
-                //IMAGE RESIZE
-                int size = profileSIZE1;
-
-                Configuration.Default.AddImageFormat(new PngFormat());
-
-                using (var input = ImageSharp.Image.Load($"{userInfo.Id}Avatar.png"))
-                {
-                    //using (var output = File.OpenWrite($"{userInfo.Id}AvatarF.png"))
-                    //{
-                        //var image = new ImageSharp.Image(input)
-                            input.Resize(new ResizeOptions
-                            {
-                                Size = new ImageSharp.Size(size, size),
-                                Mode = ResizeMode.Max
-                            });
-                        //image.ExifProfile = null; TODO FIX THIS
-                        //image.Quality = quality;
-                        input.Save($"{userInfo.Id}AvatarF.png");
-                        input.Dispose();
-                        //await output.FlushAsync();
-                        //output.Dispose();
-                        input.Dispose();
-                    //}
-                }
-                //IMAGE RESIZE END
-
-                var avatarIMG = System.Drawing.Image.FromFile($"{userInfo.Id}AvatarF.png");
-                if (avatarIMG == null)
-                {
-                    Console.WriteLine("COULDNT DOWNLOAD IMAGE. AVATAR NULL");
-                    return;
-                }
-
-                drawing.DrawImage(avatarIMG, pointA);
-                //Dispose avatar so it can be deleted
-                avatarIMG.Dispose();
-
-                Font font = new Font(fontFamily, 54.0F, FontStyle.Bold);
-                System.Drawing.Color textColor = Color.White;
-                Brush textBrush = new SolidBrush(textColor);
-                System.Drawing.Color epColor = Color.Gray;
-                Brush epBrush = new SolidBrush(epColor);
-
-                var username = userInfo.Username;
-                if (userInfo.Username.Length > 20)
-                {
-                    username = userInfo.Username.Remove(20) + "...";
-                }
-
-                
-
-                //GET RANK
-
-                var guild = ((SocketGuild)Context.Guild);
-                //guild.DownloadUsersAsync();
-
-                if (guild.MemberCount < 200)
-                {
-                    guild.DownloadUsersAsync().Wait();
-                    //await guild.DownloadUsersAsync();
-                }
-
-                //FEED LIST
-                Dictionary<ulong, float> epList = new Dictionary<ulong, float>();
-                foreach (var u in guild.Users)
-                {
-                    if (!u.IsBot && userEPDict.ContainsKey(u.Id))
+                    userStruct str = new userStruct();
+                    userEPDict.TryGetValue(u.Id, out str);
+                    if (!epList.ContainsKey(u.Id))
                     {
-                        userStruct str = new userStruct();
-                        userEPDict.TryGetValue(u.Id, out str);
-                        if (!epList.ContainsKey(u.Id))
-                        {
-                            epList.Add(u.Id, str.ep);
-                        }
+                        epList.Add(u.Id, str.ep);
                     }
                 }
-
-                //GETLIST
-                var sortedList = epList.OrderByDescending(pair => pair.Value)
-                    .ToDictionary(pair => pair.Key, pair => pair.Value);
-                var rank = GetIndex(sortedList, userInfo.Id) + 1;
-                //END RANK
-
-
-                var fontEP = new Font(fontFamily, 32F, FontStyle.Bold);
-                userStruct user = new userStruct();
-                if (userEPDict.ContainsKey(userInfo.Id))
-                {
-                    userEPDict.TryGetValue(userInfo.Id, out user);
-                    drawing.DrawString($"Rank: {rank}", fontEP, epBrush, 230, 420);
-                    drawing.DrawString($"Level: {user.level}", fontEP, epBrush, 430, 420);
-                    drawing.DrawString($"EP: {user.ep}", fontEP, epBrush, 630, 420);
-                }
-                else
-                {
-                    drawing.DrawString($"EP: 0", fontEP, epBrush, 80, 70);
-                    drawing.DrawString($"Level: 0", fontEP, epBrush, 170, 70);
-                }
-                //level = constant * sqrt(XP)
-                drawing.DrawString($"{username}", font, textBrush, 288, 300);
-
-                //DONE DRAWING
-                drawing.Save();
-
-                textBrush.Dispose();
-                drawing.Dispose();
-
-                /*var myEncoderParameters = new EncoderParameters(1);
-                var myEncoder = System.Drawing.Imaging.Encoder.Quality;
-                var myImageCodecInfo = GetEncoderInfo("image/png");
-                // Save the bitmap as a JPEG file with quality level 25.
-                var myEncoderParameter = new EncoderParameter(myEncoder, 75L);
-                myEncoderParameters.Param[0] = myEncoderParameter;*/
-                //img.Save("test.jpg", myImageCodecInfo, myEncoderParameter);
-                if (File.Exists($"{userInfo.Id}.png"))
-                {
-                    File.Delete($"{userInfo.Id}.png");
-                }
-                img.Save($"{userInfo.Id}.png");
-
-                
-
-                img.Dispose();
             }
-            catch (Exception e)
+
+            //GETLIST
+            var sortedList = epList.OrderByDescending(pair => pair.Value)
+                .ToDictionary(pair => pair.Key, pair => pair.Value);
+            var rank = GetIndex(sortedList, userInfo.Id) + 1;
+            //END RANK
+
+            userStruct user = new userStruct();
+            if (userEPDict.ContainsKey(userInfo.Id))
             {
-                Console.WriteLine(e);
-                await SentryService.SendError(e);
+                userEPDict.TryGetValue(userInfo.Id, out user);
             }
+            else
+            {
+                user.ep = 0;
+                user.level = 0;
+            }
+            //level = constant * sqrt(XP)
+
+            ProfileImageProcessing.GenerateProfileWithBg($"{userInfo.Id}Avatar.png", $"{userInfo.Id}BGF.png", username, rank,user.level, (int)user.ep, $"{userInfo.Id}.png");
         }
 
-        private async Task DrawText2(String AvatarUrl, IUser userInfo, SocketCommandContext Context)
+        private async Task DrawProfile(String AvatarUrl, IUser userInfo, SocketCommandContext Context)
         {
-            try
+            if (String.IsNullOrEmpty(AvatarUrl))
+                AvatarUrl =
+                    "http://is2.mzstatic.com/image/pf/us/r30/Purple7/v4/89/51/05/89510540-66df-9f6f-5c91-afa5e48af4e8/mzl.sbwqpbfh.png";
+
+            Uri requestUri = new Uri(AvatarUrl);
+
+            if (File.Exists($"{userInfo.Id}Avatar.png"))
             {
-                var fontFamily = new FontFamily("lato");
-                System.Drawing.Image img = new Bitmap(890, 150);
+                File.Delete($"{userInfo.Id}Avatar.png");
+            }
 
-                Graphics drawing = Graphics.FromImage(img);
+            using (var client = new HttpClient())
+            using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
+            using (
+                Stream contentStream = await (await client.SendAsync(request)).Content.ReadAsStreamAsync(),
+                    stream = new FileStream($"{userInfo.Id}Avatar.png", FileMode.Create, FileAccess.Write,
+                        FileShare.None, 3145728, true))
+            {
+                await contentStream.CopyToAsync(stream);
+                await contentStream.FlushAsync();
+                contentStream.Dispose();
+                await stream.FlushAsync();
+                stream.Dispose();
+                Console.WriteLine("DONE STREAM");
+            }
 
-                System.Drawing.Color backColor = Color.Gainsboro;
-                var bgIMG = System.Drawing.Image.FromFile($"profilecardtemplate.png");
-                var mask = System.Drawing.Image.FromFile($"ProfileMASK.png");
-
-                Point point = new Point(0, 0);
-
-                drawing.DrawImage(bgIMG, point);
-                bgIMG.Dispose();
+            var username = userInfo.Username;
+            if (userInfo.Username.Length > 20)
+            {
+                username = userInfo.Username.Remove(20) + "...";
+            }
 
 
-                if (String.IsNullOrEmpty(AvatarUrl))
-                    AvatarUrl =
-                        "http://is2.mzstatic.com/image/pf/us/r30/Purple7/v4/89/51/05/89510540-66df-9f6f-5c91-afa5e48af4e8/mzl.sbwqpbfh.png";
 
-                Uri requestUri = new Uri(AvatarUrl);
+            //GET RANK
 
-                if (File.Exists($"{userInfo.Id}Avatar.png"))
+            var guild = ((SocketGuild)Context.Guild);
+            //guild.DownloadUsersAsync();
+
+            if (guild.MemberCount < 200)
+            {
+                guild.DownloadUsersAsync().Wait();
+                //await guild.DownloadUsersAsync();
+            }
+
+            //FEED LIST
+            Dictionary<ulong, float> epList = new Dictionary<ulong, float>();
+            foreach (var u in guild.Users)
+            {
+                if (!u.IsBot && userEPDict.ContainsKey(u.Id))
                 {
-                    File.Delete($"{userInfo.Id}Avatar.png");
-                }
-
-                using (var client = new HttpClient())
-                using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
-                using (
-                    Stream contentStream = await (await client.SendAsync(request)).Content.ReadAsStreamAsync(),
-                        stream = new FileStream($"{userInfo.Id}Avatar.png", FileMode.Create, FileAccess.Write,
-                            FileShare.None, 3145728, true))
-                {
-                    await contentStream.CopyToAsync(stream);
-                    await contentStream.FlushAsync();
-                    contentStream.Dispose();
-                    await stream.FlushAsync();
-                    stream.Dispose();
-                    Console.WriteLine("DONE STREAM");
-                }
-
-
-                /*
-                Image img;
-                using (var bmpTemp = new Bitmap("image_file_path"))
-                {
-                    img = new Bitmap(bmpTemp);
-                }*/
-
-                var pointA = new Point(profileX, profileY);
-                //var resizedImg = ResizeImage(avatarIMG, 57, 57);
-
-                //IMAGE RESIZE
-                int size = profileSIZE;
-
-                Configuration.Default.AddImageFormat(new PngFormat());
-
-                using (var input = ImageSharp.Image.Load($"{userInfo.Id}Avatar.png"))
-                {
-                    using (var output = File.OpenWrite($"{userInfo.Id}AvatarF.png"))
+                    userStruct str = new userStruct();
+                    userEPDict.TryGetValue(u.Id, out str);
+                    if (!epList.ContainsKey(u.Id))
                     {
-                        //var image = new ImageSharp.Image(input)
-                        input.Resize(new ResizeOptions
-                            {
-                                Size = new ImageSharp.Size(size, size),
-                                Mode = ResizeMode.Max
-                            });
-                        //image.ExifProfile = null; TODO FIX THIS
-                        //image.Quality = quality;
-                        input.Save(output);
-                        input.Dispose();
-                        await output.FlushAsync();
-                        output.Dispose();
-                        input.Dispose();
+                        epList.Add(u.Id, str.ep);
                     }
                 }
-                //IMAGE RESIZE END
-
-                var avatarIMG = System.Drawing.Image.FromFile($"{userInfo.Id}AvatarF.png");
-                if (avatarIMG == null)
-                {
-                    Console.WriteLine("COULDNT DOWNLOAD IMAGE. AVATAR NULL");
-                    return;
-                }
-
-                drawing.DrawImage(avatarIMG, pointA);
-                drawing.DrawImage(mask, point);
-                mask.Dispose();
-                //Dispose avatar so it can be deleted
-                avatarIMG.Dispose();
-                Font font = new Font(fontFamily, 45.0F, FontStyle.Bold);
-                System.Drawing.Color textColor = Color.FromArgb(35, 152, 225);
-                Brush textBrush = new SolidBrush(textColor);
-                System.Drawing.Color epColor = Color.Black;
-                Brush epBrush = new SolidBrush(epColor);
-
-                //GET RANK
-
-                var guild = ((SocketGuild) Context.Guild);
-                //guild.DownloadUsersAsync();
-
-                if (guild.MemberCount < 200)
-                {
-                    guild.DownloadUsersAsync().Wait();
-                    //await guild.DownloadUsersAsync();
-                }
-
-                //FEED LIST
-                Dictionary<ulong, float> epList = new Dictionary<ulong, float>();
-                foreach (var u in guild.Users)
-                {
-                    if (!u.IsBot && userEPDict.ContainsKey(u.Id))
-                    {
-                        userStruct str = new userStruct();
-                        userEPDict.TryGetValue(u.Id, out str);
-                        if (!epList.ContainsKey(u.Id))
-                        {
-                            epList.Add(u.Id, str.ep);
-                        }
-                    }
-                }
-
-                //GETLIST
-                var sortedList = epList.OrderByDescending(pair => pair.Value)
-                    .ToDictionary(pair => pair.Key, pair => pair.Value);
-                var rank = GetIndex(sortedList, userInfo.Id) + 1;
-                //END RANK
-                var username = userInfo.Username;
-                if (userInfo.Username.Length > 20)
-                {
-                    username = userInfo.Username.Remove(20)+"...";
-                }
-                
-
-                var fontEP = new Font(fontFamily, 30F, FontStyle.Bold);
-                userStruct user = new userStruct();
-                if (userEPDict.ContainsKey(userInfo.Id))
-                {
-                    userEPDict.TryGetValue(userInfo.Id, out user);
-                    drawing.DrawString($"EP: {user.ep}", fontEP, epBrush, 200, 80);
-                    drawing.DrawString($"Level: {user.level}", fontEP, epBrush, 450, 80);
-                    drawing.DrawString($"Rank: {rank}", fontEP, epBrush, 700, 80);
-                }
-                else
-                {
-                    drawing.DrawString($"EP: 0", fontEP, epBrush, 200, 80);
-                    drawing.DrawString($"Level: 0", fontEP, epBrush, 450, 80);
-                    drawing.DrawString($"Rank: -", fontEP, epBrush, 700, 80);
-                }
-                drawing.DrawString($"{username}", font, textBrush, 200, 10);
-                //level = constant * sqrt(XP)
-
-                //DONE DRAWING
-                drawing.Save();
-
-                textBrush.Dispose();
-                drawing.Dispose();
-
-                /*var myEncoderParameters = new EncoderParameters(1);
-                var myEncoder = System.Drawing.Imaging.Encoder.Quality;
-                var myImageCodecInfo = GetEncoderInfo("image/jpeg");
-                // Save the bitmap as a JPEG file with quality level 25.
-                var myEncoderParameter = new EncoderParameter(myEncoder, 75L);
-                myEncoderParameters.Param[0] = myEncoderParameter;*/
-                //img.Save("test.jpg", myImageCodecInfo, myEncoderParameter);
-                if (File.Exists($"{userInfo.Id}.png"))
-                {
-                    File.Delete($"{userInfo.Id}.png");
-                }
-                img.Save($"{userInfo.Id}.png");
-
-                img.Dispose();
             }
-            catch (Exception e)
+
+            //GETLIST
+            var sortedList = epList.OrderByDescending(pair => pair.Value)
+                .ToDictionary(pair => pair.Key, pair => pair.Value);
+            var rank = GetIndex(sortedList, userInfo.Id) + 1;
+            //END RANK
+
+            userStruct user = new userStruct();
+            if (userEPDict.ContainsKey(userInfo.Id))
             {
-                Console.WriteLine(e);
-                await SentryService.SendError(e);
+                userEPDict.TryGetValue(userInfo.Id, out user);
             }
+            else
+            {
+                user.ep = 0;
+                user.level = 0;
+            }
+            
+            ProfileImageProcessing.GenerateProfile($"{userInfo.Id}Avatar.png", username, rank, user.level, (int)user.ep, $"{userInfo.Id}.png");
         }
 
         public async Task ToggleEPSubscribe(SocketCommandContext context)
@@ -826,50 +622,6 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 await context.Channel.SendMessageAsync(":white_check_mark: You will be notified on level ups!");
             }
             SaveDatabaseGuild();
-        }
-
-
-        /// <summary>
-        /// Resize the image to the specified width and height.
-        /// </summary>
-        /// <param name="image">The image to resize.</param>
-        /// <param name="width">The width to resize to.</param>
-        /// <param name="height">The height to resize to.</param>
-        /// <returns>The resized image.</returns>
-        public Bitmap ResizeImage(System.Drawing.Image image, int width, int height)
-        {
-            if (image == null)
-            {
-                Console.WriteLine("IMAGE NULL U FUCK");
-                return null;
-            }
-            var destRect = new Rectangle(0, 0, width, height);
-            Console.WriteLine($"HORIZONTAL: {image.HorizontalResolution}, VERTICAL: {image.VerticalResolution}");
-            var destImage = new Bitmap((int) image.HorizontalResolution, (int) image.VerticalResolution);
-
-
-            //destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
-
-            using (var graphics = Graphics.FromImage(destImage))
-            {
-                graphics.CompositingMode = CompositingMode.SourceCopy;
-                graphics.CompositingQuality = CompositingQuality.HighQuality;
-                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                graphics.SmoothingMode = SmoothingMode.HighQuality;
-                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-
-                using (var wrapMode = new ImageAttributes())
-                {
-                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
-                    graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
-                }
-            }
-            if (destImage == null)
-            {
-                Console.WriteLine("DESTIMAGE NULL");
-                return null;
-            }
-            return destImage;
         }
 
         public async Task IncreaseEP(SocketMessage msg)
