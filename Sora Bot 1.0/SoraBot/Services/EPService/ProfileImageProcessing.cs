@@ -105,18 +105,31 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             // measure each string and split the margin between them??
             var font = new Font(_titleFont, 42, FontStyle.Bold);
 
-            // rank
-            output.DrawText($"Rank: {rank}", font, color, posRank, new ImageSharp.Drawing.TextGraphicsOptions
+            var rankText = $"Rank: {rank}";
+            var levelText = $"Level: {level}";
+            var epText = $"EP: {ep}";
+
+            var fontSpan = new FontSpan(font, 72); //imagesharp renders at 72 dpi
+
+            var rankSize = TextMeasurer.Measure(rankText, fontSpan); // find the width of the rank text
+            var epSize = TextMeasurer.Measure(epText, fontSpan); // find the width of the EP text
+
+            var left = posRank.X + rankSize.Width; // find the point the rankText stops
+            var right = posEP.X - epSize.Width; // find the point the epText starts
+
+            var posLevel2 = new Vector2(left + (right - left) / 2, posRank.Y); // find the point halfway between the 2 other bits of text
+
+            output.DrawText(rankText, font, color, posRank, new ImageSharp.Drawing.TextGraphicsOptions
             {
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Left
             });
-            output.DrawText($"Level: {level}", font, color, posLevel, new ImageSharp.Drawing.TextGraphicsOptions
+            output.DrawText(levelText, font, color, posLevel2, new ImageSharp.Drawing.TextGraphicsOptions
             {
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center
             });
-            output.DrawText($"EP: {ep}", font, color, posEP, new ImageSharp.Drawing.TextGraphicsOptions
+            output.DrawText(epText, font, color, posEP, new ImageSharp.Drawing.TextGraphicsOptions
             {
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Right

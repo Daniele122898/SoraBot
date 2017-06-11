@@ -23,7 +23,20 @@ namespace Sora_Bot_1.SoraBot.Modules.Marry
         public async Task MarryUser([Summary("User to Marry")] SocketGuildUser user)
         {
             await _marryService.Marry(Context, _interactive, user);
-        }   
+        }
+
+        [Command("divorce"), Summary("Will divorce from user")]
+        public async Task DivorceUser([Summary("User to Divorce")] SocketGuildUser user)
+        {
+            await _marryService.Divorce(Context, user);
+        }
+
+        [Command("marriages"), Summary("Shows your Marriages")]
+        public async Task ShowMarriages([Summary("User to check marriages of")]SocketUser user = null)
+        {
+            SocketUser userInfo = user ?? Context.User;
+            await _marryService.ShowMarriages(Context, userInfo);
+        }
 
     }
 }

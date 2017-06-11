@@ -10,6 +10,7 @@ using Sora_Bot_1.SoraBot.Core;
 using Sora_Bot_1.SoraBot.Services;
 using System.IO;
 using System.Collections;
+using Sora_Bot_1.SoraBot.Services.Marry;
 
 namespace Sora_Bot_1.SoraBot.Modules.InfoModule
 {
@@ -19,11 +20,13 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
     {
         private MusicService musicService;
         private CommandHandlingService _commandHandler;
+        private MarryService _marryService;
 
-        public InfoModule(MusicService _service, CommandHandlingService handler)
+        public InfoModule(MusicService _service, CommandHandlingService handler, MarryService marryService)
         {
             musicService = _service;
             _commandHandler = handler;
+            _marryService = marryService;
         }
 
         [Command(""), Summary("Gives infos about the bot")]
@@ -164,50 +167,6 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
             
 
             await Context.Channel.SendMessageAsync("", false, ebn);
-            /*
-            var eb = new EmbedBuilder()
-            {
-                Color = new Color(4, 97, 247),
-                ThumbnailUrl = Context.Client.CurrentUser.GetAvatarUrl(),
-                Footer = new EmbedFooterBuilder()
-                {
-                    Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
-                    IconUrl = Context.User.GetAvatarUrl()
-                }
-            };
-            
-            eb.AddField((efb) =>
-            {
-                efb.Name = "System";
-                efb.IsInline = true;
-                efb.Value =
-                        $"**OS version:**\t{(RuntimeInformation.OSDescription.Length >= 37 ? RuntimeInformation.OSDescription.Remove(37) : RuntimeInformation.OSDescription)}\n**Architecture:**\t{RuntimeInformation.OSArchitecture}\n**Framework:**\t{RuntimeInformation.FrameworkDescription}";
-            });
-
-            eb.AddField((efb) =>
-            {
-                efb.Name = "Sora";
-                efb.IsInline = true;
-                efb.Value = $"**Up time:**\t{(DateTime.Now - proc.StartTime).ToString(@"d'd 'hh\:mm\:ss")}\n" +
-                $"{(proc.PagedMemorySize64 == 0 ? $"**Memory:**\t{RSS.ToString("f1")} mB / {VSZ.ToString("f1")} mB" : $"**Memory:**\t{formatRamValue(proc.PagedMemorySize64).ToString("f2")} {formatRamUnit(proc.PagedMemorySize64)}")}" +
-                $"{(Context.User.Id == 192750776005689344 ? $"\n**PROCESS ID**:\t{proc.Id}" : "")}\n**Processor time:**\t{proc.TotalProcessorTime.ToString(@"d'd 'hh\:mm\:ss")}\n**Feedback or Suggestions here:**\n[Click to Join](https://discord.gg/Pah4yj5)";
-            });
-
-            eb.AddField((efb) =>
-            {
-                efb.Name = "Discord";
-                efb.IsInline = true;
-
-                var channelCount = 0;
-                var userCount = 0;
-                foreach (var g in _client.Guilds)
-                {
-                    channelCount += g.Channels.Count;
-                    userCount += g.MemberCount;
-                }
-
-                efb.Value = $"**State:**\t{_client.ConnectionState}\n**Guilds:**\t{_client.Guilds.Count}\n**Channels:**\t{channelCount}\n**Users:**\t{userCount}\n**Playing music for:** \t{musicService.PlayingFor()} guilds\n**Ping:**\t{_client.Latency} ms";
-            });*/
         }
 
         [Command("permissions"), Summary("Returns the guild perms of the current user, or the user paramter, if one passed.")]
@@ -251,7 +210,7 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
         // $sample whois 96642168176807936 --> Khionu#8708
         [Command("user"), Summary("Returns info about the current user, or the user paramter, if one passed.")]
         [Alias("userinfo", "whois")]
-        public async Task UserInfo([Summary("The (optional) user to get info for")] IUser user = null)
+        public async Task UserInfo([Summary("The (optional) user to get info for")] SocketUser user = null)
         {
             try
             {
@@ -335,6 +294,24 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                     x.IsInline = true;
                     x.Value = $"{(String.IsNullOrWhiteSpace(roles) ? "*none*": $"{roles}")}";
                 });
+
+                var marriages = _marryService.GetMerryData(userInfo);
+
+                if (marriages != null)
+                {
+                    eb.AddField((x) =>
+                    {
+                        string val = "";
+                        foreach (var marriage in marriages)
+                        {
+                            var us = Context.Client.GetUser(marriage.UserId);
+                            val += $"{us.Username}#{us.Discriminator}, ";
+                        }
+                        x.Name = "Marriages";
+                        x.IsInline = false;
+                        x.Value = val+ $"\n*use `{_commandHandler.GetPrefix(Context.Guild.Id)}marriages @user` for more info*";
+                    });
+                }
 
                 /*
                 eb.AddField((efb) =>
