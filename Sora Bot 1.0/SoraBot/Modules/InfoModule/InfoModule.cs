@@ -18,9 +18,9 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
     public class InfoModule : ModuleBase<SocketCommandContext>
     {
         private MusicService musicService;
-        private CommandHandler _commandHandler;
+        private CommandHandlingService _commandHandler;
 
-        public InfoModule(MusicService _service, CommandHandler handler)
+        public InfoModule(MusicService _service, CommandHandlingService handler)
         {
             musicService = _service;
             _commandHandler = handler;
@@ -441,7 +441,7 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                 {
                     x.Name = "Total Emojis";
                     x.IsInline = true;
-                    x.Value = $"{Context.Guild.Emojis.Count}";
+                    x.Value = $"{Context.Guild.Emotes.Count}";
                 });
 
                 eb.AddField((x) =>
@@ -456,7 +456,7 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                     x.Name = "Emojis";
                     x.IsInline = false;
                     string val = "";
-                    foreach (var e in Context.Guild.Emojis)
+                    foreach (var e in Context.Guild.Emotes)
                     {
                         if (val.Length < 950)
                             val += $"<:{e.Name}:{e.Id}> ";

@@ -12,9 +12,9 @@ namespace Sora_Bot_1.SoraBot.Modules.DynamicPrefixModule
 {
     public class DynamicPrefixModule : ModuleBase<SocketCommandContext>
     {
-        private readonly CommandHandler handler;
+        private readonly CommandHandlingService handler;
 
-        public DynamicPrefixModule(CommandHandler _handler)
+        public DynamicPrefixModule(CommandHandlingService _handler)
         {
             handler = _handler;
         }

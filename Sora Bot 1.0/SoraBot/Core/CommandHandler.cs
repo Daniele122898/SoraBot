@@ -18,10 +18,12 @@ using Sora_Bot_1.SoraBot.Services.PatService;
 using Sora_Bot_1.SoraBot.Services.StarBoradService;
 using Sora_Bot_1.SoraBot.Services.TagService;
 using Discord.Addons.InteractiveCommands;
+using Sora_Bot_1.SoraBot.Modules.Marry;
 using Sora_Bot_1.SoraBot.Services.Mod;
 using Sora_Bot_1.SoraBot.Services.Weather;
 using Sora_Bot_1.SoraBot.Services.LeagueOfLegends;
 using Sora_Bot_1.SoraBot.Services.Giphy;
+using Sora_Bot_1.SoraBot.Services.Marry;
 using Sora_Bot_1.SoraBot.Services.YT;
 using Sora_Bot_1.SoraBot.Services.Reminder;
 using Sora_Bot_1.SoraBot.Services.RateLimit;
@@ -33,7 +35,7 @@ namespace Sora_Bot_1.SoraBot.Core
     {
         private DiscordSocketClient client;
         private CommandService commands;
-        private DependencyMap map;
+        //private DependencyMap map;
         private CommandHandler handler => this;
         private MusicService musicService;
         private UserGuildUpdateService updateService;
@@ -52,6 +54,7 @@ namespace Sora_Bot_1.SoraBot.Core
         private BlackListService _blackListService;
         private UbService _ubService;
         private ReminderService _remindService;
+        private MarryService _marryService;
         private InteractiveService _interactiveService;
         private RatelimitService ratelimitService;
         private RatelimitService2 _rateLimit2;
@@ -68,7 +71,7 @@ namespace Sora_Bot_1.SoraBot.Core
             InitializeLoader();
             LoadDatabase();
             client = c;
-            updateService = new UserGuildUpdateService();
+            /*updateService = new UserGuildUpdateService();
             ratelimitService = new RatelimitService();
             starBoardService = new StarBoardService(client);
             _afkService = new AfkSertvice();
@@ -86,6 +89,7 @@ namespace Sora_Bot_1.SoraBot.Core
             _lolService = new lolService();
             _rateLimit2 = new RatelimitService2();
             _gifService = new GifService();
+            _marryService = new MarryService();
             _animeService = new AnimeService();
             //remService = new ReminderService();
 
@@ -116,6 +120,7 @@ namespace Sora_Bot_1.SoraBot.Core
             map.Add(_imdbService);
             map.Add(_animeService);
             map.Add(_lolService);
+            map.Add(_marryService);
             map.Add(patService);
             map.Add(_blackListService);
             map.Add(_gifService);
@@ -125,7 +130,7 @@ namespace Sora_Bot_1.SoraBot.Core
             map.Add(_weatherService);
             map.Add(starBoardService);
             map.Add(epService);
-            //map.Add(remService);
+            //map.Add(remService);*/
 
             //Discover all of the commands in this assembly and load them
             await commands.AddModulesAsync(Assembly.GetEntryAssembly());
@@ -370,14 +375,14 @@ namespace Sora_Bot_1.SoraBot.Core
             if (_rateLimit2.CheckIfRatelimited(context.User))
                 return;
 
-            var result = await commands.ExecuteAsync(context, argPos, map);
+            /*var result = await commands.ExecuteAsync(context, argPos, map);
 
             if (result.IsSuccess)
             {
                 //await ratelimitService.checkRatelimit(context.User);
                 await _rateLimit2.RateLimitMain(context.User);
                 _commandsRan++;
-            }
+            }*/
 
             //if (!result.IsSuccess)
             //  await context.Channel.SendMessageAsync(result.ErrorReason);

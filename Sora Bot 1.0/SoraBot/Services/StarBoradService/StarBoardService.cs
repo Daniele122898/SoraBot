@@ -55,7 +55,7 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
 
                 if (starChannelDict.TryGetValue(guildID, out channelID))
                 {
-                    if (reaction.Emoji.Name.Equals("⭐") || reaction.Emoji.Name.Equals("🌟"))
+                    if (reaction.Emote.Name.Equals("⭐") || reaction.Emote.Name.Equals("🌟"))
                     {
                         var chan = (((reaction.Channel as IGuildChannel).Guild as SocketGuild)
                                    .GetChannel(channelID) as
@@ -131,7 +131,7 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                                 };
 
                                 sentMessage = await chan.SendMessageAsync(
-                                    $"{reaction.Emoji.Name} in #{msg.Channel.Name}{(msg.Content.Contains("http") ? $" by {msg.Author.Username}#{msg.Author.Discriminator}\n{msg.Content}" : "")}",
+                                    $"{reaction.Emote.Name} in #{msg.Channel.Name}{(msg.Content.Contains("http") ? $" by {msg.Author.Username}#{msg.Author.Discriminator}\n{msg.Content}" : "")}",
                                     false, (msg.Content.Contains("http") ? null : eb));
 
                             }
@@ -155,7 +155,7 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                                 };
 
                                 sentMessage = await chan.SendMessageAsync(
-                                    $"{reaction.Emoji.Name} in #{msg.Channel.Name}\n",
+                                    $"{reaction.Emote.Name} in #{msg.Channel.Name}\n",
                                     false, eb);
                             }
                             starMsg msgStruct = new starMsg

@@ -26,7 +26,7 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
     {
         //PREFIX
 
-        private readonly CommandHandler handler;
+        private readonly CommandHandlingService handler;
         private UserGuildUpdateService updateService;
         private StarBoardService starBoardService;
         private AnimeService _aniServ;
@@ -36,7 +36,7 @@ namespace Sora_Bot_1.SoraBot.Modules.OwnerModule
         private string _token;
 
 
-        public OwnerModule(CommandHandler _handler, UserGuildUpdateService service, StarBoardService starboards,
+        public OwnerModule(CommandHandlingService _handler, UserGuildUpdateService service, StarBoardService starboards,
             EPService _epService, AnimeService aniSer)
         {
             handler = _handler;

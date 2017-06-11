@@ -30,8 +30,8 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
     {
         ConcurrentDictionary<ulong, userStruct> userEPDict = new ConcurrentDictionary<ulong, userStruct>();
         ConcurrentDictionary<ulong, bool> userBG = new ConcurrentDictionary<ulong, bool>();
-        ConcurrentDictionary<ulong, int> userCooldown = new ConcurrentDictionary<ulong, int>();
-        ConcurrentDictionary<ulong, int> userBGUpdateCD = new ConcurrentDictionary<ulong, int>();
+        ConcurrentDictionary<ulong, DateTime> userCooldown = new ConcurrentDictionary<ulong, DateTime>();
+        ConcurrentDictionary<ulong, DateTime> userBGUpdateCD = new ConcurrentDictionary<ulong, DateTime>();
         private DiscordSocketClient client;
         private JsonSerializer jSerializer = new JsonSerializer();
         private int timeToUpdate = Environment.TickCount + 30000;
@@ -102,19 +102,19 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     return;
                 }
 
-                if (Context.User.Id != 192750776005689344 && userCooldown.ContainsKey(Context.User.Id))
+                if (Context.User.Id != 192750776005689344 && userBGUpdateCD.ContainsKey(Context.User.Id))
                 {
-                    int cooldown = 0;
-                    userBGUpdateCD.TryGetValue(Context.User.Id, out cooldown);
-                    if (Environment.TickCount >= cooldown)
+                    DateTime timeToTriggerAgain;
+                    userBGUpdateCD.TryGetValue(Context.User.Id, out timeToTriggerAgain);
+                    if (timeToTriggerAgain.CompareTo(DateTime.UtcNow) < 0)
                     {
-                        cooldown = Environment.TickCount + 45000;
-                        userBGUpdateCD.TryUpdate(Context.User.Id, cooldown);
+                        timeToTriggerAgain = DateTime.UtcNow.AddSeconds(45);
+                        userBGUpdateCD.TryUpdate(Context.User.Id, timeToTriggerAgain);
                     }
                     else
                     {
-                        float time = (cooldown - Environment.TickCount) / 1000;
-                        int remainingTime = (int) Math.Round(time);
+                        var time = timeToTriggerAgain.Subtract(DateTime.UtcNow.TimeOfDay);
+                        int remainingTime = time.Second;
                         await Context.Channel.SendMessageAsync(
                             $":no_entry_sign: You are still on cooldown! Wait another {remainingTime} seconds!");
                         return;
@@ -122,8 +122,8 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 }
                 else
                 {
-                    var cooldown = Environment.TickCount + 45000;
-                    userBGUpdateCD.TryAdd(Context.User.Id, cooldown);
+                    DateTime timeToTriggerAgain = DateTime.UtcNow.AddSeconds(45);
+                    userBGUpdateCD.TryAdd(Context.User.Id, timeToTriggerAgain);
                 }
 
                 Uri requestUri = new Uri(url);
@@ -156,31 +156,31 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
 
                 using (var input = ImageSharp.Image.Load($"{Context.User.Id}BG.jpg"))
                 {
-                    using (var output = File.OpenWrite($"{Context.User.Id}BGF.jpg"))
-                    {
-                        var image = new ImageSharp.Image(input);
+                    //using (var output = File.OpenWrite($"{Context.User.Id}BGF.jpg"))
+                    //{
+                        //var image = new ImageSharp.Image(input);
                         //int divide = image.Width / 900;
                         //int width = image.Width / divide;
                         //int height = image.Height / divide;
-                        image.Resize(new ResizeOptions
+                        input.Resize(new ResizeOptions
                         {
                             Size = new ImageSharp.Size(900, 10000),
                             Mode = ResizeMode.Max
                         });
                         //image.ExifProfile = null; TODO FIX THIS
                         //image.Quality = quality;
-                        image.Save(output);
-                        image.Dispose();
+                        input.Save($"{Context.User.Id}BGF.png");
                         input.Dispose();
-                        await output.FlushAsync();
-                        output.Dispose();
+                        input.Dispose();
+                        //await output.FlushAsync();
+                        //output.Dispose();
 
                         /*.Resize(new ResizeOptions
                             {
                                 Size = new ImageSharp.Size(size, size),
                                 Mode = ResizeMode.Max
                             });*/
-                    }
+                    //}
                 }
                 //IMAGE RESIZE END
                 if (File.Exists($"{Context.User.Id}BG.jpg"))
@@ -391,17 +391,17 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             {
                 if (Context.User.Id != 192750776005689344 && userCooldown.ContainsKey(Context.User.Id))
                 {
-                    int cooldown = 0;
-                    userCooldown.TryGetValue(Context.User.Id, out cooldown);
-                    if (Environment.TickCount >= cooldown)
+                    DateTime timeToTriggerAgain;
+                    userCooldown.TryGetValue(Context.User.Id, out timeToTriggerAgain);
+                    if (timeToTriggerAgain.CompareTo(DateTime.UtcNow) < 0)
                     {
-                        cooldown = Environment.TickCount + 30000;
-                        userCooldown.TryUpdate(Context.User.Id, cooldown);
+                        timeToTriggerAgain = DateTime.UtcNow.AddSeconds(30);
+                        userCooldown.TryUpdate(Context.User.Id, timeToTriggerAgain);
                     }
                     else
                     {
-                        float time = (cooldown - Environment.TickCount) / 1000;
-                        int remainingTime = (int) Math.Round(time);
+                        var time = timeToTriggerAgain.Subtract(DateTime.UtcNow.TimeOfDay);
+                        int remainingTime = time.Second;
                         await Context.Channel.SendMessageAsync(
                             $":no_entry_sign: You are still on cooldown! Wait another {remainingTime} seconds!");
                         return;
@@ -409,8 +409,8 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 }
                 else
                 {
-                    var cooldown = Environment.TickCount + 30000;
-                    userCooldown.TryAdd(Context.User.Id, cooldown);
+                    DateTime timeToTriggerAgain = DateTime.UtcNow.AddSeconds(30);
+                    userCooldown.TryAdd(Context.User.Id, timeToTriggerAgain);
                 }
                 if (userBG.ContainsKey(user.Id))
                 {
@@ -451,7 +451,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
 
                 System.Drawing.Color backColor = Color.Gainsboro;
 
-                var bgIMG = System.Drawing.Image.FromFile($"{userInfo.Id}BGF.jpg");
+                var bgIMG = System.Drawing.Image.FromFile($"{userInfo.Id}BGF.png");
                 var statMask = System.Drawing.Image.FromFile($"moreBGtemp.png");
 
                 Point point = new Point(0, 0);
@@ -505,22 +505,22 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
 
                 using (var input = ImageSharp.Image.Load($"{userInfo.Id}Avatar.png"))
                 {
-                    using (var output = File.OpenWrite($"{userInfo.Id}AvatarF.png"))
-                    {
-                        var image = new ImageSharp.Image(input)
-                            .Resize(new ResizeOptions
+                    //using (var output = File.OpenWrite($"{userInfo.Id}AvatarF.png"))
+                    //{
+                        //var image = new ImageSharp.Image(input)
+                            input.Resize(new ResizeOptions
                             {
                                 Size = new ImageSharp.Size(size, size),
                                 Mode = ResizeMode.Max
                             });
                         //image.ExifProfile = null; TODO FIX THIS
                         //image.Quality = quality;
-                        image.Save(output);
-                        image.Dispose();
-                        await output.FlushAsync();
-                        output.Dispose();
+                        input.Save($"{userInfo.Id}AvatarF.png");
                         input.Dispose();
-                    }
+                        //await output.FlushAsync();
+                        //output.Dispose();
+                        input.Dispose();
+                    //}
                 }
                 //IMAGE RESIZE END
 
@@ -605,12 +605,12 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 textBrush.Dispose();
                 drawing.Dispose();
 
-                var myEncoderParameters = new EncoderParameters(1);
+                /*var myEncoderParameters = new EncoderParameters(1);
                 var myEncoder = System.Drawing.Imaging.Encoder.Quality;
-                var myImageCodecInfo = GetEncoderInfo("image/jpeg");
+                var myImageCodecInfo = GetEncoderInfo("image/png");
                 // Save the bitmap as a JPEG file with quality level 25.
                 var myEncoderParameter = new EncoderParameter(myEncoder, 75L);
-                myEncoderParameters.Param[0] = myEncoderParameter;
+                myEncoderParameters.Param[0] = myEncoderParameter;*/
                 //img.Save("test.jpg", myImageCodecInfo, myEncoderParameter);
                 if (File.Exists($"{userInfo.Id}.png"))
                 {
@@ -694,16 +694,16 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 {
                     using (var output = File.OpenWrite($"{userInfo.Id}AvatarF.png"))
                     {
-                        var image = new ImageSharp.Image(input)
-                            .Resize(new ResizeOptions
+                        //var image = new ImageSharp.Image(input)
+                        input.Resize(new ResizeOptions
                             {
                                 Size = new ImageSharp.Size(size, size),
                                 Mode = ResizeMode.Max
                             });
                         //image.ExifProfile = null; TODO FIX THIS
                         //image.Quality = quality;
-                        image.Save(output);
-                        image.Dispose();
+                        input.Save(output);
+                        input.Dispose();
                         await output.FlushAsync();
                         output.Dispose();
                         input.Dispose();
@@ -791,12 +791,12 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 textBrush.Dispose();
                 drawing.Dispose();
 
-                var myEncoderParameters = new EncoderParameters(1);
+                /*var myEncoderParameters = new EncoderParameters(1);
                 var myEncoder = System.Drawing.Imaging.Encoder.Quality;
                 var myImageCodecInfo = GetEncoderInfo("image/jpeg");
                 // Save the bitmap as a JPEG file with quality level 25.
                 var myEncoderParameter = new EncoderParameter(myEncoder, 75L);
-                myEncoderParameters.Param[0] = myEncoderParameter;
+                myEncoderParameters.Param[0] = myEncoderParameter;*/
                 //img.Save("test.jpg", myImageCodecInfo, myEncoderParameter);
                 if (File.Exists($"{userInfo.Id}.png"))
                 {
