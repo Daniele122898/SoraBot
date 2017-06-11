@@ -33,7 +33,6 @@ namespace Sora_Bot_1.SoraBot.Core
     public class Program
     {
         public DiscordSocketClient client;
-        private CommandHandler commands;
         private ConcurrentDictionary<string, string> configDict = new ConcurrentDictionary<string, string>();
         private string token;
 
@@ -129,55 +128,6 @@ namespace Sora_Bot_1.SoraBot.Core
                 .AddSingleton<EPService>()
                 .AddSingleton<InteractiveService>()
                 .BuildServiceProvider();
-        }
-
-        private async Task Owner_reconnectToDisc()
-        {
-            try
-            {
-                Console.WriteLine("TRYING TO RECONNECT");
-                await Task.Delay(20000);
-                client = createClient().Result;
-                await client.LoginAsync(TokenType.Bot, token);
-                //await client.ConnectAsync(); TODO StartAsync();
-                await client.StartAsync();
-                commands = new CommandHandler();
-                await commands.Install(client);
-                client.Disconnected += Client_Disconnected;
-                await SentryService.SendMessage($"**THE BOT HAS DISCONNECTED AND SUCCESFULLY RECONNECTED**");
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-            }
-        }
-
-        private async Task Client_Disconnected(Exception e)
-        {
-            try
-            {
-                await Task.Delay(20000);
-                if (client.ConnectionState == ConnectionState.Connected)
-                {
-                    await SentryService.SendMessage("**Disconnected and Wrapper reconnected himself**");
-                    return;
-                }
-                Console.WriteLine("TRYING TO RECOVER WITH RECONNECT");
-                Console.WriteLine(e);
-                //await SentryService.SendError(e);
-                client = createClient().Result;
-                await client.LoginAsync(TokenType.Bot, token);
-                //await client.ConnectAsync(); TODO StartAsync();
-                commands = new CommandHandler();
-                await commands.Install(client);
-                client.Disconnected += Client_Disconnected;
-                await SentryService.SendMessage($"**THE BOT HAS DISCONNECTED AND SUCCESFULLY RECONNECTED**\n{e}");
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-            }
-            
         }
 
         private async Task<DiscordSocketClient> createClient()

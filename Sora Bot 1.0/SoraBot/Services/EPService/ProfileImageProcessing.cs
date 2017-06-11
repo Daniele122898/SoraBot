@@ -33,9 +33,9 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
 
                 DrawMask("moreBGtemp.png", output, new ImageSharp.Size(900, 500));
 
-                DrawStats(rank, level, ep, output, new System.Numerics.Vector2(230, 430), new System.Numerics.Vector2(520, 430), new System.Numerics.Vector2(850, 430), Rgba32.Gray);
+                DrawStats(rank, level, ep, output, new System.Numerics.Vector2(240, 435), new System.Numerics.Vector2(530, 435), new System.Numerics.Vector2(860, 435), Rgba32.Gray);
 
-                DrawTitle(name, output, new System.Numerics.Vector2(295, 300), Rgba32.White);
+                DrawTitle(name, output, new System.Numerics.Vector2(300, 300), Rgba32.White);
 
                 DrawAvatar(avatarUrl, output, new Rectangle(73, 273, 155, 155));
 

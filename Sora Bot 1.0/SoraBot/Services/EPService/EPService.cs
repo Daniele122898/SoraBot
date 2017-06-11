@@ -756,7 +756,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             }
             else
             {
-                File.Create("UserEPSubscriber.json").Dispose();
+                File.Create("UserCustomBG.json").Dispose();
             }
         }
 
