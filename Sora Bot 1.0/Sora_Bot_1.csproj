@@ -14,13 +14,10 @@
   <ItemGroup>
     <Compile Remove="BackUP\**" />
     <Compile Remove="Bakcup2\**" />
-    <Compile Remove="fonts\**" />
     <EmbeddedResource Remove="BackUP\**" />
     <EmbeddedResource Remove="Bakcup2\**" />
-    <EmbeddedResource Remove="fonts\**" />
     <None Remove="BackUP\**" />
     <None Remove="Bakcup2\**" />
-    <None Remove="fonts\**" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="0xFADED#3237BGF.jpg" />
@@ -131,5 +128,11 @@
     <PackageReference Include="Microsoft.NETCore.App" Version="1.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
     <PackageReference Include="runtime.linux-x64.CoreCompat.System.Drawing" Version="1.0.0-beta009" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="MarryData.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="fonts" />
   </ItemGroup>
 </Project>

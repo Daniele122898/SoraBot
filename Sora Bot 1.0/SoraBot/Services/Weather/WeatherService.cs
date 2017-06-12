@@ -13,10 +13,17 @@ namespace Sora_Bot_1.SoraBot.Services.Weather
         private string weatherID;
         public WeatherService()
         {
-            var configDict = ConfigService.ConfigService.getConfig();
-            if (!configDict.TryGetValue("weather", out weatherID))
+            try
             {
-                Console.WriteLine("COULDN'T GET WEATHER API ID FROM CONFIG!");
+                var configDict = ConfigService.ConfigService.getConfig();
+                if (!configDict.TryGetValue("weather", out weatherID))
+                {
+                    Console.WriteLine("COULDN'T GET WEATHER API ID FROM CONFIG!");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
         public async Task GetWeather(SocketCommandContext Context, string query)

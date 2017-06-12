@@ -6,6 +6,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.Logging;
+using Sora_Bot_1.SoraBot.Services;
 
 namespace Sora_Bot_1.SoraBot.Core
 {
@@ -53,7 +54,8 @@ namespace Sora_Bot_1.SoraBot.Core
             if (message.Exception is CommandException command)
             {
                 // Don't risk blocking the logging task by awaiting a message send; ratelimits!?
-                var _ = command.Context.Channel.SendMessageAsync($"Error: {command.Message}");
+                //var _ = command.Context.Channel.SendMessageAsync($"Error: {command.Message}");
+                SentryService.SendMessage($"Error: {command.Message}");
             }
 
             _discordLogger.Log(
