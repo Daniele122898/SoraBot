@@ -2,13 +2,11 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.InteractiveCommands;
 using Discord.Commands;
 using Discord.WebSocket;
-using Google.Apis.YouTube.v3;
 
 namespace Sora_Bot_1.SoraBot.Services.Marry
 {
@@ -158,7 +156,7 @@ namespace Sora_Bot_1.SoraBot.Services.Marry
 
             if (marryData == null || marryData.Count ==0)
             {
-                await Context.Channel.SendMessageAsync(":no_entry_sign: You are not married to anyone :frowning:");
+                await Context.Channel.SendMessageAsync($":no_entry_sign: {user.Username}#{user.Discriminator} is not married to anyone :frowning:");
                 return;
             }
             

@@ -16,6 +16,7 @@ using Sora_Bot_1.SoraBot.Services;
 using Sora_Bot_1.SoraBot.Services.ConfigService;
 using Sora_Bot_1.SoraBot.Services.EPService;
 using Sora_Bot_1.SoraBot.Services.Giphy;
+using Sora_Bot_1.SoraBot.Services.GlobalSoraBans;
 using Sora_Bot_1.SoraBot.Services.LeagueOfLegends;
 using Sora_Bot_1.SoraBot.Services.Marry;
 using Sora_Bot_1.SoraBot.Services.Mod;
@@ -127,6 +128,7 @@ namespace Sora_Bot_1.SoraBot.Core
                 .AddSingleton<PatService>()
                 .AddSingleton<EPService>()
                 .AddSingleton<InteractiveService>()
+                .AddSingleton<GlobalBanService>()
                 .BuildServiceProvider();
         }
 

@@ -13,6 +13,7 @@ using Newtonsoft.Json.Converters;
 using Sora_Bot_1.SoraBot.Services;
 using Sora_Bot_1.SoraBot.Services.ChangelogService;
 using Sora_Bot_1.SoraBot.Services.EPService;
+using Sora_Bot_1.SoraBot.Services.GlobalSoraBans;
 using Sora_Bot_1.SoraBot.Services.Mod;
 using Sora_Bot_1.SoraBot.Services.RateLimit;
 using Sora_Bot_1.SoraBot.Services.StarBoradService;
@@ -38,6 +39,7 @@ namespace Sora_Bot_1.SoraBot.Core
         private StarBoardService _starBoardService;
         private MusicService _musicService;
         private ModService _modService;
+        private GlobalBanService _globalBans;
         private readonly BlackListService _blackListService;
         private readonly RatelimitService2 _ratelimitService2;
 
@@ -58,6 +60,7 @@ namespace Sora_Bot_1.SoraBot.Core
             _modService = _provider.GetService<ModService>();
             _blackListService = _provider.GetService<BlackListService>();
             _ratelimitService2 = _provider.GetService<RatelimitService2>();
+            _globalBans = _provider.GetService<GlobalBanService>();
 
             SentryService.client = _discord;
 
@@ -271,6 +274,9 @@ namespace Sora_Bot_1.SoraBot.Core
             var context = new SocketCommandContext(_discord, message);
 
             if (context.IsPrivate)
+                return;
+
+            if (_globalBans.IsBanned(context.User.Id))
                 return;
 
             if (_blackListService.CheckIfBlacklisted(context))
