@@ -297,7 +297,7 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
 
                 var marriages = _marryService.GetMerryData(userInfo);
 
-                if (marriages != null)
+                if (marriages != null && marriages.Count > 0)
                 {
                     eb.AddField((x) =>
                     {

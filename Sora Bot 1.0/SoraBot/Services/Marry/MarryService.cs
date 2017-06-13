@@ -114,8 +114,13 @@ namespace Sora_Bot_1.SoraBot.Services.Marry
                 {
                     marryData.Remove(foundUser);
 
-                    _marryDict.AddOrUpdate(Context.User.Id, marryData, (key, oldValue) => marryData);
-
+                    if (marryData.Count == 0)
+                        _marryDict.TryRemove(Context.User.Id, out marryData);
+                    else
+                        _marryDict.AddOrUpdate(Context.User.Id, marryData, (key, oldValue) => marryData);
+                    
+                    
+                    
                     marryData = new List<MarryData>();
                     if (_marryDict.ContainsKey(user.Id))
                         _marryDict.TryGetValue(user.Id, out marryData);
@@ -123,8 +128,12 @@ namespace Sora_Bot_1.SoraBot.Services.Marry
                     var founduser = marryData.FirstOrDefault(x => x.UserId == Context.User.Id);
                     if (marryData.Contains(founduser))
                         marryData.Remove(founduser);
-
-                    _marryDict.AddOrUpdate(user.Id, marryData, (key, oldValue) => marryData);
+                    
+                    if (marryData.Count == 0)
+                        _marryDict.TryRemove(user.Id, out marryData);
+                    else
+                        _marryDict.AddOrUpdate(user.Id, marryData, (key, oldValue) => marryData);
+                    
                     await Context.Channel.SendMessageAsync("You are now divorced :broken_heart:");
                     _marryDB.SaveMarryData(_marryDict);
                     return;
@@ -147,7 +156,7 @@ namespace Sora_Bot_1.SoraBot.Services.Marry
             
             List<MarryData> marryData = GetMerryData(user);
 
-            if (marryData == null)
+            if (marryData == null || marryData.Count ==0)
             {
                 await Context.Channel.SendMessageAsync(":no_entry_sign: You are not married to anyone :frowning:");
                 return;
@@ -159,11 +168,11 @@ namespace Sora_Bot_1.SoraBot.Services.Marry
                 Footer = new EmbedFooterBuilder()
                 {
                     Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
-                    IconUrl = user.GetAvatarUrl()
+                    IconUrl = Context.User.GetAvatarUrl()
                 },
                 Title = $"Marriages of {user.Username}#{user.Discriminator}",
                 Description = "\n",
-                ThumbnailUrl = Context.User.GetAvatarUrl()
+                ThumbnailUrl = user.GetAvatarUrl()
             };
 
             foreach (var marry in marryData)
