@@ -53,7 +53,8 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
             "https://media.giphy.com/media/kvKFM3UWg2P04/giphy.gif",
             "https://media.giphy.com/media/wnsgren9NtITS/giphy.gif",
             "http://media.giphy.com/media/veU1qeC9SJiKY/giphy.gif",
-            "https://cdn.discordapp.com/attachments/287369965252902931/298164710212108288/giphy_7.gif"
+            "https://cdn.discordapp.com/attachments/287369965252902931/298164710212108288/giphy_7.gif",
+            "http://imgur.com/a/kVgsM"
         };
 
         private string[] _pokes = new string[]

@@ -19,7 +19,7 @@ namespace Sora_Bot_1.SoraBot.Modules.GlobalBans
         [RequireOwner]
         public async Task GlobalBan(SocketUser user, [Remainder] string reason=null)
         {
-            await _banService.BanUser(Context,user, reason);
+            await _banService.BanUser(Context,user.Id, reason);
         }
         
         [Command("globalban")]
@@ -33,7 +33,14 @@ namespace Sora_Bot_1.SoraBot.Modules.GlobalBans
         [RequireOwner]
         public async Task GlobalUnBan(SocketUser user)
         {
-            await _banService.UnbanUser(Context, user);
+            await _banService.UnbanUser(Context, user.Id);
+        }
+        
+        [Command("globalunban")]
+        [RequireOwner]
+        public async Task GlobalUnBan(ulong id)
+        {
+            await _banService.UnbanUser(Context, id);
         }
         
         [Command("globalbanlist")]

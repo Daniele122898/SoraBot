@@ -18,35 +18,6 @@ namespace Sora_Bot_1.SoraBot.Services.GlobalSoraBans
             _banDB.InitializeLoader();
             _globalBanDict = _banDB.LoadGlobalBanData();
         }
-
-        public async Task BanUser(SocketCommandContext Context, SocketUser user, string reason)
-        {
-            if (String.IsNullOrWhiteSpace(reason))
-                reason = _notDefined;
-
-            if (_globalBanDict.ContainsKey(user.Id))
-            {
-                if (reason == _notDefined)
-                {
-                    await Context.Channel.SendMessageAsync(
-                        ":no_entry_sign: Can't update a reason without a reason :upside_down:");
-                }
-                else
-                {
-                    _globalBanDict.TryUpdate(user.Id, reason);
-                    await Context.Channel.SendMessageAsync(
-                        $":white_check_mark: Reason has been updated to {reason}");
-                }
-
-            }
-            else
-            {
-                _globalBanDict.TryAdd(user.Id, reason);
-                await Context.Channel.SendMessageAsync(
-                    $":white_check_mark: {user.Username}#{user.Discriminator} has been globally banned from using Sora! Reason:\n`{reason}`");
-            }
-            _banDB.SaveGlobalBanData(_globalBanDict);
-        }
         
         public async Task BanUser(SocketCommandContext Context, ulong id, string reason)
         {
@@ -71,25 +42,26 @@ namespace Sora_Bot_1.SoraBot.Services.GlobalSoraBans
             else
             {
                 _globalBanDict.TryAdd(id, reason);
+                var user = Context.Client.GetUser(id);
                 await Context.Channel.SendMessageAsync(
-                    $":white_check_mark: {id} has been globally banned from using Sora! Reason:\n`{reason}`");
+                    $":white_check_mark: {(user == null ? $"{id}" : $"{user.Username}#{user.Id}")} has been globally banned from using Sora! Reason:\n`{reason}`");
             }
             _banDB.SaveGlobalBanData(_globalBanDict);
         }
 
-        public async Task UnbanUser(SocketCommandContext Context, SocketUser user)
+        public async Task UnbanUser(SocketCommandContext Context, ulong id)
         {
-            if (!_globalBanDict.ContainsKey(user.Id))
+            if (!_globalBanDict.ContainsKey(id))
             {
                 await Context.Channel.SendMessageAsync(
                     ":no_entry_sign: Can't unban a user that wasn't banned");
                 return;
             }
 
-            _globalBanDict.TryRemove(user.Id, out _);
-        
+            _globalBanDict.TryRemove(id, out _);
+            var user = Context.Client.GetUser(id);
             await Context.Channel.SendMessageAsync(
-                $":white_check_mark: {user.Username}#{user.Discriminator} has been globally unbanned!");
+                $":white_check_mark: {(user == null ? $"{id}": $"{user.Username}#{user.Discriminator}")} has been globally unbanned!");
             
             _banDB.SaveGlobalBanData(_globalBanDict);
         }
