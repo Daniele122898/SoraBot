@@ -47,6 +47,35 @@ namespace Sora_Bot_1.SoraBot.Services.GlobalSoraBans
             }
             _banDB.SaveGlobalBanData(_globalBanDict);
         }
+        
+        public async Task BanUser(SocketCommandContext Context, ulong id, string reason)
+        {
+            if (String.IsNullOrWhiteSpace(reason))
+                reason = _notDefined;
+
+            if (_globalBanDict.ContainsKey(id))
+            {
+                if (reason == _notDefined)
+                {
+                    await Context.Channel.SendMessageAsync(
+                        ":no_entry_sign: Can't update a reason without a reason :upside_down:");
+                }
+                else
+                {
+                    _globalBanDict.TryUpdate(id, reason);
+                    await Context.Channel.SendMessageAsync(
+                        $":white_check_mark: Reason has been updated to {reason}");
+                }
+
+            }
+            else
+            {
+                _globalBanDict.TryAdd(id, reason);
+                await Context.Channel.SendMessageAsync(
+                    $":white_check_mark: {id} has been globally banned from using Sora! Reason:\n`{reason}`");
+            }
+            _banDB.SaveGlobalBanData(_globalBanDict);
+        }
 
         public async Task UnbanUser(SocketCommandContext Context, SocketUser user)
         {

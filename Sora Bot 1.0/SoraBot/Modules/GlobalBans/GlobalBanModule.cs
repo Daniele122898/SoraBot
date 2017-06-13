@@ -22,6 +22,13 @@ namespace Sora_Bot_1.SoraBot.Modules.GlobalBans
             await _banService.BanUser(Context,user, reason);
         }
         
+        [Command("globalban")]
+        [RequireOwner]
+        public async Task GlobalBan(ulong Id, [Remainder] string reason=null)
+        {
+            await _banService.BanUser(Context,Id, reason);
+        }
+        
         [Command("globalunban")]
         [RequireOwner]
         public async Task GlobalUnBan(SocketUser user)
