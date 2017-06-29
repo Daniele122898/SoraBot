@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
-using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Globalization;
@@ -22,7 +21,7 @@ using Newtonsoft.Json.Converters;
 using Color = System.Drawing.Color;
 using Point = System.Drawing.Point;
 using Rectangle = System.Drawing.Rectangle;
-using Size = System.Drawing.Size;
+using SixLabors.Primitives; 
 
 namespace Sora_Bot_1.SoraBot.Services.EPService
 {
@@ -156,7 +155,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                         //int height = image.Height / divide;
                         input.Resize(new ResizeOptions
                         {
-                            Size = new ImageSharp.Size(900, 500),
+                            Size = new Size(900, 500),
                             Mode = ResizeMode.Crop
                         });
                         //image.ExifProfile = null; TODO FIX THIS
@@ -265,12 +264,12 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 var eb = new EmbedBuilder()
                 {
                     Color = new Discord.Color(4, 97, 247),
-                    ThumbnailUrl = Context.Guild.IconUrl,
+                    ThumbnailUrl = new Uri(Context.Guild.IconUrl),
                     Title = $"Top 10 in {guild.Name} (Global EP)",
                     Footer = new EmbedFooterBuilder()
                     {
                         Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
-                        IconUrl = Context.User.GetAvatarUrl()
+                        IconUrl = new Uri(Context.User.GetAvatarUrl())
                     }
                 };
                 int rank = 1;
@@ -590,7 +589,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     {
                         if (lvlSubsriberList.Contains(context.User.Id))
                         {
-                            await (await context.User.CreateDMChannelAsync()).SendMessageAsync(
+                            await (await context.User.GetOrCreateDMChannelAsync()).SendMessageAsync(
                                 $":trophy: You leveled up! You are now level **{user.level}** \\ (•◡•) /");
                         }
                     }

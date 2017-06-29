@@ -216,7 +216,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                     Footer = new EmbedFooterBuilder()
                     {
                         Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
-                        IconUrl = Context.User.GetAvatarUrl()
+                        IconUrl = new Uri(Context.User.GetAvatarUrl())
                     },
                 };
 
@@ -866,7 +866,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                 {
                     Color = new Color(4, 97, 247),
                     Title = $"{DateTime.UtcNow.TimeOfDay.ToString().Remove(8)} - Message Deleted",
-                    ThumbnailUrl = "https://img.clipartfest.com/664ce829afe3443ac3aae2f074b4bd69_recycle-bin-icon-recycle-bin-icon-clipart_2400-2400.png",
+                    ThumbnailUrl = new Uri("https://img.clipartfest.com/664ce829afe3443ac3aae2f074b4bd69_recycle-bin-icon-recycle-bin-icon-clipart_2400-2400.png"),
                     Description = msg.Value.Content,
                     Footer = new EmbedFooterBuilder()
                     {
@@ -934,7 +934,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
             {
                 Color = new Color(4, 97, 247),
                 Title = $"{DateTime.UtcNow.TimeOfDay.ToString().Remove(8)} - Role {(isCreate ? "Created" : "Deleted")}",
-                ThumbnailUrl = "http://i.imgur.com/Qo4kSxq.png",
+                ThumbnailUrl = new Uri("http://i.imgur.com/Qo4kSxq.png"),
                 Description = $"**{role.Name}** ({role.Id}) has been {(isCreate ? "created" : "deleted")}!"
             };
             eb.AddField((x) =>
@@ -1016,7 +1016,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                 {
                     Color = new Color(4, 97, 247),
                     Title = $"{DateTime.UtcNow.TimeOfDay.ToString().Remove(8)} - Role Updated",
-                    ThumbnailUrl = "http://i.imgur.com/Qo4kSxq.png",
+                    ThumbnailUrl = new Uri("http://i.imgur.com/Qo4kSxq.png"),
                     Description = $"{(oldRole.Name != newRole.Name ? $"**{oldRole.Name}** ({oldRole.Id}) has been updated to **{newRole.Name}** ({newRole.Id})" : $"**{newRole.Name}**")}"
                 };
                 eb.AddField((x) =>
@@ -1072,7 +1072,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
             {
                 Color = new Color(4, 97, 247),
                 Title = $"{DateTime.UtcNow.TimeOfDay.ToString().Remove(8)} - Channel was {(isCreate ? "Created" : "Deleted")}",
-                ThumbnailUrl = "https://cdn0.iconfinder.com/data/icons/kirrkle-social-networks-part-1/60/05_-_Text_messaging-512.png",
+                ThumbnailUrl = new Uri("https://cdn0.iconfinder.com/data/icons/kirrkle-social-networks-part-1/60/05_-_Text_messaging-512.png"),
                 Description = $"**#{ichannel.Name}** ({ichannel.Id}) has been {(isCreate ? "created" : "deleted")}!"
             };
             return eb;
@@ -1141,7 +1141,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                 {
                     Color = new Color(4, 97, 247),
                     Title = $"{DateTime.UtcNow.TimeOfDay.ToString().Remove(8)} - Channel was Updated",
-                    ThumbnailUrl = "https://cdn0.iconfinder.com/data/icons/kirrkle-social-networks-part-1/60/05_-_Text_messaging-512.png",
+                    ThumbnailUrl = new Uri("https://cdn0.iconfinder.com/data/icons/kirrkle-social-networks-part-1/60/05_-_Text_messaging-512.png"),
                     Description = $"{(socketOld.Name != socketNew.Name ? $"**#{socketOld.Name}** ({socketOld.Id}) \nhas been changed to \n<#{socketNew.Id}> ({socketNew.Id})" : $"<#{socketNew.Id}>")}"
                 };
 
@@ -1217,7 +1217,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
             {
                 Color = new Color(4, 97, 247),
                 Title = $"{DateTime.UtcNow.TimeOfDay.ToString().Remove(8)} - Server was Updated",
-                ThumbnailUrl = "https://cdn1.iconfinder.com/data/icons/round-ui/143/33-512.png",
+                ThumbnailUrl = new Uri("https://cdn1.iconfinder.com/data/icons/round-ui/143/33-512.png"),
                 Description = $"{(guildOld.Name != guildNew.Name ? $"**{guildOld.Name}**\nhas been changed to \n**{guildNew.Name}**" : $"**{guildOld}** - Name hasn't changed")}!"
             };
 
@@ -1284,7 +1284,7 @@ namespace Sora_Bot_1.SoraBot.Services.Mod
                 Footer = new EmbedFooterBuilder()
                 {
                     Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
-                    IconUrl = Context.User.GetAvatarUrl()
+                    IconUrl = new Uri(Context.User.GetAvatarUrl())
                 },
                 Title = $"ModLog Config File for {Context.Guild.Name}"
             };

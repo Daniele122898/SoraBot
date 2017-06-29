@@ -35,7 +35,7 @@ namespace Sora_Bot_1.SoraBot.Services.RateLimit
             try
             {
                 _timer = new Timer(_ =>
-                {////await (await Context.User.CreateDMChannelAsync()).SendMessageAsync("",false,eb);
+                {////await (await Context.User.GetOrCreateDMChannelAsync()).SendMessageAsync("",false,eb);
                     var temp = _bucketDict.ToArray();
                     foreach (var bucket in temp)
                     {
@@ -135,7 +135,7 @@ namespace Sora_Bot_1.SoraBot.Services.RateLimit
                 {
                     //RATELIMIT
                     data.rateLimitedTill = DateTime.UtcNow.AddSeconds(BUCKET_RATELIMITER);
-                    await (await user.CreateDMChannelAsync()).SendMessageAsync("" +
+                    await (await user.GetOrCreateDMChannelAsync()).SendMessageAsync("" +
                             $"**You have been ratelimited for {BUCKET_RATELIMITER} seconds. Please do not spam commands or stars! If you continue doing so your lockout will increase in time!**\n" +
                                         "If this was by mistake and you did not spam. join https://discord.gg/Pah4yj5 and @ me");
                     await SentryService.SendMessage($"**Rate limit occured:**\n" +
@@ -166,7 +166,7 @@ namespace Sora_Bot_1.SoraBot.Services.RateLimit
                     if (data.combo >= COMBO_MAX)
                     {
                         data.rateLimitedTill = DateTime.UtcNow.AddSeconds(COMBO_RATELIMITER);
-                        await (await user.CreateDMChannelAsync()).SendMessageAsync("" +
+                        await (await user.GetOrCreateDMChannelAsync()).SendMessageAsync("" +
                             $"**You have been ratelimited for {COMBO_RATELIMITER} seconds. Your ratelimit was triggered by the combo breaker and thus your time is higher than normal! Please do not spam commands or stars! If you continue doing so your lockout will increase in time!**\n" +
                                         "If this was by mistake and you did not spam. join https://discord.gg/Pah4yj5 and @ me");
                         await SentryService.SendMessage($"**Rate limit occured:**\n" +

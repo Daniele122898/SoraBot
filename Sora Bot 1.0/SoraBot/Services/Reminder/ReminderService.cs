@@ -54,7 +54,7 @@ namespace Sora_Bot_1.SoraBot.Services.Reminder
             try
             {
                 _timer = new Timer(async _ =>
-                {////await (await Context.User.CreateDMChannelAsync()).SendMessageAsync("",false,eb);
+                {////await (await Context.User.GetOrCreateDMChannelAsync()).SendMessageAsync("",false,eb);
                     foreach (var user in _remindDict.ToArray())
                     {
                         List<RemindData> itemsToRemove = new List<RemindData>();
@@ -63,7 +63,7 @@ namespace Sora_Bot_1.SoraBot.Services.Reminder
                             if (reminder.TimeToRemind.CompareTo(DateTime.UtcNow) <= 0)
                             {
                                 var userToRemind = _client.GetUser(user.Key);
-                                await (await userToRemind.CreateDMChannelAsync()).SendMessageAsync($":alarm_clock: **Reminder:** {reminder.message}");
+                                await (await userToRemind.GetOrCreateDMChannelAsync()).SendMessageAsync($":alarm_clock: **Reminder:** {reminder.message}");
                                 itemsToRemove.Add(reminder);
                             }
                         }
@@ -200,7 +200,7 @@ namespace Sora_Bot_1.SoraBot.Services.Reminder
                 var eb = new EmbedBuilder()
                 {
                     Color = new Color(4, 97, 247),
-                    ThumbnailUrl = Context.User.GetAvatarUrl(),
+                    ThumbnailUrl = new Uri(Context.User.GetAvatarUrl()),
                     Title = $"{Context.User.Username}, your Reminders are"
                 };
                 for (int i = 0; i < orderedList.Count && i<10; i++)

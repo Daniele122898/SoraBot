@@ -30,7 +30,7 @@ namespace Sora_Bot_1.SoraBot.Services
             }
         }
 
-        //await (await Context.User.CreateDMChannelAsync()).SendMessageAsync("",false,eb);
+        //await (await Context.User.GetOrCreateDMChannelAsync()).SendMessageAsync("",false,eb);
 
         public static async Task SendError(Exception e)
         {
@@ -50,7 +50,7 @@ namespace Sora_Bot_1.SoraBot.Services
                         Title = "Exception Occured",
                         Description = err
                     };
-                    await (await serenity.CreateDMChannelAsync()).SendMessageAsync("", false, eb);
+                    await (await serenity.GetOrCreateDMChannelAsync()).SendMessageAsync("", false, eb);
                 }
                 else
                 {
@@ -63,7 +63,7 @@ namespace Sora_Bot_1.SoraBot.Services
                         Description = errS
                     };
 
-                    await (await serenity.CreateDMChannelAsync()).SendMessageAsync("", false, eb);
+                    await (await serenity.GetOrCreateDMChannelAsync()).SendMessageAsync("", false, eb);
 
                     var eb2 = new EmbedBuilder()
                     {
@@ -71,7 +71,7 @@ namespace Sora_Bot_1.SoraBot.Services
                         Title = "Exception Occured 2",
                         Description = errE
                     };
-                    await (await serenity.CreateDMChannelAsync()).SendMessageAsync("", false, eb2);
+                    await (await serenity.GetOrCreateDMChannelAsync()).SendMessageAsync("", false, eb2);
                 }
                 
             }
@@ -87,7 +87,7 @@ namespace Sora_Bot_1.SoraBot.Services
             {
                 if (serenity == null)
                     return;
-                await (await serenity.CreateDMChannelAsync()).SendMessageAsync(message);
+                await (await serenity.GetOrCreateDMChannelAsync()).SendMessageAsync(message);
             }
             catch (Exception e)
             {
@@ -118,7 +118,7 @@ namespace Sora_Bot_1.SoraBot.Services
                                 $"**Message that Caused the Exception**\n" +
                                 $"{Context.Message.Content}\n\n{err}"
                     };
-                    await (await serenity.CreateDMChannelAsync()).SendMessageAsync("", false, eb);
+                    await (await serenity.GetOrCreateDMChannelAsync()).SendMessageAsync("", false, eb);
                 }
                 else
                 {
@@ -136,7 +136,7 @@ namespace Sora_Bot_1.SoraBot.Services
                                 $"{Context.Message.Content}\n\n{errS}"
                     };
 
-                    await (await serenity.CreateDMChannelAsync()).SendMessageAsync("", false, eb);
+                    await (await serenity.GetOrCreateDMChannelAsync()).SendMessageAsync("", false, eb);
 
                     var eb2 = new EmbedBuilder()
                     {
@@ -144,7 +144,7 @@ namespace Sora_Bot_1.SoraBot.Services
                         Title = "Exception Occured 2",
                         Description = errE
                     };
-                    await (await serenity.CreateDMChannelAsync()).SendMessageAsync("", false, eb2);
+                    await (await serenity.GetOrCreateDMChannelAsync()).SendMessageAsync("", false, eb2);
                 }
             }
             catch (Exception exception)

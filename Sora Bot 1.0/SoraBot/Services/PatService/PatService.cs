@@ -90,10 +90,10 @@ namespace Sora_Bot_1.SoraBot.Services.PatService
                     Footer = new EmbedFooterBuilder()
                     {
                         Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
-                        IconUrl = Context.User.GetAvatarUrl()
+                        IconUrl = new Uri(Context.User.GetAvatarUrl())
                     },
                     Title = $"Affinity stats of {user.Username}#{user.Discriminator}",
-                    ThumbnailUrl = user.GetAvatarUrl(),
+                    ThumbnailUrl = new Uri(user.GetAvatarUrl()),
                     Description = $"" +
                     $"Pats:     {stats.pats}\n" +
                     $"Hugs:     {stats.hugs}\n" +

@@ -42,6 +42,7 @@ namespace Sora_Bot_1.SoraBot.Core
         private GlobalBanService _globalBans;
         private readonly BlackListService _blackListService;
         private readonly RatelimitService2 _ratelimitService2;
+        private PlayingWith _playingService;
 
 
         public CommandHandlingService(IServiceProvider provider, DiscordSocketClient discord, CommandService commands)
@@ -61,6 +62,7 @@ namespace Sora_Bot_1.SoraBot.Core
             _blackListService = _provider.GetService<BlackListService>();
             _ratelimitService2 = _provider.GetService<RatelimitService2>();
             _globalBans = _provider.GetService<GlobalBanService>();
+            _playingService = new PlayingWith(_discord);
 
             SentryService.client = _discord;
 

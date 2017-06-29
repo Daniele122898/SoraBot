@@ -6,13 +6,14 @@ using System.Text;
 using ImageSharp;
 using ImageSharp.Drawing.Brushes;
 using SixLabors.Fonts;
+using SixLabors.Primitives;
 
 namespace Sora_Bot_1.SoraBot.Services.EPService
 {
     public static class ProfileImageProcessing
     {
         private static FontCollection _fontCollection;
-        private static Font _titleFont;
+        private static FontFamily _titleFont;
 
         private static Image<Rgba32> _bgMaskImage;
         private static Image<Rgba32> _noBgMask;
@@ -32,9 +33,9 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
         {
             using (var output = new Image<Rgba32>(900, 500))
             {
-                DrawBackground(backgroundUrl, output, new ImageSharp.Size(900, 500));
+                DrawBackground(backgroundUrl, output, new Size(900,500));
 
-                DrawMask(_bgMaskImage, output, new ImageSharp.Size(900, 500));
+                DrawMask(_bgMaskImage, output, new Size(900, 500));
 
                 DrawStats(rank, level, ep, output, new System.Numerics.Vector2(240, 435), new System.Numerics.Vector2(530, 435), new System.Numerics.Vector2(850, 435), Rgba32.Gray);
 
@@ -51,11 +52,11 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
         {
             using (var output = new Image<Rgba32>(890, 150))
             {
-                DrawMask(_noBgMask, output, new ImageSharp.Size(1000, 150));
+                DrawMask(_noBgMask, output, new Size(1000, 150));
 
                 DrawAvatar(avatarUrl, output, new Rectangle(26, 15, 121, 121));
 
-                DrawMask(_noBgMaskOverlay, output, new ImageSharp.Size(1000, 150));
+                DrawMask(_noBgMaskOverlay, output, new Size(1000, 150));
 
                 DrawStats(rank, level, ep, output, new System.Numerics.Vector2(200, 92), new System.Numerics.Vector2(480, 92), new System.Numerics.Vector2(830, 92), Rgba32.Black);
 
@@ -67,14 +68,14 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             }//dispose of output to help save memory
         }
 
-        private static void DrawMask(Image<Rgba32> mask, Image<Rgba32> output, ImageSharp.Size size)
+        private static void DrawMask(Image<Rgba32> mask, Image<Rgba32> output, Size size)
         {
 
             output.DrawImage(mask, 1, size, new Point(0, 0));
 
         }
 
-        private static void DrawBackground(string backgroundUrl, Image<Rgba32> output, ImageSharp.Size size)
+        private static void DrawBackground(string backgroundUrl, Image<Rgba32> output, Size size)
         {
             using (Image<Rgba32> background = Image.Load(backgroundUrl))//900x500
             {
@@ -109,10 +110,10 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             var levelText = $"Level: {level}";
             var epText = $"EP: {ep}";
 
-            var fontSpan = new FontSpan(font, 72); //imagesharp renders at 72 dpi
+            //var fontSpan = new FontSpan(font, 72); //imagesharp renders at 72 
 
-            var rankSize = TextMeasurer.Measure(rankText, fontSpan); // find the width of the rank text
-            var epSize = TextMeasurer.Measure(epText, fontSpan); // find the width of the EP text
+            var rankSize = TextMeasurer.Measure(rankText, font, 72); // find the width of the rank text
+            var epSize = TextMeasurer.Measure(epText, font, 72); // find the width of the EP text
 
             var left = posRank.X + rankSize.Width; // find the point the rankText stops
             var right = posEP.X - epSize.Width; // find the point the epText starts

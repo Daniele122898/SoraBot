@@ -123,7 +123,7 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                                     Author = new EmbedAuthorBuilder()
                                     {
                                         IconUrl =
-                                            msg.Author.GetAvatarUrl(),
+                                            new Uri(msg.Author.GetAvatarUrl()),
                                         Name =
                                             $"{msg.Author.Username}#{msg.Author.Discriminator}"
                                     },
@@ -142,11 +142,11 @@ namespace Sora_Bot_1.SoraBot.Services.StarBoradService
                                     Color = new Color(4, 97, 247),
                                     Timestamp = DateTimeOffset.UtcNow,
                                     ImageUrl =
-                                    msg.Attachments.FirstOrDefault().Url,
+                                    new Uri(msg.Attachments.FirstOrDefault().Url),
                                     Author = new EmbedAuthorBuilder()
                                     {
                                         IconUrl =
-                                            msg.Author.GetAvatarUrl(),
+                                            new Uri(msg.Author.GetAvatarUrl()),
                                         Name =
                                             $"{msg.Author.Username}#{msg.Author.Discriminator}"
                                     },

@@ -62,7 +62,7 @@ namespace Sora_Bot_1.SoraBot.Services.Weather
         public EmbedBuilder GetEmbed() =>
             new EmbedBuilder()
             .WithColor(new Color(4, 97, 247))
-            .WithAuthor(x => { x.Name = "OpenWeatherMap"; x.IconUrl = "https://pbs.twimg.com/profile_images/720298646630084608/wb7LSoAc.jpg"; })
+            .WithAuthor(x => { x.Name = "OpenWeatherMap"; x.IconUrl = new Uri("https://pbs.twimg.com/profile_images/720298646630084608/wb7LSoAc.jpg"); })
             .AddField(x => x.WithName("Country 🗾").WithValue($"{name} , {sys.country}").WithIsInline(true))
             .AddField(x => x.WithName("Lat / Long 🗺").WithValue($"{coord.lat} / {coord.lon}").WithIsInline(true))
             .AddField(x => x.WithName("Condition 🌥️").WithValue(String.Join(", ", weather.Select(w => w.main))).WithIsInline(true))

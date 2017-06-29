@@ -511,7 +511,7 @@ namespace Sora_Bot_1.SoraBot.Services
                             Footer = new EmbedFooterBuilder()
                             {
                                 Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
-                                IconUrl = Context.User.GetAvatarUrl()
+                                IconUrl = new Uri(Context.User.GetAvatarUrl())
                             }
                         };
 
@@ -618,7 +618,7 @@ namespace Sora_Bot_1.SoraBot.Services
                             Footer = new EmbedFooterBuilder()
                             {
                                 Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
-                                IconUrl = Context.User.GetAvatarUrl()
+                                IconUrl = new Uri(Context.User.GetAvatarUrl())
                             }
                         };
 

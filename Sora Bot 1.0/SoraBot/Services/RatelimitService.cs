@@ -33,7 +33,7 @@ namespace Sora_Bot_1.SoraBot.Services
                             if (!userStruct.messageSent)
                             {
                                 userStruct.timeBetween = Environment.TickCount + timeToAdd;
-                                await (await user.CreateDMChannelAsync()).SendMessageAsync(
+                                await (await user.GetOrCreateDMChannelAsync()).SendMessageAsync(
                                     "**You have been ratelimited for 20 seconds. Please do not spam commands or stars! If you continue doing so your lockout will increase in time!**\n" +
                                     "If this was by mistake and you did not spam. join https://discord.gg/Pah4yj5 and @ me");
                                 userStruct.timeBetween += punishTime;
@@ -93,7 +93,7 @@ namespace Sora_Bot_1.SoraBot.Services
                             if (!userStruct.messageSent)
                             {
                                 userStruct.timeBetween = Environment.TickCount + timeToAdd;
-                                await (await user.CreateDMChannelAsync()).SendMessageAsync(
+                                await (await user.GetOrCreateDMChannelAsync()).SendMessageAsync(
                                     "**You have been ratelimited for 20 seconds. Please do not spam commands! If you continue doing so your lockout will increase in time!**\n" +
                                     "If this was by mistake and you did not spam. join https://discord.gg/Pah4yj5 and @ me");
                                 userStruct.timeBetween += punishTime;

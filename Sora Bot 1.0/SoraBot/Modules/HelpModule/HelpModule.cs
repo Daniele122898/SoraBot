@@ -71,7 +71,7 @@ namespace Sora_Bot_1.SoraBot.Modules.HelpModule
             }
             else
             {
-                //await (await Context.User.CreateDMChannelAsync()).SendMessageAsync("",false,eb);
+                //await (await Context.User.GetOrCreateDMChannelAsync()).SendMessageAsync("",false,eb);
                 await Context.Channel.SendMessageAsync($"{Context.User.Mention} help can be found here <http://git.argus.moe/serenity/SoraBot/wikis/sora-help>");
             }
         }

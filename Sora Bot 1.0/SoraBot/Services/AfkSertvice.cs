@@ -96,7 +96,7 @@ namespace Sora_Bot_1.SoraBot.Services
                         Color = new Color(4, 97, 247),
                         Author = new EmbedAuthorBuilder()
                         {
-                            IconUrl = u.GetAvatarUrl(),
+                            IconUrl = new Uri(u.GetAvatarUrl()),
                             Name = $"{u.Username} is currently AFK"
                         },
                         Description = str.message

@@ -131,7 +131,7 @@ namespace Sora_Bot_1.SoraBot.Services
                     eb.WithFooter(x =>
                     {
                         x.Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}";
-                        x.IconUrl = Context.User.GetAvatarUrl();
+                        x.IconUrl = new Uri(Context.User.GetAvatarUrl());
                     });
                     eb.Build();
 
@@ -213,7 +213,7 @@ namespace Sora_Bot_1.SoraBot.Services
                     eb.WithFooter(x =>
                     {
                         x.Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}";
-                        x.IconUrl = Context.User.GetAvatarUrl();
+                        x.IconUrl = new Uri(Context.User.GetAvatarUrl());
                     });
 
                     //.AddField(efb => efb.WithName("Japanese Name").WithValue(name_japanese).WithIsInline(true));
@@ -314,7 +314,7 @@ namespace Sora_Bot_1.SoraBot.Services
                     var eb = animeDa.GetEmbed();
                     eb.WithFooter(x => {
                         x.Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}";
-                        x.IconUrl = Context.User.GetAvatarUrl();
+                        x.IconUrl = new Uri(Context.User.GetAvatarUrl());
                     });
                     eb.Build();
 
@@ -350,12 +350,12 @@ namespace Sora_Bot_1.SoraBot.Services
                 .WithAuthor(x =>
                 {
                     x.Name = "Anilist";
-                    x.IconUrl = "https://anilist.co/img/logo_al.png";
+                    x.IconUrl = new Uri("https://anilist.co/img/logo_al.png");
                 })
                 .WithTitle($"{name_first} {name_last}")
-                .WithUrl(Link)
+                .WithUrl(new Uri(Link))
                 .WithDescription($"{(String.IsNullOrWhiteSpace(Synopsis)? "No Info found!": "")}" + Synopsis.Replace("<br>", Environment.NewLine))
-                .WithImageUrl(image_url_lge);
+                .WithImageUrl(new Uri(image_url_lge));
 
     }
 
@@ -377,11 +377,11 @@ namespace Sora_Bot_1.SoraBot.Services
         public EmbedBuilder GetEmbed() =>
             new EmbedBuilder()
             .WithColor(new Color(4, 97, 247))
-            .WithAuthor(x => { x.Name = "Anilist"; x.IconUrl = "https://anilist.co/img/logo_al.png"; })
+            .WithAuthor(x => { x.Name = "Anilist"; x.IconUrl = new Uri("https://anilist.co/img/logo_al.png"); })
             .WithTitle(title_english)
-            .WithUrl(Link)
+            .WithUrl(new Uri(Link))
             .WithDescription(Synopsis.Replace("<br>", Environment.NewLine))
-            .WithImageUrl(image_url_lge)
+            .WithImageUrl(new Uri(image_url_lge))
             .AddField(efb => efb.WithName("Chapters").WithValue(total_chapters.ToString()).WithIsInline(true))
             .AddField(efb => efb.WithName("Status").WithValue(publishing_status.ToString()).WithIsInline(true))
             .AddField(efb => efb.WithName("Genres").WithValue(String.Join(", ", Genres)).WithIsInline(true))
@@ -408,11 +408,11 @@ namespace Sora_Bot_1.SoraBot.Services
         public EmbedBuilder GetEmbed() =>
             new EmbedBuilder()
             .WithColor(new Color(4, 97, 247))
-            .WithAuthor(x => { x.Name = "Anilist"; x.IconUrl = "https://anilist.co/img/logo_al.png"; })
+            .WithAuthor(x => { x.Name = "Anilist"; x.IconUrl = new Uri("https://anilist.co/img/logo_al.png"); })
             .WithTitle(title_english)
-            .WithUrl(Link)
+            .WithUrl(new Uri(Link))
             .WithDescription(Synopsis.Replace("<br>", Environment.NewLine))
-            .WithImageUrl(image_url_lge)
+            .WithImageUrl(new Uri(image_url_lge))
             .AddField(efb => efb.WithName("Episodes").WithValue(total_episodes.ToString()).WithIsInline(true))
             .AddField(efb => efb.WithName("Status").WithValue(AiringStatus.ToString()).WithIsInline(true))
             .AddField(efb => efb.WithName("Genres").WithValue(String.Join(",", Genres)).WithIsInline(true))

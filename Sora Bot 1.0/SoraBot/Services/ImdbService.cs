@@ -29,7 +29,7 @@ namespace Sora_Bot_1.SoraBot.Services
                     var eb = movie.GetEmbed();
                     eb.WithFooter(x => {
                         x.Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}";
-                        x.IconUrl = Context.User.GetAvatarUrl();
+                        x.IconUrl = new Uri(Context.User.GetAvatarUrl());
                     });
                     eb.Build();
                     await Context.Channel.SendMessageAsync("", false, eb);
@@ -75,9 +75,9 @@ namespace Sora_Bot_1.SoraBot.Services
         public EmbedBuilder GetEmbed() =>
             new EmbedBuilder()
             .WithColor(new Color(4, 97, 247))
-            .WithAuthor(x => { x.Name = "IMDb"; x.IconUrl = "http://image.prntscr.com/image/6fdc466f14524542afbd3f923a4595ee.png"; })
+            .WithAuthor(x => { x.Name = "IMDb"; x.IconUrl = new Uri("http://image.prntscr.com/image/6fdc466f14524542afbd3f923a4595ee.png"); })
             .WithTitle(Title)
-            .WithUrl($"http://www.imdb.com/title/{ImdbId}/")
+            .WithUrl(new Uri($"http://www.imdb.com/title/{ImdbId}/"))
             .WithDescription(Plot)
             .AddField(x => x.WithName("Rating").WithValue(ImdbRating).WithIsInline(true))
             .AddField(x => x.WithName("Genre").WithValue(Genre).WithIsInline(true))
@@ -85,6 +85,6 @@ namespace Sora_Bot_1.SoraBot.Services
             .AddField(x => x.WithName("Director").WithValue(Director).WithIsInline(true))
             .AddField(x => x.WithName("Writer").WithValue(Writer).WithIsInline(true))
             .AddField(x => x.WithName("Type").WithValue(type).WithIsInline(true))
-            .WithImageUrl(Poster);
+            .WithImageUrl(new Uri(Poster));
     }
 }
