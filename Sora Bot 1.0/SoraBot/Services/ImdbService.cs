@@ -101,7 +101,14 @@ namespace Sora_Bot_1.SoraBot.Services
     {
         private const string simpleQuery = "https://api.themoviedb.org/3/search/movie?api_key={0}&query={1}";
         private const string precQuery = "https://api.themoviedb.org/3/movie/{0}?api_key={1}";
-        private static string apiKey = "1a5208c03548341994368d020ade877f";
+        private static string apiKey = "";
+
+        static TheMovieDbProvider()
+        {
+            var configDict = ConfigService.ConfigService.getConfig();
+            if(!configDict.TryGetValue("movieDB", out apiKey))
+                Console.WriteLine("COULDNT GET MOVIEDB API KEY FROM CONFIG!");
+        }
 
         public static async Task<Results[]> FindMovie(string name)
         {
