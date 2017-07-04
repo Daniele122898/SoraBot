@@ -4,17 +4,16 @@ https://discordapp.com/oauth2/authorize?client_id=270931284489011202&scope=bot&p
 ## Major Changelogs (check frequent one with ´$changelog´)
 
 **Version**
-0.1.3.0.0
+0.1.5
 
 **Date**
-17.4.2017 20:00 UTC +2
+4.7.2017 16:00 UTC +2
 
 **Changes**
-  - Added Reminders!
-  - Removed R rated content 
-    from gif search
-  - Fixed crucial Mod service bug
-  - Fixed some starboard bugs
+  - Reworked the enitre image processing
+  - Updated new discord.net version
+  - Reworked the Imdb and movie search
+  - fixed some bugs :eyes:
 	  
 	  
 # Help => Can be found in Wiki as well (updated more frequently)
@@ -161,6 +160,28 @@ Example: `$a welcome Welcome {user} to {server} you are our {count}th member!`
 | `t taglist`  	| *none*                   	| `$t taglist`                             	| This will list all tags in the Guild                                                                                                                                                            	|
 | `t`          	| tagname                  	| `$t test`                                	| This will post the value of the specified tag                                                                                                                                                   	|
 | `t restrict` 	| [permission to restrict] 	| `$t restrict Administrator`              	| Restricts the Tag Command to the specified permissions (If no permission is entered the restriction will be removed!) => `ManageChannels , Administrator, KickMembers, BanMembers, ManageGuild` 	|
+
+## Marriages
+
+**GENERAL** Marriages are global and limited to 10!
+
+| Command     | Parameter | Example                   | Output                                                                                                                    |
+|-------------|-----------|---------------------------|---------------------------------------------------------------------------------------------------------------------------|
+| `marry`     | @user     | `$marry @Serenity#0783`   | The mentioned user has to answer with "yes" so that you can get married. Marriages are global and limited to 10 marriages |
+| `divorce`   | @user     | `$divorce @Serenity#0783` | Divorce yourself from a user you are married to.                                                                          |
+| `marriages` | [@user]   | `$rmremind`               | Check your or another users' marriages                                                                                    |
+
+## Blacklist
+
+**GENERAL** This allows you to blacklist users in your guild from further using Sora
+
+**ATTENTION** For ALL commands you need Administrator permissions!
+
+| Command         | Parameter | Example                       | Output                                                                                    |
+|-----------------|-----------|-------------------------------|-------------------------------------------------------------------------------------------|
+| `blacklist`     | @user     | `$blacklist @Serenity#0783`   | Blacklists the specified user preventing him from using Sora any further in the guild     |
+| `rmblacklist`   | @user     | `$rmblacklist @Serenity#0783` | Removes the specified user from the blacklist allowing him to use Sora again in the guild |
+| `showblacklist` | *none*    | `$rmremind`                   | Shows all the blacklisted users in the guild                                              |
 
 ## Starboard
 
