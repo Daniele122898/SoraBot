@@ -13,6 +13,27 @@ Desktop.ini
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
 
+\Sora Bot 1.0\Bakcup2
+\Sora Bot 1.0\BackUP
+\Sora Bot 1.0\fonts
+
+\Bakcup2
+\BackUP
+\fonts
+
+/Bakcup2/
+/BackUP/
+/fonts/
+
+Bakcup2/
+BackUP/
+fonts/
+
+Sora Bot 1.0/Bakcup2/
+Sora Bot 1.0/BackUP/
+Sora Bot 1.0/fonts/
+
+
 token.txt
 token2.txt
 guildlist.txt
@@ -24,6 +45,10 @@ guildlist.txt
 *.msm
 *.msp
 *.png
+*.txt
+*.html
+*.asc
+*.webm
 
 # Windows shortcuts
 *.lnk
