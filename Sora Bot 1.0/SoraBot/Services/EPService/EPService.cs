@@ -143,7 +143,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     Console.WriteLine("DONE BG STREAM");
                 }
 
-                Configuration.Default.AddImageFormat(new PngFormat());
+                Configuration.Default.AddImageFormat(ImageFormats.Png);
 
                 using (var input = ImageSharp.Image.Load($"{Context.User.Id}BG.jpg"))
                 {
@@ -264,12 +264,12 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 var eb = new EmbedBuilder()
                 {
                     Color = new Discord.Color(4, 97, 247),
-                    ThumbnailUrl = new Uri(Context.Guild.IconUrl),
+                    ThumbnailUrl =  (Context.Guild.IconUrl),
                     Title = $"Top 10 in {guild.Name} (Global EP)",
                     Footer = new EmbedFooterBuilder()
                     {
                         Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
-                        IconUrl = new Uri(Context.User.GetAvatarUrl())
+                        IconUrl =  (Context.User.GetAvatarUrl())
                     }
                 };
                 int rank = 1;
@@ -379,7 +379,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                 AvatarUrl =
                     "http://is2.mzstatic.com/image/pf/us/r30/Purple7/v4/89/51/05/89510540-66df-9f6f-5c91-afa5e48af4e8/mzl.sbwqpbfh.png";
 
-            Uri requestUri = new Uri(AvatarUrl);
+            Uri requestUri =  new Uri(AvatarUrl);
 
             if (File.Exists($"{userInfo.Id}Avatar.png"))
             {

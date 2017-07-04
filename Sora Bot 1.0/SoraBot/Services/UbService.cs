@@ -25,7 +25,7 @@ namespace Sora_Bot_1.SoraBot.Services
                 var eb = ub.GetEmbed();
                 eb.WithFooter(x => {
                     x.Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}";
-                    x.IconUrl = new Uri(Context.User.GetAvatarUrl());
+                    x.IconUrl =  (Context.User.GetAvatarUrl());
                 });
                 eb.Build();
                 
@@ -48,10 +48,10 @@ namespace Sora_Bot_1.SoraBot.Services
         public EmbedBuilder GetEmbed() =>
             new EmbedBuilder()
             .WithColor(new Color(4, 97, 247))
-            .WithAuthor(x => { x.Name = "Urban Dictionary"; x.IconUrl = new Uri("https://lh5.ggpht.com/oJ67p2f1o35dzQQ9fVMdGRtA7jKQdxUFSQ7vYstyqTp-Xh-H5BAN4T5_abmev3kz55GH=w300"); })
+            .WithAuthor(x => { x.Name = "Urban Dictionary"; x.IconUrl =  ("https://lh5.ggpht.com/oJ67p2f1o35dzQQ9fVMdGRtA7jKQdxUFSQ7vYstyqTp-Xh-H5BAN4T5_abmev3kz55GH=w300"); })
             .WithTitle($"Definition of {list[0].word}")
             .WithDescription(list[0].definition)
-            .WithUrl(new Uri(list[0].permalink))
+            .WithUrl( (list[0].permalink))
             .AddField(x => x.WithName("Examples").WithValue(list[0].example).WithIsInline(false))
             .AddField(x => x.WithName("Author").WithValue(list[0].author).WithIsInline(true))
             .AddField(x => x.WithName("Stats").WithValue($"{list[0].thumbs_up} :thumbsup:\t{list[0].thumbs_down} :thumbsdown:").WithIsInline(true))

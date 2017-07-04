@@ -80,14 +80,14 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
             var ebn = new EmbedBuilder()
             {
                 Color = new Color(4, 97, 247),
-                ThumbnailUrl = new Uri(Context.Client.CurrentUser.GetAvatarUrl()),
+                ThumbnailUrl =  (Context.Client.CurrentUser.GetAvatarUrl()),
                 Footer = new EmbedFooterBuilder()
                 {
                     Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
-                    IconUrl = new Uri(Context.User.GetAvatarUrl())
+                    IconUrl =  (Context.User.GetAvatarUrl())
                 },
                 Title = "**Sora Info**",
-                Url = new Uri("http://git.argus.moe/serenity/SoraBot")
+                Url =  ("http://git.argus.moe/serenity/SoraBot")
             };
             ebn.AddField((x) =>
             {
@@ -190,13 +190,13 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
             var eb = new EmbedBuilder()
             {
                 Color = new Color(4, 97, 247),
-                ThumbnailUrl = new Uri(avatarURL),
+                ThumbnailUrl =  (avatarURL),
                 Title = $"{userInfo.Username}#{userInfo.Discriminator} Guild Permissions",
                 Description = $"{(String.IsNullOrWhiteSpace(permissions) ? "*none*" : permissions)}",
                 Footer = new EmbedFooterBuilder()
                 {
                     Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
-                    IconUrl = new Uri(Context.User.GetAvatarUrl())
+                    IconUrl =  (Context.User.GetAvatarUrl())
                 }
             };
             await ReplyAsync("", embed: eb);
@@ -222,13 +222,13 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                 var eb = new EmbedBuilder()
                 {
                     Color = new Color(4, 97, 247),
-                    ThumbnailUrl = new Uri(avatarURL),
+                    ThumbnailUrl =  (avatarURL),
                     Title = $"{userInfo.Username}",
                     Description = $"Joined Discord on {userInfo.CreatedAt.ToString().Remove(userInfo.CreatedAt.ToString().Length - 6)}. That is {(int)(DateTime.Now.Subtract(userInfo.CreatedAt.DateTime).TotalDays)} days ago!", //{(int)(DateTime.Now.Subtract(Context.Guild.CreatedAt.DateTime).TotalDays)}
                     Footer = new EmbedFooterBuilder()
                     {
                         Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator} | {userInfo.Username} ID: {userInfo.Id}",
-                        IconUrl = new Uri(Context.User.GetAvatarUrl())
+                        IconUrl =  (Context.User.GetAvatarUrl())
                     }
                 };
                 var socketUser = userInfo as SocketGuildUser;
@@ -346,13 +346,13 @@ namespace Sora_Bot_1.SoraBot.Modules.InfoModule
                 var eb = new EmbedBuilder()
                 {
                     Color = new Color(4, 97, 247),
-                    ThumbnailUrl = new Uri(avatarURL),
+                    ThumbnailUrl =  (avatarURL),
                     Title = $"{Context.Guild.Name} info",
                     Description = $"Created on {Context.Guild.CreatedAt.ToString().Remove(Context.Guild.CreatedAt.ToString().Length - 6)}. That's {(int)(DateTime.Now.Subtract(Context.Guild.CreatedAt.DateTime).TotalDays)} days ago!",
                     Footer = new EmbedFooterBuilder()
                     {
                         Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator} | Guild ID: {Context.Guild.Id}",
-                        IconUrl = new Uri(Context.User.GetAvatarUrl())
+                        IconUrl =  (Context.User.GetAvatarUrl())
                     }
                 };
                 var guild = ((SocketGuild)Context.Guild);

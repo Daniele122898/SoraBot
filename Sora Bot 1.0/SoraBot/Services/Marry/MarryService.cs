@@ -166,11 +166,11 @@ namespace Sora_Bot_1.SoraBot.Services.Marry
                 Footer = new EmbedFooterBuilder()
                 {
                     Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
-                    IconUrl = new Uri(Context.User.GetAvatarUrl())
+                    IconUrl =  (Context.User.GetAvatarUrl())
                 },
                 Title = $"Marriages of {user.Username}#{user.Discriminator}",
                 Description = "\n",
-                ThumbnailUrl = new Uri(user.GetAvatarUrl())
+                ThumbnailUrl =  (user.GetAvatarUrl())
             };
 
             foreach (var marry in marryData)

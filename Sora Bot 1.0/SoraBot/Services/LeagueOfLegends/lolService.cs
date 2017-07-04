@@ -59,9 +59,9 @@ namespace Sora_Bot_1.SoraBot.Services.LeagueOfLegends
                         Author = new EmbedAuthorBuilder
                         {
                             Name = "League of Legends",
-                            IconUrl = new Uri("https://yt3.ggpht.com/-AEerXPqHm3M/AAAAAAAAAAI/AAAAAAAAAAA/S8WpkwxItLQ/s900-c-k-no-mo-rj-c0xffffff/photo.jpg")
+                            IconUrl =  ("https://yt3.ggpht.com/-AEerXPqHm3M/AAAAAAAAAAI/AAAAAAAAAAA/S8WpkwxItLQ/s900-c-k-no-mo-rj-c0xffffff/photo.jpg")
                         },
-                        ThumbnailUrl = new Uri($"http://avatar.leagueoflegends.com/{region}/{search}.png")
+                        ThumbnailUrl =  ($"http://avatar.leagueoflegends.com/{region}/{search}.png")
                     };
                     var rankedsolo5v5 = data.playerStatSummaries.Where(x => x.playerStatSummaryType == "RankedSolo5x5").FirstOrDefault();
                     if (rankedsolo5v5 != null)
@@ -149,9 +149,9 @@ namespace Sora_Bot_1.SoraBot.Services.LeagueOfLegends
                     Author = new EmbedAuthorBuilder
                     {
                         Name = "League of Legends",
-                        IconUrl = new Uri("https://yt3.ggpht.com/-AEerXPqHm3M/AAAAAAAAAAI/AAAAAAAAAAA/S8WpkwxItLQ/s900-c-k-no-mo-rj-c0xffffff/photo.jpg")
+                        IconUrl =  ("https://yt3.ggpht.com/-AEerXPqHm3M/AAAAAAAAAAI/AAAAAAAAAAA/S8WpkwxItLQ/s900-c-k-no-mo-rj-c0xffffff/photo.jpg")
                     },
-                    ThumbnailUrl = new Uri($"http://avatar.leagueoflegends.com/{region}/{search}.png")
+                    ThumbnailUrl =  ($"http://avatar.leagueoflegends.com/{region}/{search}.png")
                 };
 
                 eb.AddField((x) =>

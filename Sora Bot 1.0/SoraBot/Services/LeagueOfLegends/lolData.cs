@@ -40,7 +40,7 @@ namespace Sora_Bot_1.SoraBot.Services.LeagueOfLegends
         public EmbedBuilder GetEmbed() =>
            new EmbedBuilder()
             .WithColor(new Color(4, 97, 247))
-            .WithAuthor(x => { x.Name = "League of Legends"; x.IconUrl = new Uri("https://yt3.ggpht.com/-AEerXPqHm3M/AAAAAAAAAAI/AAAAAAAAAAA/S8WpkwxItLQ/s900-c-k-no-mo-rj-c0xffffff/photo.jpg"); })
+            .WithAuthor(x => { x.Name = "League of Legends"; x.IconUrl =  ("https://yt3.ggpht.com/-AEerXPqHm3M/AAAAAAAAAAI/AAAAAAAAAAA/S8WpkwxItLQ/s900-c-k-no-mo-rj-c0xffffff/photo.jpg"); })
             .AddField(x => x.WithName("Name").WithValue($"{name}").WithIsInline(true))
             .AddField(x => x.WithName("Level").WithValue($"{summonerLevel}").WithIsInline(true))
             .AddField(x => x.WithName("ID").WithValue($"id{id}").WithIsInline(true));

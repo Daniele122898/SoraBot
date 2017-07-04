@@ -173,7 +173,7 @@ namespace Sora_Bot_1.SoraBot.Services.UserBlacklist
                     Title = $"Blacklisted Users in {Context.Guild.Name}",
                     Footer = new EmbedFooterBuilder
                     {
-                        IconUrl = new Uri(Context.User.GetAvatarUrl()),
+                        IconUrl =  (Context.User.GetAvatarUrl()),
                         Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}"
                     }
                 };

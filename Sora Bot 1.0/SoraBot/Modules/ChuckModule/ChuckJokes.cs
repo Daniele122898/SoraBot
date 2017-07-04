@@ -33,8 +33,8 @@ namespace Sora_Bot_1.SoraBot.Modules.ChuckModule
         public EmbedBuilder GetEmbed() =>
             new EmbedBuilder()
             .WithColor(new Color(4, 97, 247))
-            .WithAuthor(x => { x.Name = "Chuck Norris"; x.IconUrl = new Uri($"{icon_url}"); })
-            .WithUrl(new Uri($"{url}"))
+            .WithAuthor(x => { x.Name = "Chuck Norris"; x.IconUrl =  ($"{icon_url}"); })
+            .WithUrl( ($"{url}"))
             .WithDescription($"{value}");
     }
 }

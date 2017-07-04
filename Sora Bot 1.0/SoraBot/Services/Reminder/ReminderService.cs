@@ -200,7 +200,7 @@ namespace Sora_Bot_1.SoraBot.Services.Reminder
                 var eb = new EmbedBuilder()
                 {
                     Color = new Color(4, 97, 247),
-                    ThumbnailUrl = new Uri(Context.User.GetAvatarUrl()),
+                    ThumbnailUrl =  (Context.User.GetAvatarUrl()),
                     Title = $"{Context.User.Username}, your Reminders are"
                 };
                 for (int i = 0; i < orderedList.Count && i<10; i++)

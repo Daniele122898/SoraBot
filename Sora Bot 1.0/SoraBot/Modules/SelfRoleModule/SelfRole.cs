@@ -83,7 +83,7 @@ namespace Sora_Bot_1.SoraBot.Modules.SelfRoleModule
                     Footer = new EmbedFooterBuilder()
                     {
                         Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
-                        IconUrl = new Uri(Context.User.GetAvatarUrl())
+                        IconUrl =  (Context.User.GetAvatarUrl())
                     },
                     Description = ""
                 };

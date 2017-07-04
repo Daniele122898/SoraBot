@@ -115,14 +115,14 @@
   <ItemGroup>
     <PackageReference Include="CoreCompat.System.Drawing" Version="1.0.0-beta006" />
     <PackageReference Include="Discord.Addons.InteractiveCommands" Version="1.2.4" />
-    <PackageReference Include="Discord.Net.Commands" Version="1.0.0-rc3-00772" />
-    <PackageReference Include="Discord.Net.Core" Version="1.0.0-rc3-00772" />
-    <PackageReference Include="Discord.Net.WebSocket" Version="1.0.0-rc3-00772" />
+    <PackageReference Include="Discord.Net.Commands" Version="1.0.1-build-00785" />
+    <PackageReference Include="Discord.Net.Core" Version="1.0.1-build-00785" />
+    <PackageReference Include="Discord.Net.WebSocket" Version="1.0.1-build-00785" />
     <PackageReference Include="Google.Apis" Version="1.27.1" />
     <PackageReference Include="Google.Apis.Auth" Version="1.27.1" />
     <PackageReference Include="Google.Apis.YouTube.v3" Version="1.27.1.760" />
-    <PackageReference Include="ImageSharp" Version="1.0.0-alpha9-00152" />
-    <PackageReference Include="ImageSharp.Drawing" Version="1.0.0-alpha9-00147" />
+    <PackageReference Include="ImageSharp" Version="1.0.0-alpha9-00169" />
+    <PackageReference Include="ImageSharp.Drawing" Version="1.0.0-alpha9-00164" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="1.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="1.0.1" />
     <PackageReference Include="Microsoft.NETCore.App" Version="1.1.0" />
