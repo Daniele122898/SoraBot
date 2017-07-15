@@ -200,12 +200,13 @@ You cannot star your own message. It will not be added to the starboard. Only di
 **PREFIX** This Command uses a module prefix. which means infront of all commands needs to be the prefix `p`!
 **GENERAL** You will gain EP by writing messages... duh.
 
-| Command       | Parameter       | Example                                           | Output                                                                                                                                  |
-|---------------|-----------------|---------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
-| `p`           | [@Mention user] | `$p / $p @Serenity#0783`                          | Creates a profile image showing the EP and Level of the User (If specified the mentioned user otherwise the invoking user)              |
-| `p subscribe` | *none*          | `$p subscribe`                                    | Toggles your lvl up notifies (If Sora will Message you when you level up. Standard : false)                                             |
-| `p top10`     | *none*          | `$p top10`                                        | Posts the top 10 list of users sorted by EP => The EP is globaly aquired on all Guilds that Sora is on!                                 |
-| `p setbg`     | [URL to Image]  | `$p setbg www.example.com/image.jpg` / `$p setbg` | Not specifing the URL will remove your set BG and reset to the default profile card. This feature requires you to have atleast lvl 20!  |
+| Command         | Parameter       | Example                                           | Output                                                                                                                                 |
+|-----------------|-----------------|---------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| `p`             | [@Mention user] | `$p / $p @Serenity#0783`                          | Creates a profile image showing the EP and Level of the User (If specified the mentioned user otherwise the invoking user)             |
+| `p subscribe`   | *none*          | `$p subscribe`                                    | Toggles your lvl up notifies (If Sora will Message you when you level up. Standard : false)                                            |
+| `p top10`       | *none*          | `$p top10`                                        | Posts the top 10 list of users sorted by EP => The EP is globaly aquired on all Guilds that Sora is on!                                |
+| `p globaltop10` | *none*          | `$p globaltop10`                                  | Posts a list of the top 10 users with the highest Global EP => they dont need to be in your guild like in the local top10 list!        |
+| `p setbg`       | [URL to Image]  | `$p setbg www.example.com/image.jpg` / `$p setbg` | Not specifing the URL will remove your set BG and reset to the default profile card. This feature requires you to have atleast lvl 20! |
 
 ## Help
 
