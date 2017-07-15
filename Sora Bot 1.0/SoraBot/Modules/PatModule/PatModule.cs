@@ -52,7 +52,6 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
             "https://media.giphy.com/media/du8yT5dStTeMg/giphy.gif",
             "https://media.giphy.com/media/kvKFM3UWg2P04/giphy.gif",
             "https://media.giphy.com/media/wnsgren9NtITS/giphy.gif",
-            "http://media.giphy.com/media/veU1qeC9SJiKY/giphy.gif",
             "https://cdn.discordapp.com/attachments/287369965252902931/298164710212108288/giphy_7.gif",
             "http://imgur.com/a/kVgsM"
         };
@@ -66,7 +65,8 @@ namespace Sora_Bot_1.SoraBot.Modules.PatModule
             "https://media.giphy.com/media/LXTQN2kRbaqAw/giphy.gif",
             "https://lh6.googleusercontent.com/-Rc6igf9sWvk/U1PkqRGRsiI/AAAAAAAAAPE/5WvzL636Cl4/w500-h281/13854_1235188662.gif",
             "http://i.imgur.com/VtWJ8ak.gif",
-            "https://31.media.tumblr.com/7c8457fd628f55b768ac2c6232a893cf/tumblr_mnycv2sm2f1r43mgoo1_500.gif"
+            "https://31.media.tumblr.com/7c8457fd628f55b768ac2c6232a893cf/tumblr_mnycv2sm2f1r43mgoo1_500.gif",
+            "https://images-ext-1.discordapp.net/external/A00hhizfYnErvzALZsK98HpgYQWIesG9CdMiRnCgeX8/http/imgur.com/bStOFsM.gif"
         };
 
         private string[] _slaps = new string[]

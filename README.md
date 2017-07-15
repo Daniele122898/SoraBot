@@ -100,7 +100,7 @@ They are shown in the list when you do `$rmremind` with less detail tho.
 ## Music
 
 **GENERAL** Sora can **FINALLY** play all sorts of sources. YT, Soundcloud, vimeo ~~and even youporn~~ :eyes:  Have fun :) 
-**ATTENTION** Sora can now add yt videos by NAME. use `$addyt <name>` for this new feature.
+**ATTENTION** Sora can now add yt videos by NAME. use `$add <name>` for this new feature.
 
 | Command                | Parameter                             | Example                                                                  | Output                                                                                                   |
 |------------------------|---------------------------------------|--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|

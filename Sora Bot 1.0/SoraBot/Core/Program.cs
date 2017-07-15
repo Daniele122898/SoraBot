@@ -76,12 +76,12 @@ namespace Sora_Bot_1.SoraBot.Core
             var services = ConfigureServices();
             services.GetRequiredService<LogService>();
             await services.GetRequiredService<CommandHandlingService>().InitializeAsync(services);
-
+            
             //configure the client to use a bot token and use our token
             await client.LoginAsync(TokenType.Bot, token);
             //connect the cline tot discord gateway
             await client.StartAsync();
-
+            
             //commands = new CommandHandler();
             //await commands.Install(client);
              

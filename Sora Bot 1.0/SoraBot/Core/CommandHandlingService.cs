@@ -101,6 +101,18 @@ namespace Sora_Bot_1.SoraBot.Core
             _discord.GuildAvailable += Client_GuildAvailable;
             _discord.JoinedGuild += Client_JoinedGuild;
             _discord.LeftGuild += Client_LeftGuild;
+            
+            //CommandService
+            _commands.Log += CommandsOnLog;
+            
+        }
+
+        private async Task CommandsOnLog(LogMessage logMessage)
+        {
+            await SentryService.SendMessage($"Severity: {logMessage.Severity}\n" +
+                                            $"Source: {logMessage.Source}");
+            await SentryService.SendMessage($"Exception: {logMessage.Exception}\n" +
+                                            $"Message: {logMessage.Message}\n");
         }
 
 
@@ -302,7 +314,7 @@ namespace Sora_Bot_1.SoraBot.Core
 
 
             var result = await _commands.ExecuteAsync(context, argPos, _provider);
-
+            
             if (result.IsSuccess)
             {
                 //await ratelimitService.checkRatelimit(context.User);

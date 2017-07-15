@@ -9,6 +9,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -199,14 +200,73 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
             }
         }
 
+        public async Task ShowTop10Global(SocketCommandContext Context)
+        {
+            try
+            {
+                //GLOBAL EP LIST
+                var globalSortedList = userEPDict.OrderByDescending(pair => pair.Value.ep)
+                    .ToDictionary(pair => pair.Key, pair => pair.Value.ep);
+                
+                //var top10 = globalSortedList.Take(10);
+                
+                //CREATE TOP 10
+                var eb = new EmbedBuilder()
+                {
+                    Color = new Discord.Color(4, 97, 247),
+                    ThumbnailUrl =  (Context.Guild.IconUrl),
+                    Title = $"Top 10 Globally",
+                    Footer = new EmbedFooterBuilder()
+                    {
+                        Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
+                        IconUrl =  Context.User.GetAvatarUrl()
+                    }
+                };
+                int rank = 1;
+                int count = 0;
+                foreach (var u in globalSortedList)
+                {
+                    if(count>= 10)
+                        break;
+                    var us =Context.Client.GetUser(u.Key);
+                    if(us == null)
+                        continue;
+                    count++;
+                    int level = (int) Math.Round(0.15F * Math.Sqrt(u.Value));
+                    eb.AddField((x) =>
+                    {
+                        x.Name = $"{rank}. {us.Username}#{us.Discriminator}";
+                        x.IsInline = false;
+                        x.Value = $"Lvl. {level} \tEP: {u.Value}";
+                    });
+                    rank++;
+                }
+                var ep = globalSortedList[Context.User.Id];
+                int lvl =
+                    (int)
+                    Math.Round(0.15F * Math.Sqrt(ep));
+                eb.AddField((x) =>
+                {
+                    x.Name = $"Your Rank: {(GetIndex(globalSortedList, Context.User.Id)) + 1}"; //
+                    x.IsInline = false;
+                    x.Value =
+                        $"Level: {lvl} \tEP: {ep}";
+                });
+                await Context.Channel.SendMessageAsync("", false, eb);
+            }
+            catch (Exception e)
+            {
+                await SentryService.SendError(e, Context);
+            }
+        }
+
         public async Task shotTop10(SocketCommandContext Context)
         {
             try
             {
 
                 //GET RANK
-
-                var guild = ((SocketGuild)Context.Guild);
+                var guild = Context.Guild;
                 //guild.DownloadUsersAsync();
 
                 if (guild.MemberCount < 200)
@@ -259,12 +319,18 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                  * var top5 = dict.OrderByDescending(pair => pair.Value).Take(5)
                .ToDictionary(pair => pair.Key, pair => pair.Value);
                */
+                
+                
+                //GLOBAL EP LIST
+                var globalSortedList = userEPDict.OrderByDescending(pair => pair.Value.ep)
+                    .ToDictionary(pair => pair.Key, pair => pair.Value.ep);
+                
 
                 //CREATE TOP 10
                 var eb = new EmbedBuilder()
                 {
                     Color = new Discord.Color(4, 97, 247),
-                    ThumbnailUrl =  (Context.Guild.IconUrl),
+                    ThumbnailUrl =  Context.Guild.IconUrl,
                     Title = $"Top 10 in {guild.Name} (Global EP)",
                     Footer = new EmbedFooterBuilder()
                     {
@@ -281,7 +347,7 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     {
                         x.Name = $"{rank}. {us.Username}#{us.Discriminator}";
                         x.IsInline = false;
-                        x.Value = $"Lvl. {level} \tEP: {u.Value}";
+                        x.Value = $"Lvl. {level} \tEP: {u.Value} \tGlobal Rank: {GetIndex(globalSortedList, u.Key)+1}";
                     });
                     rank++;
                 }
@@ -291,10 +357,10 @@ namespace Sora_Bot_1.SoraBot.Services.EPService
                     Math.Round(0.15F * Math.Sqrt(sortedList[Context.User.Id]));
                 eb.AddField((x) =>
                 {
-                    x.Name = $"Your Rank: {index + 1}";
+                    x.Name = $"Your Rank: {index + 1}"; //
                     x.IsInline = false;
                     x.Value =
-                        $"Level: {lvl} \tEP: {sortedList[Context.User.Id]}";
+                        $"Level: {lvl} \tEP: {sortedList[Context.User.Id]} \tYour Global Rank: {GetIndex(globalSortedList, Context.User.Id)+1}";
                 });
                 await Context.Channel.SendMessageAsync("", false, eb);
             }

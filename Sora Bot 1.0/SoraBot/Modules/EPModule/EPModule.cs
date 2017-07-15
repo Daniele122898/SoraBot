@@ -26,6 +26,15 @@ namespace Sora_Bot_1.SoraBot.Modules.EPModule
         {
             await epService.shotTop10(Context);
         }
+        
+        [Command("globaltop10", RunMode = RunMode.Async),
+         Summary(
+             "Posts the top 10 list of users sorted by EP OF ALL USERS GLOBALLY")]
+        [Alias("globaltop", "global")]
+        public async Task Top10ListGLobal()
+        {
+            await epService.ShowTop10Global(Context);
+        }
 
         [Command("", RunMode = RunMode.Async), Summary("Displays short profile image of User, if not specified it will show yours")]
         public async Task SendProfile(
