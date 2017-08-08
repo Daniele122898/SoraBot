@@ -8,7 +8,7 @@
     Join Sora on Discord
     <br><br>
     <a href="https://discord.gg/Pah4yj5">
-        <img src="https://discordapp.com/api/guilds/281589163659362305/widget.png">
+        <img src="https://discordapp.com/api/guilds/281589163659362305/widget.png?style=banner2">
     </a>
 </p>
 
