@@ -2,6 +2,21 @@
 [![](http://i.imgur.com/nImGi6j.png)](https://discordapp.com/oauth2/authorize?client_id=270931284489011202&scope=bot&permissions=2146958463)
 [![](http://i.imgur.com/qR7CGSV.png)](http://git.argus.moe/serenity/SoraBot/wikis/sora-help)
 
+<hr/>
+
+<p align="center">
+    Join Sora on Discord
+    <br><br>
+    <a href="https://discord.gg/Pah4yj5">
+        <img src="https://discordapp.com/api/guilds/281589163659362305/widget.png">
+    </a>
+</p>
+
+<hr/>
+
+## Join our Discord
+[![](https://discordapp.com/api/guilds/281589163659362305/widget.png)](https://discordapp.com/api/guilds/281589163659362305/widget.png)
+
 ## Major Changelogs (check frequent one with ´$changelog´)
 
 **Version**
