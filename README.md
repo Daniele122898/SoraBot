@@ -14,9 +14,6 @@
 
 <hr/>
 
-## Join our Discord
-[![](https://discordapp.com/api/guilds/281589163659362305/widget.png)](https://discordapp.com/api/guilds/281589163659362305/widget.png)
-
 ## Major Changelogs (check frequent one with ´$changelog´)
 
 **Version**
