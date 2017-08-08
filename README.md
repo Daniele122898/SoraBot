@@ -1,5 +1,6 @@
-## Invite Sora
-https://discordapp.com/oauth2/authorize?client_id=270931284489011202&scope=bot&permissions=2146958463
+[![](http://i.imgur.com/6gQhMSB.png)](http://git.argus.moe/serenity/SoraBot-v2)
+[![](http://i.imgur.com/nImGi6j.png)](https://discordapp.com/oauth2/authorize?client_id=270931284489011202&scope=bot&permissions=2146958463)
+[![](http://i.imgur.com/qR7CGSV.png)](http://git.argus.moe/serenity/SoraBot/wikis/sora-help)
 
 ## Major Changelogs (check frequent one with ´$changelog´)
 
