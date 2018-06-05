@@ -1,6 +1,6 @@
-[![](http://i.imgur.com/6gQhMSB.png)](http://git.argus.moe/serenity/SoraBot-v2)
+[![](http://i.imgur.com/6gQhMSB.png)](http://argonaut.pw/Sora/)
 [![](http://i.imgur.com/nImGi6j.png)](https://discordapp.com/oauth2/authorize?client_id=270931284489011202&scope=bot&permissions=305523831)
-[![](http://i.imgur.com/qR7CGSV.png)](http://git.argus.moe/serenity/SoraBot/wikis/sora-help)
+[![](http://i.imgur.com/qR7CGSV.png)](http://git.argus.moe/serenity/SoraBot-v2/wikis/home)
 
 <hr/>
 
@@ -14,7 +14,7 @@
 
 <hr/>
 
-## Major Changelogs (check frequent one with ´$changelog´)
+## Major Changelogs (check frequent one with Â´$changelogÂ´)
 
 **Version**
 0.1.5
@@ -168,7 +168,7 @@ Example: `$a welcome Welcome {user} to {server} you are our {count}th member!`
 
 | Command      	| Parameter                	| Example                                  	| Output                                                                                                                                                                                          	|
 |--------------	|--------------------------	|------------------------------------------	|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|
-| `t create`   	| [tagname] ¦ [tagvalue]   	| `$t create test ¦ this will be displyed` 	| Creates a tag (THE SYMBOL BETWEEN THE NAME AND VALUE IS A PIPE! CANT USE IT IN THIS MARKDOWN TABLE :()                                                                                                                                                                                  	|
+| `t create`   	| [tagname] Â¦ [tagvalue]   	| `$t create test Â¦ this will be displyed` 	| Creates a tag (THE SYMBOL BETWEEN THE NAME AND VALUE IS A PIPE! CANT USE IT IN THIS MARKDOWN TABLE :()                                                                                                                                                                                  	|
 | `t remove`   	| tagname                  	| `$t remove test`                         	| Removes the specified tag => You either need to be the creator or the specified permission group to do that. (If not specified it's manage hannels)                                             	|
 | `t taglist`  	| *none*                   	| `$t taglist`                             	| This will list all tags in the Guild                                                                                                                                                            	|
 | `t`          	| tagname                  	| `$t test`                                	| This will post the value of the specified tag                                                                                                                                                   	|
@@ -247,7 +247,7 @@ You cannot star your own message. It will not be added to the starboard. Only di
 | `git`      | *none*          | `$git`                 | Will post a link to my gitlab page                                                |
 | `feedback` | *none*          | `$feedback / $bug`       | Posts a link to my discord in where you can report bugs or issue Feature requests |
 | `door`     | @mention        | `$door @Serenity#0783` | Shows the specified user the door. Mostly used after bad jokes                    |
-| `lenny`    | *none*          | `$lenny`               | Posts a nice lenny face ( ?° ?? ?°)                                                  |
+| `lenny`    | *none*          | `$lenny`               | Posts a nice lenny face ( ?Â° ?? ?Â°)                                                  |
 | `google`   | What to google  | `$google what is c#?`  | Googles something for you. Mostly used to google for others...                    |
 | `swag`     | *none*          | `$swag`                | Swags the chat                                                                    |
 | `about`    | *none*          | `$about`               | Gives infos about Sora and where he came from :)                                  |
